@@ -2,8 +2,8 @@
 
 import { Building2, Check, Star, Zap } from 'lucide-react'
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 import { useState } from 'react'
+import { useSupabase } from '@/components/providers/supabase-provider'
 import { Button } from '@/components/ui/button'
 import { PLAN_FEATURES, PLAN_PRICES } from '@/lib/constants'
 import { cn } from '@/lib/utils'
@@ -23,11 +23,11 @@ const billingDiscount: Record<Billing, string | null> = {
 }
 
 export default function PricingPage() {
-  const { data: session } = useSession()
+  const { user } = useSupabase()
   const [billing, setBilling] = useState<Billing>('month')
 
   const handleCheckout = async (plan: 'pro' | 'agency') => {
-    if (!session) {
+    if (!user) {
       window.location.href = '/auth/login?callbackUrl=/pricing'
       return
     }
@@ -149,7 +149,7 @@ export default function PricingPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {plans.map((plan) => {
-              const isCurrentPlan = session?.user?.plan === plan.id
+              const isCurrentPlan = user?.plan === plan.id
               const Icon = plan.icon
               return (
                 <div

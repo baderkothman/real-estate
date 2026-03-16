@@ -2,7 +2,6 @@
 
 import { AlertTriangle, PlusCircle, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
@@ -15,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useSupabase } from '@/components/providers/supabase-provider'
 import { CITIES_LEBANON, PLAN_LIMITS } from '@/lib/constants'
 
 const propertySchema = z.object({
@@ -35,7 +35,7 @@ const propertySchema = z.object({
 type FieldErrors = Partial<Record<string, string>>
 
 export default function CreatePropertyPage() {
-  const { data: session } = useSession()
+  const { user } = useSupabase()
   const router = useRouter()
 
   const [form, setForm] = useState({
@@ -54,9 +54,7 @@ export default function CreatePropertyPage() {
   const [serverError, setServerError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const planLimit = session?.user?.plan
-    ? PLAN_LIMITS[session.user.plan]
-    : PLAN_LIMITS.free
+  const planLimit = user?.plan ? PLAN_LIMITS[user.plan] : PLAN_LIMITS.free
 
   const setField = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }))

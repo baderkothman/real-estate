@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tail:*)",
+      "Bash(npm run:*)",
+      "Bash(echo not installed:*)",
+      "Bash(node:*)",
+      "Bash(npx node:*)",
+      "Bash(head:*)",
+      "Bash(sleep 5:*)",
+      "Bash(grep 3002:*)"
+    ]
+  }
+}

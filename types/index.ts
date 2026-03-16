@@ -8,7 +8,6 @@ export interface User {
   name: string
   email: string
   phone: string
-  passwordHash?: string
   profileImage?: string
   bio?: string
   plan: Plan

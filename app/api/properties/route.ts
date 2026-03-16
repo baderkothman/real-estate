@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { createClient } from '@/lib/supabase/server'
 import { PLAN_LIMITS } from '@/lib/constants'
 import {
   createProperty,
@@ -7,6 +7,7 @@ import {
   getProperties,
   getUserProperties,
 } from '@/services/property.service'
+import { getUserById } from '@/services/user.service'
 import type { ListingType, PropertyFilters } from '@/types'
 
 export async function GET(request: NextRequest) {
@@ -33,14 +34,21 @@ export async function GET(request: NextRequest) {
     search: searchParams.get('search') ?? undefined,
   }
 
-  const session = await auth()
-  const result = await getProperties(filters, page, pageSize, session?.user?.id)
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const result = await getProperties(filters, page, pageSize, user?.id)
   return NextResponse.json(result)
 }
 
 export async function POST(request: NextRequest) {
-  const session = await auth()
-  if (!session?.user) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -58,17 +66,21 @@ export async function POST(request: NextRequest) {
       images: string[]
     }
 
+    // Get user's plan from profiles
+    const profile = await getUserById(user.id)
+    const plan = profile?.plan ?? 'free'
+
     // Check plan limits
-    const userProps = await getUserProperties(session.user.id)
+    const userProps = await getUserProperties(user.id)
     const activeCount = userProps.filter(
       (p) => p.status !== 'rejected' && !p.isSold
     ).length
-    const limit = PLAN_LIMITS[session.user.plan]
+    const limit = PLAN_LIMITS[plan]
 
     if (activeCount >= limit.maxProperties) {
       return NextResponse.json(
         {
-          error: `You have reached the listing limit for your ${session.user.plan} plan (${limit.maxProperties} listings). Please upgrade to add more.`,
+          error: `You have reached the listing limit for your ${plan} plan (${limit.maxProperties} listings). Please upgrade to add more.`,
         },
         { status: 403 }
       )
@@ -76,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     const property = await createProperty({
       ...body,
-      userId: session.user.id,
+      userId: user.id,
     })
 
     return NextResponse.json(property, { status: 201 })

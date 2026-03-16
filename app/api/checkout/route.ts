@@ -1,11 +1,14 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { createClient } from '@/lib/supabase/server'
 import { getPriceId } from '@/lib/stripe'
 
 export async function POST(request: NextRequest) {
-  const session = await auth()
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session?.user) {
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -29,9 +32,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // In production with real Stripe keys:
     const stripe = (await import('@/lib/stripe')).stripe
-    const baseUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000'
+    const baseUrl = request.headers.get('origin') ?? 'http://localhost:3000'
 
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: 'subscription',
@@ -40,7 +42,7 @@ export async function POST(request: NextRequest) {
       success_url: `${baseUrl}/dashboard/profile?upgraded=1`,
       cancel_url: `${baseUrl}/pricing`,
       metadata: {
-        userId: session.user.id,
+        userId: user.id,
         plan,
         billing,
       },

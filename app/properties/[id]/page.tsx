@@ -21,7 +21,7 @@ import { PropertyCard } from '@/components/property/property-card'
 import { PropertyGallery } from '@/components/property/property-gallery'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { auth } from '@/lib/auth'
+import { createClient } from '@/lib/supabase/server'
 import {
   cn,
   formatDate,
@@ -53,15 +53,18 @@ export async function generateMetadata({
 
 export default async function PropertyPage({ params }: PropertyPageProps) {
   const { id } = await params
-  const session = await auth()
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  const property = await getPropertyById(id, session?.user?.id)
+  const property = await getPropertyById(id, user?.id)
   if (!property) notFound()
 
   const owner = await getUserById(property.userId)
   const similar = await getSimilarProperties(id, property.city)
 
-  const isOwner = session?.user?.id === property.userId
+  const isOwner = user?.id === property.userId
   const isApproved = property.status === 'approved'
 
   return (
@@ -268,7 +271,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                 {/* Contact — only for approved properties */}
                 {isApproved && (
                   <div className="space-y-2 border-t border-[rgba(34,24,18,0.08)] pt-4">
-                    {session ? (
+                    {user ? (
                       <>
                         <a
                           href={`mailto:${owner.email}`}
@@ -322,11 +325,11 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
             <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-5 text-center">
               <Heart className="h-6 w-6 text-[#fa6b05] mx-auto mb-3" />
               <p className="text-sm text-[#5f554d] mb-4">
-                {session
+                {user
                   ? 'Save this property to revisit it later.'
                   : 'Sign in to save this property to your list.'}
               </p>
-              {session ? (
+              {user ? (
                 <p className="text-xs text-[#8b8178]">
                   Use the heart icon on the listing card to save.
                 </p>

@@ -1,10 +1,11 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { createClient } from '@/lib/supabase/server'
 import {
   deleteProperty,
   getPropertyById,
   updateProperty,
 } from '@/services/property.service'
+import { getUserById } from '@/services/user.service'
 
 interface Params {
   params: Promise<{ id: string }>
@@ -12,8 +13,11 @@ interface Params {
 
 export async function GET(_request: NextRequest, { params }: Params) {
   const { id } = await params
-  const session = await auth()
-  const property = await getPropertyById(id, session?.user?.id)
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const property = await getPropertyById(id, user?.id)
 
   if (!property) {
     return NextResponse.json({ error: 'Property not found' }, { status: 404 })
@@ -24,9 +28,12 @@ export async function GET(_request: NextRequest, { params }: Params) {
 
 export async function PUT(request: NextRequest, { params }: Params) {
   const { id } = await params
-  const session = await auth()
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session?.user) {
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -35,8 +42,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Property not found' }, { status: 404 })
   }
 
-  // Only owner or admin can update
-  if (property.userId !== session.user.id && session.user.role !== 'admin') {
+  const profile = await getUserById(user.id)
+  if (property.userId !== user.id && profile?.role !== 'admin') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -54,9 +61,12 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
 export async function DELETE(_request: NextRequest, { params }: Params) {
   const { id } = await params
-  const session = await auth()
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session?.user) {
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -65,7 +75,8 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Property not found' }, { status: 404 })
   }
 
-  if (property.userId !== session.user.id && session.user.role !== 'admin') {
+  const profile = await getUserById(user.id)
+  if (property.userId !== user.id && profile?.role !== 'admin') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

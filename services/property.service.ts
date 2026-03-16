@@ -1,65 +1,76 @@
-import { mockProperties } from '@/data/mock-properties'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { ITEMS_PER_PAGE } from '@/lib/constants'
 import type {
   CreatePropertyInput,
   PaginatedResult,
+  Plan,
   Property,
   PropertyFilters,
 } from '@/types'
 
-// In-memory store (resets on server restart in dev)
-let propertiesStore: Property[] = [...mockProperties]
+// ─── DB row types ──────────────────────────────────────────────────────────────
 
-// Saved properties store: Map<userId, Set<propertyId>>
-const savedStore = new Map<string, Set<string>>()
-
-function applyFilters(
-  props: Property[],
-  filters?: PropertyFilters
-): Property[] {
-  if (!filters) return props
-
-  return props.filter((p) => {
-    if (
-      filters.city &&
-      !p.city.toLowerCase().includes(filters.city.toLowerCase())
-    ) {
-      return false
-    }
-    if (filters.listingType && p.listingType !== filters.listingType) {
-      return false
-    }
-    if (filters.minPrice !== undefined && p.price < filters.minPrice) {
-      return false
-    }
-    if (filters.maxPrice !== undefined && p.price > filters.maxPrice) {
-      return false
-    }
-    if (filters.status && p.status !== filters.status) {
-      return false
-    }
-    if (filters.userId && p.userId !== filters.userId) {
-      return false
-    }
-    if (
-      filters.isFeatured !== undefined &&
-      p.isFeatured !== filters.isFeatured
-    ) {
-      return false
-    }
-    if (filters.search) {
-      const q = filters.search.toLowerCase()
-      if (
-        !p.title.toLowerCase().includes(q) &&
-        !p.city.toLowerCase().includes(q) &&
-        !p.description.toLowerCase().includes(q)
-      ) {
-        return false
-      }
-    }
-    return true
-  })
+interface ProfileJoin {
+  name: string
+  profile_image: string | null
+  plan: Plan
 }
+
+interface PropertyRow {
+  id: string
+  user_id: string
+  title: string
+  city: string
+  address: string | null
+  listing_type: 'sale' | 'rent'
+  price: number
+  bedrooms: number | null
+  bathrooms: number | null
+  area_sq_m: number | null
+  description: string
+  status: 'pending' | 'approved' | 'rejected'
+  is_sold: boolean
+  sold_at: string | null
+  is_featured: boolean
+  featured_until: string | null
+  images: string[]
+  cover_image: string | null
+  created_at: string
+  profiles?: ProfileJoin | null
+}
+
+// ─── Mapper ───────────────────────────────────────────────────────────────────
+
+function dbRowToProperty(row: PropertyRow, savedSet?: Set<string>): Property {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    title: row.title,
+    city: row.city,
+    address: row.address ?? undefined,
+    listingType: row.listing_type,
+    price: Number(row.price),
+    bedrooms: row.bedrooms ?? undefined,
+    bathrooms: row.bathrooms ?? undefined,
+    areaSqM: row.area_sq_m ?? undefined,
+    description: row.description,
+    status: row.status,
+    isSold: row.is_sold,
+    soldAt: row.sold_at ? new Date(row.sold_at) : undefined,
+    isFeatured: row.is_featured,
+    featuredUntil: row.featured_until ? new Date(row.featured_until) : undefined,
+    images: row.images,
+    coverImage: row.cover_image ?? undefined,
+    createdAt: new Date(row.created_at),
+    ownerName: row.profiles?.name,
+    ownerImage: row.profiles?.profile_image ?? undefined,
+    ownerPlan: row.profiles?.plan,
+    savedByCurrentUser: savedSet ? savedSet.has(row.id) : false,
+  }
+}
+
+// ─── Service functions ────────────────────────────────────────────────────────
 
 export async function getProperties(
   filters?: PropertyFilters,
@@ -67,132 +78,275 @@ export async function getProperties(
   pageSize = ITEMS_PER_PAGE,
   currentUserId?: string
 ): Promise<PaginatedResult<Property>> {
-  // Default: only approved properties for public view
-  const baseFilter: PropertyFilters = {
-    status: filters?.status ?? 'approved',
-    ...filters,
+  const supabase = await createClient()
+
+  let query = supabase
+    .from('properties')
+    .select('*, profiles!user_id(name, profile_image, plan)', { count: 'exact' })
+    .order('created_at', { ascending: false })
+
+  // Default: approved properties for public view
+  const status = filters?.status ?? 'approved'
+  query = query.eq('status', status)
+
+  if (filters?.city) {
+    query = query.ilike('city', `%${filters.city}%`)
+  }
+  if (filters?.listingType) {
+    query = query.eq('listing_type', filters.listingType)
+  }
+  if (filters?.minPrice !== undefined) {
+    query = query.gte('price', filters.minPrice)
+  }
+  if (filters?.maxPrice !== undefined) {
+    query = query.lte('price', filters.maxPrice)
+  }
+  if (filters?.userId) {
+    query = query.eq('user_id', filters.userId)
+  }
+  if (filters?.isFeatured !== undefined) {
+    query = query.eq('is_featured', filters.isFeatured)
+  }
+  if (filters?.search) {
+    const q = filters.search
+    query = query.or(
+      `title.ilike.%${q}%,city.ilike.%${q}%,description.ilike.%${q}%`
+    )
   }
 
-  const filtered = applyFilters(propertiesStore, baseFilter)
-  // Sort by createdAt desc
-  const sorted = filtered.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
-
-  const total = sorted.length
-  const totalPages = Math.ceil(total / pageSize)
   const offset = (page - 1) * pageSize
-  const data = sorted.slice(offset, offset + pageSize).map((p) => ({
-    ...p,
-    savedByCurrentUser: currentUserId
-      ? (savedStore.get(currentUserId)?.has(p.id) ?? false)
-      : false,
-  }))
+  query = query.range(offset, offset + pageSize - 1)
 
-  return { data, total, page, pageSize, totalPages }
+  const { data: rows, count, error } = await query
+  if (error) throw error
+
+  // Build saved set for current user
+  let savedSet = new Set<string>()
+  if (currentUserId && rows && rows.length > 0) {
+    const { data: saved } = await supabase
+      .from('saved_properties')
+      .select('property_id')
+      .eq('user_id', currentUserId)
+      .in(
+        'property_id',
+        (rows as PropertyRow[]).map((r) => r.id)
+      )
+    savedSet = new Set(
+      (saved as { property_id: string }[] | null)?.map((s) => s.property_id) ??
+        []
+    )
+  }
+
+  const total = count ?? 0
+  return {
+    data: ((rows as PropertyRow[]) ?? []).map((row) =>
+      dbRowToProperty(row, savedSet)
+    ),
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  }
 }
 
 export async function getPropertyById(
   id: string,
   currentUserId?: string
 ): Promise<Property | null> {
-  const prop = propertiesStore.find((p) => p.id === id) ?? null
-  if (!prop) return null
-  return {
-    ...prop,
-    savedByCurrentUser: currentUserId
-      ? (savedStore.get(currentUserId)?.has(id) ?? false)
-      : false,
+  const supabase = await createClient()
+
+  const { data: row, error } = await supabase
+    .from('properties')
+    .select('*, profiles!user_id(name, profile_image, plan)')
+    .eq('id', id)
+    .single()
+
+  if (error || !row) return null
+
+  let savedByCurrentUser = false
+  if (currentUserId) {
+    const { data: saved } = await supabase
+      .from('saved_properties')
+      .select('user_id')
+      .eq('user_id', currentUserId)
+      .eq('property_id', id)
+      .maybeSingle()
+    savedByCurrentUser = !!saved
   }
+
+  return dbRowToProperty(
+    row as PropertyRow,
+    savedByCurrentUser ? new Set([id]) : new Set()
+  )
 }
 
 export async function getFeaturedProperties(limit = 6): Promise<Property[]> {
-  return propertiesStore
-    .filter((p) => p.isFeatured && p.status === 'approved' && !p.isSold)
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
-    .slice(0, limit)
+  const supabase = await createClient()
+
+  const { data: rows, error } = await supabase
+    .from('properties')
+    .select('*, profiles!user_id(name, profile_image, plan)')
+    .eq('is_featured', true)
+    .eq('status', 'approved')
+    .eq('is_sold', false)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error || !rows) return []
+  return (rows as PropertyRow[]).map((row) => dbRowToProperty(row))
 }
 
 export async function getLatestProperties(
   limit = 8,
   excludeUserId?: string
 ): Promise<Property[]> {
-  return propertiesStore
-    .filter(
-      (p) =>
-        p.status === 'approved' &&
-        !p.isSold &&
-        (excludeUserId ? p.userId !== excludeUserId : true)
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
-    .slice(0, limit)
+  const supabase = await createClient()
+
+  let query = supabase
+    .from('properties')
+    .select('*, profiles!user_id(name, profile_image, plan)')
+    .eq('status', 'approved')
+    .eq('is_sold', false)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (excludeUserId) {
+    query = query.neq('user_id', excludeUserId)
+  }
+
+  const { data: rows, error } = await query
+  if (error || !rows) return []
+  return (rows as PropertyRow[]).map((row) => dbRowToProperty(row))
 }
 
 export async function createProperty(
   data: CreatePropertyInput
 ): Promise<Property> {
-  const newProperty: Property = {
-    id: `p${Date.now()}`,
-    ...data,
-    status: 'pending',
-    isSold: false,
-    isFeatured: false,
-    createdAt: new Date(),
-  }
-  propertiesStore = [newProperty, ...propertiesStore]
-  return newProperty
+  const supabase = await createClient()
+
+  const { data: row, error } = await supabase
+    .from('properties')
+    .insert({
+      user_id: data.userId,
+      title: data.title,
+      city: data.city,
+      address: data.address ?? null,
+      listing_type: data.listingType,
+      price: data.price,
+      bedrooms: data.bedrooms ?? null,
+      bathrooms: data.bathrooms ?? null,
+      area_sq_m: data.areaSqM ?? null,
+      description: data.description,
+      images: data.images,
+      cover_image: data.coverImage ?? null,
+      status: 'pending',
+      is_sold: false,
+      is_featured: false,
+    })
+    .select('*, profiles!user_id(name, profile_image, plan)')
+    .single()
+
+  if (error || !row)
+    throw new Error(error?.message ?? 'Failed to create property')
+  return dbRowToProperty(row as PropertyRow)
 }
 
 export async function updateProperty(
   id: string,
   data: Partial<Property>
 ): Promise<Property | null> {
-  const idx = propertiesStore.findIndex((p) => p.id === id)
-  if (idx === -1) return null
-  propertiesStore[idx] = { ...propertiesStore[idx], ...data }
-  return propertiesStore[idx]
+  const supabase = await createClient()
+
+  const dbUpdate: Record<string, unknown> = {}
+  if (data.title !== undefined) dbUpdate.title = data.title
+  if (data.city !== undefined) dbUpdate.city = data.city
+  if (data.address !== undefined) dbUpdate.address = data.address
+  if (data.listingType !== undefined) dbUpdate.listing_type = data.listingType
+  if (data.price !== undefined) dbUpdate.price = data.price
+  if (data.bedrooms !== undefined) dbUpdate.bedrooms = data.bedrooms
+  if (data.bathrooms !== undefined) dbUpdate.bathrooms = data.bathrooms
+  if (data.areaSqM !== undefined) dbUpdate.area_sq_m = data.areaSqM
+  if (data.description !== undefined) dbUpdate.description = data.description
+  if (data.status !== undefined) dbUpdate.status = data.status
+  if (data.isSold !== undefined) dbUpdate.is_sold = data.isSold
+  if (data.soldAt !== undefined)
+    dbUpdate.sold_at = data.soldAt ? new Date(data.soldAt).toISOString() : null
+  if (data.isFeatured !== undefined) dbUpdate.is_featured = data.isFeatured
+  if (data.featuredUntil !== undefined)
+    dbUpdate.featured_until = data.featuredUntil
+      ? new Date(data.featuredUntil).toISOString()
+      : null
+  if (data.images !== undefined) dbUpdate.images = data.images
+  if (data.coverImage !== undefined) dbUpdate.cover_image = data.coverImage
+
+  const { data: row, error } = await supabase
+    .from('properties')
+    .update(dbUpdate)
+    .eq('id', id)
+    .select('*, profiles!user_id(name, profile_image, plan)')
+    .single()
+
+  if (error || !row) return null
+  return dbRowToProperty(row as PropertyRow)
 }
 
 export async function deleteProperty(id: string): Promise<boolean> {
-  const before = propertiesStore.length
-  propertiesStore = propertiesStore.filter((p) => p.id !== id)
-  return propertiesStore.length < before
+  const supabase = await createClient()
+  const { error } = await supabase.from('properties').delete().eq('id', id)
+  return !error
 }
 
 export async function toggleSave(
   propertyId: string,
   userId: string
 ): Promise<{ saved: boolean }> {
-  if (!savedStore.has(userId)) {
-    savedStore.set(userId, new Set())
-  }
-  const userSaved = savedStore.get(userId)!
-  if (userSaved.has(propertyId)) {
-    userSaved.delete(propertyId)
+  const supabase = await createClient()
+
+  const { data: existing } = await supabase
+    .from('saved_properties')
+    .select('user_id')
+    .eq('user_id', userId)
+    .eq('property_id', propertyId)
+    .maybeSingle()
+
+  if (existing) {
+    await supabase
+      .from('saved_properties')
+      .delete()
+      .eq('user_id', userId)
+      .eq('property_id', propertyId)
     return { saved: false }
-  } else {
-    userSaved.add(propertyId)
-    return { saved: true }
   }
+
+  await supabase
+    .from('saved_properties')
+    .insert({ user_id: userId, property_id: propertyId })
+  return { saved: true }
 }
 
 export async function toggleSold(
   propertyId: string,
   userId: string
 ): Promise<{ isSold: boolean }> {
-  const prop = propertiesStore.find((p) => p.id === propertyId)
-  if (!prop || prop.userId !== userId) throw new Error('Not authorized')
-  const newSold = !prop.isSold
-  await updateProperty(propertyId, {
-    isSold: newSold,
-    soldAt: newSold ? new Date() : undefined,
-  })
+  const supabase = await createClient()
+
+  const { data: row } = await supabase
+    .from('properties')
+    .select('user_id, is_sold')
+    .eq('id', propertyId)
+    .single()
+
+  if (!row || row.user_id !== userId) throw new Error('Not authorized')
+
+  const newSold = !row.is_sold
+  await supabase
+    .from('properties')
+    .update({
+      is_sold: newSold,
+      sold_at: newSold ? new Date().toISOString() : null,
+    })
+    .eq('id', propertyId)
+
   return { isSold: newSold }
 }
 
@@ -200,24 +354,39 @@ export async function getUserProperties(
   userId: string,
   includeAll = false
 ): Promise<Property[]> {
-  return propertiesStore
-    .filter((p) => {
-      if (p.userId !== userId) return false
-      if (!includeAll && p.status === 'rejected') return false
-      return true
-    })
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
+  const supabase = await createClient()
+
+  let query = supabase
+    .from('properties')
+    .select('*, profiles!user_id(name, profile_image, plan)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (!includeAll) {
+    query = query.neq('status', 'rejected')
+  }
+
+  const { data: rows, error } = await query
+  if (error || !rows) return []
+  return (rows as PropertyRow[]).map((row) => dbRowToProperty(row))
 }
 
 export async function getSavedProperties(userId: string): Promise<Property[]> {
-  const userSaved = savedStore.get(userId)
-  if (!userSaved || userSaved.size === 0) return []
-  return propertiesStore.filter(
-    (p) => userSaved.has(p.id) && p.status === 'approved'
-  )
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('saved_properties')
+    .select('properties(*, profiles!user_id(name, profile_image, plan))')
+    .eq('user_id', userId)
+
+  if (error || !data) return []
+
+  return (data as unknown as { properties: PropertyRow | null }[])
+    .map((item) => item.properties)
+    .filter(
+      (p): p is PropertyRow => p !== null && p.status === 'approved'
+    )
+    .map((row) => dbRowToProperty(row, new Set([row.id])))
 }
 
 export async function getSimilarProperties(
@@ -225,27 +394,41 @@ export async function getSimilarProperties(
   city: string,
   limit = 3
 ): Promise<Property[]> {
-  return propertiesStore
-    .filter(
-      (p) =>
-        p.id !== propertyId &&
-        p.city === city &&
-        p.status === 'approved' &&
-        !p.isSold
-    )
-    .slice(0, limit)
+  const supabase = await createClient()
+
+  const { data: rows, error } = await supabase
+    .from('properties')
+    .select('*, profiles!user_id(name, profile_image, plan)')
+    .neq('id', propertyId)
+    .eq('city', city)
+    .eq('status', 'approved')
+    .eq('is_sold', false)
+    .limit(limit)
+
+  if (error || !rows) return []
+  return (rows as PropertyRow[]).map((row) => dbRowToProperty(row))
 }
 
 export async function featureProperty(
   propertyId: string,
   days: number
 ): Promise<Property | null> {
+  const admin = createAdminClient()
   const until = new Date()
   until.setDate(until.getDate() + days)
-  return updateProperty(propertyId, {
-    isFeatured: true,
-    featuredUntil: until,
-  })
+
+  const { data: row, error } = await admin
+    .from('properties')
+    .update({
+      is_featured: true,
+      featured_until: until.toISOString(),
+    })
+    .eq('id', propertyId)
+    .select('*, profiles!user_id(name, profile_image, plan)')
+    .single()
+
+  if (error || !row) return null
+  return dbRowToProperty(row as PropertyRow)
 }
 
 export async function getAdminProperties(
@@ -253,20 +436,33 @@ export async function getAdminProperties(
   pageSize = 25,
   statusFilter?: string
 ): Promise<PaginatedResult<Property>> {
-  let filtered = propertiesStore
+  const admin = createAdminClient()
+
+  let query = admin
+    .from('properties')
+    .select('*, profiles!user_id(name, profile_image, plan)', { count: 'exact' })
+    .order('created_at', { ascending: false })
+
   if (statusFilter && statusFilter !== 'all') {
     if (statusFilter === 'featured') {
-      filtered = filtered.filter((p) => p.isFeatured)
+      query = query.eq('is_featured', true)
     } else {
-      filtered = filtered.filter((p) => p.status === statusFilter)
+      query = query.eq('status', statusFilter)
     }
   }
-  const sorted = filtered.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
-  const total = sorted.length
-  const totalPages = Math.ceil(total / pageSize)
+
   const offset = (page - 1) * pageSize
-  const data = sorted.slice(offset, offset + pageSize)
-  return { data, total, page, pageSize, totalPages }
+  query = query.range(offset, offset + pageSize - 1)
+
+  const { data: rows, count, error } = await query
+  if (error) throw error
+
+  const total = count ?? 0
+  return {
+    data: ((rows as PropertyRow[]) ?? []).map((row) => dbRowToProperty(row)),
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  }
 }

@@ -1,7 +1,8 @@
 import { User } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { auth } from '@/lib/auth'
+import { createClient } from '@/lib/supabase/server'
+import { getUserById } from '@/services/user.service'
 
 const navItems = [
   { href: '/dashboard/profile', label: 'My Listings' },
@@ -14,11 +15,17 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth()
+  const supabase = await createClient()
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser()
 
-  if (!session?.user) {
+  if (!authUser) {
     redirect('/auth/login')
   }
+
+  const profile = await getUserById(authUser.id)
+  if (!profile) redirect('/auth/login')
 
   return (
     <div className="min-h-screen bg-[#fcfaf7]">
@@ -33,7 +40,7 @@ export default async function DashboardLayout({
                 Dashboard
               </h1>
               <p className="text-[#8b8178] text-sm">
-                Welcome back, {session.user.name}
+                Welcome back, {profile.name}
               </p>
             </div>
           </div>

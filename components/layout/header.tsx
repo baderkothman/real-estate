@@ -11,10 +11,10 @@ import {
   X,
 } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { signOut, useSession } from 'next-auth/react'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { useSupabase } from '@/components/providers/supabase-provider'
 import { cn, getInitials } from '@/lib/utils'
 
 const navLinks = [
@@ -26,19 +26,26 @@ const navLinks = [
 ]
 
 export function Header() {
-  const { data: session } = useSession()
+  const { user, supabase } = useSupabase()
   const pathname = usePathname()
+  const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-
-  const user = session?.user
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  const handleSignOut = async () => {
+    setProfileOpen(false)
+    setMobileOpen(false)
+    await supabase.auth.signOut()
+    router.push('/')
+    router.refresh()
+  }
 
   return (
     <header
@@ -103,11 +110,11 @@ export function Header() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={user.profileImage}
-                        alt={user.name ?? ''}
+                        alt={user.name}
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      getInitials(user.name ?? 'U')
+                      getInitials(user.name)
                     )}
                   </div>
                   <span className="max-w-[100px] truncate font-medium text-[#181411]">
@@ -177,10 +184,7 @@ export function Header() {
                       <div className="border-t border-[rgba(34,24,18,0.08)] py-1.5">
                         <button
                           type="button"
-                          onClick={() => {
-                            setProfileOpen(false)
-                            void signOut({ callbackUrl: '/' })
-                          }}
+                          onClick={() => void handleSignOut()}
                           className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
                         >
                           <LogOut className="h-4 w-4" />
@@ -254,11 +258,11 @@ export function Header() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={user.profileImage}
-                        alt={user.name ?? ''}
+                        alt={user.name}
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      getInitials(user.name ?? 'U')
+                      getInitials(user.name)
                     )}
                   </div>
                   <div className="min-w-0">
@@ -295,10 +299,7 @@ export function Header() {
                 </Link>
                 <button
                   type="button"
-                  onClick={() => {
-                    setMobileOpen(false)
-                    void signOut({ callbackUrl: '/' })
-                  }}
+                  onClick={() => void handleSignOut()}
                   className="flex w-full items-center gap-2.5 px-4 py-3 text-sm text-red-600 rounded-xl hover:bg-red-50 transition-colors"
                 >
                   <LogOut className="h-4 w-4" /> Sign Out

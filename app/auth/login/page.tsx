@@ -3,11 +3,11 @@
 import { AlertCircle, Eye, EyeOff, LogIn } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { signIn } from 'next-auth/react'
 import { Suspense, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { createClient } from '@/lib/supabase/client'
 
 function LoginForm() {
   const router = useRouter()
@@ -27,15 +27,15 @@ function LoginForm() {
     setIsLoading(true)
 
     try {
-      const result = await signIn('credentials', {
+      const supabase = createClient()
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
-        redirect: false,
       })
 
-      if (result?.error) {
+      if (signInError) {
         setError('Invalid email or password. Please try again.')
-      } else if (result?.ok) {
+      } else {
         router.push(callbackUrl)
         router.refresh()
       }
@@ -48,14 +48,6 @@ function LoginForm() {
 
   return (
     <div className="rounded-[20px] border border-[rgba(34,24,18,0.08)] bg-white shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-8">
-      {/* Demo credentials hint */}
-      <div className="mb-6 rounded-lg border border-[#fa6b05]/20 bg-[#fef0e6] px-4 py-3">
-        <p className="text-xs text-[#5f554d]">
-          <span className="text-[#fa6b05] font-medium">Demo:</span>{' '}
-          admin@othman.com / admin123 &nbsp;|&nbsp; user@othman.com / user123
-        </p>
-      </div>
-
       {error && (
         <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
           <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />

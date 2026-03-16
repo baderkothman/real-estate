@@ -1,7 +1,39 @@
-import { mockUsers } from '@/data/mock-users'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { CreateUserInput, PaginatedResult, Plan, User } from '@/types'
 
-let usersStore: User[] = [...mockUsers]
+// ─── DB row type ──────────────────────────────────────────────────────────────
+
+interface ProfileRow {
+  id: string
+  email: string
+  name: string
+  phone: string
+  profile_image: string | null
+  bio: string | null
+  plan: Plan
+  role: 'user' | 'admin'
+  is_banned: boolean
+  created_at: string
+}
+
+// ─── Mapper ───────────────────────────────────────────────────────────────────
+
+function dbRowToUser(row: ProfileRow): User {
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    profileImage: row.profile_image ?? undefined,
+    bio: row.bio ?? undefined,
+    plan: row.plan,
+    role: row.role,
+    isBanned: row.is_banned,
+    createdAt: new Date(row.created_at),
+  }
+}
+
+// ─── Service functions ────────────────────────────────────────────────────────
 
 export async function getUsers(
   search?: string,
@@ -9,91 +41,133 @@ export async function getUsers(
   page = 1,
   pageSize = 12
 ): Promise<PaginatedResult<User>> {
-  let filtered = usersStore.filter((u) => !u.isBanned || true) // include all for admin
+  const admin = createAdminClient()
+
+  let query = admin
+    .from('profiles')
+    .select('*', { count: 'exact' })
+    .order('created_at', { ascending: false })
 
   if (search) {
-    const q = search.toLowerCase()
-    filtered = filtered.filter(
-      (u) =>
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q) ||
-        u.phone.includes(q)
+    query = query.or(
+      `name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`
     )
   }
-
   if (plan && plan !== 'all') {
-    filtered = filtered.filter((u) => u.plan === plan)
+    query = query.eq('plan', plan)
   }
 
-  const sorted = filtered.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
-
-  const total = sorted.length
-  const totalPages = Math.ceil(total / pageSize)
   const offset = (page - 1) * pageSize
-  const data = sorted.slice(offset, offset + pageSize)
+  query = query.range(offset, offset + pageSize - 1)
 
-  return { data, total, page, pageSize, totalPages }
+  const { data, count, error } = await query
+  if (error) throw error
+
+  const total = count ?? 0
+  return {
+    data: ((data as ProfileRow[]) ?? []).map(dbRowToUser),
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  }
 }
 
 export async function getUserById(id: string): Promise<User | null> {
-  return usersStore.find((u) => u.id === id) ?? null
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('profiles')
+    .select('*')
+    .eq('id', id)
+    .single()
+  if (error || !data) return null
+  return dbRowToUser(data as ProfileRow)
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
-  return (
-    usersStore.find((u) => u.email.toLowerCase() === email.toLowerCase()) ??
-    null
-  )
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('profiles')
+    .select('*')
+    .eq('email', email.toLowerCase())
+    .maybeSingle()
+  if (error || !data) return null
+  return dbRowToUser(data as ProfileRow)
 }
 
 export async function createUser(data: CreateUserInput): Promise<User> {
+  const admin = createAdminClient()
+
   const existing = await getUserByEmail(data.email)
   if (existing) throw new Error('Email already in use')
 
-  const newUser: User = {
-    id: `u${Date.now()}`,
-    name: data.name,
+  const { data: authUser, error } = await admin.auth.admin.createUser({
     email: data.email,
-    phone: data.phone,
-    passwordHash: data.password, // In production: bcrypt hash
-    bio: data.bio,
-    plan: 'free',
-    role: 'user',
-    isBanned: false,
-    createdAt: new Date(),
+    password: data.password,
+    email_confirm: true,
+    user_metadata: {
+      name: data.name,
+      phone: data.phone,
+    },
+  })
+
+  if (error || !authUser.user)
+    throw new Error(error?.message ?? 'Failed to create user')
+
+  // Update bio if provided (trigger already created the profile row)
+  if (data.bio) {
+    await admin
+      .from('profiles')
+      .update({ bio: data.bio })
+      .eq('id', authUser.user.id)
   }
 
-  usersStore = [newUser, ...usersStore]
-  return newUser
+  const user = await getUserById(authUser.user.id)
+  if (!user) throw new Error('Failed to retrieve created user')
+  return user
 }
 
 export async function updateUser(
   id: string,
   data: Partial<User>
 ): Promise<User | null> {
-  const idx = usersStore.findIndex((u) => u.id === id)
-  if (idx === -1) return null
+  const admin = createAdminClient()
 
-  // Don't allow role change via this method
-  const { role: _role, ...safeData } = data
-  usersStore[idx] = { ...usersStore[idx], ...safeData }
-  return usersStore[idx]
+  const dbUpdate: Record<string, unknown> = {}
+  if (data.name !== undefined) dbUpdate.name = data.name
+  if (data.phone !== undefined) dbUpdate.phone = data.phone
+  if (data.profileImage !== undefined)
+    dbUpdate.profile_image = data.profileImage
+  if (data.bio !== undefined) dbUpdate.bio = data.bio
+  // role and plan are NOT updatable via this method
+
+  const { data: row, error } = await admin
+    .from('profiles')
+    .update(dbUpdate)
+    .eq('id', id)
+    .select('*')
+    .single()
+
+  if (error || !row) return null
+  return dbRowToUser(row as ProfileRow)
 }
 
 export async function banUser(id: string, banned: boolean): Promise<boolean> {
-  const idx = usersStore.findIndex((u) => u.id === id)
-  if (idx === -1) return false
-  usersStore[idx] = { ...usersStore[idx], isBanned: banned }
-  return true
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from('profiles')
+    .update({ is_banned: banned })
+    .eq('id', id)
+  return !error
 }
 
 export async function changeUserPlan(id: string, plan: Plan): Promise<boolean> {
-  const idx = usersStore.findIndex((u) => u.id === id)
-  if (idx === -1) return false
-  usersStore[idx] = { ...usersStore[idx], plan }
-  return true
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from('profiles')
+    .update({ plan })
+    .eq('id', id)
+  return !error
 }
 
 export async function getPublicUsers(
@@ -102,28 +176,35 @@ export async function getPublicUsers(
   page = 1,
   pageSize = 12
 ): Promise<PaginatedResult<User>> {
-  let filtered = usersStore.filter((u) => !u.isBanned)
+  const admin = createAdminClient()
+
+  let query = admin
+    .from('profiles')
+    .select('*', { count: 'exact' })
+    .eq('is_banned', false)
+    .order('created_at', { ascending: false })
 
   if (search) {
-    const q = search.toLowerCase()
-    filtered = filtered.filter(
-      (u) =>
-        u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+    query = query.or(
+      `name.ilike.%${search}%,email.ilike.%${search}%`
     )
   }
-
   if (plan && plan !== 'all') {
-    filtered = filtered.filter((u) => u.plan === plan)
+    query = query.eq('plan', plan)
   }
 
-  const sorted = filtered.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
-
-  const total = sorted.length
-  const totalPages = Math.ceil(total / pageSize)
   const offset = (page - 1) * pageSize
-  const data = sorted.slice(offset, offset + pageSize)
+  query = query.range(offset, offset + pageSize - 1)
 
-  return { data, total, page, pageSize, totalPages }
+  const { data, count, error } = await query
+  if (error) throw error
+
+  const total = count ?? 0
+  return {
+    data: ((data as ProfileRow[]) ?? []).map(dbRowToUser),
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  }
 }

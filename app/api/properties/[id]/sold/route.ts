@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { createClient } from '@/lib/supabase/server'
 import { toggleSold } from '@/services/property.service'
 
 interface Params {
@@ -8,14 +8,17 @@ interface Params {
 
 export async function POST(_request: NextRequest, { params }: Params) {
   const { id } = await params
-  const session = await auth()
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session?.user) {
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
-    const result = await toggleSold(id, session.user.id)
+    const result = await toggleSold(id, user.id)
     return NextResponse.json(result)
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to toggle sold'

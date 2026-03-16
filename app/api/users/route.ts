@@ -1,6 +1,11 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
-import { createUser, getPublicUsers, getUsers } from '@/services/user.service'
+import { createClient } from '@/lib/supabase/server'
+import {
+  createUser,
+  getPublicUsers,
+  getUsers,
+  getUserById,
+} from '@/services/user.service'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
@@ -11,8 +16,15 @@ export async function GET(request: NextRequest) {
   const pageSize = parseInt(searchParams.get('pageSize') ?? '12', 10)
 
   if (isAdmin) {
-    const session = await auth()
-    if (!session?.user || session.user.role !== 'admin') {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+    const profile = await getUserById(user.id)
+    if (profile?.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
     const result = await getUsers(search, plan, page, pageSize)
@@ -41,9 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await createUser(body)
-    // Don't return passwordHash
-    const { passwordHash: _, ...safeUser } = user
-    return NextResponse.json(safeUser, { status: 201 })
+    return NextResponse.json(user, { status: 201 })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to create user'
     return NextResponse.json({ error: message }, { status: 400 })

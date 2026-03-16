@@ -3,13 +3,12 @@
 import { CheckCircle, Eye, EyeOff, Save } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { PlanBadge } from '@/components/common/plan-badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useSupabase } from '@/components/providers/supabase-provider'
 import { getInitials } from '@/lib/utils'
 
 interface ProfileData {
@@ -21,8 +20,7 @@ interface ProfileData {
 }
 
 export default function EditProfilePage() {
-  const { data: session, update } = useSession()
-  const _router = useRouter()
+  const { user, supabase, refreshUser } = useSupabase()
 
   const [profile, setProfile] = useState<ProfileData>({
     name: '',
@@ -31,10 +29,8 @@ export default function EditProfilePage() {
     bio: '',
     profileImage: '',
   })
-  const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showCurrentPw, setShowCurrentPw] = useState(false)
   const [showNewPw, setShowNewPw] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isSavingPw, setIsSavingPw] = useState(false)
@@ -42,42 +38,37 @@ export default function EditProfilePage() {
   const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
-    if (session?.user) {
+    if (user) {
       setProfile({
-        name: session.user.name ?? '',
-        email: session.user.email ?? '',
-        phone: '',
-        bio: '',
-        profileImage: session.user.profileImage ?? '',
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        bio: user.bio ?? '',
+        profileImage: user.profileImage ?? '',
       })
-      // Fetch full user data
-      fetch(`/api/users/${session.user.id}`)
-        .then((r) => r.json())
-        .then((data: { phone?: string; bio?: string }) => {
-          setProfile((prev) => ({
-            ...prev,
-            phone: data.phone ?? '',
-            bio: data.bio ?? '',
-          }))
-        })
-        .catch(() => null)
     }
-  }, [session])
+  }, [user])
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!user) return
     setIsSaving(true)
     setErrorMsg('')
     setSuccessMsg('')
     try {
-      const res = await fetch(`/api/users/${session?.user.id}`, {
+      const res = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profile),
+        body: JSON.stringify({
+          name: profile.name,
+          phone: profile.phone,
+          bio: profile.bio,
+          profileImage: profile.profileImage,
+        }),
       })
       if (!res.ok) throw new Error('Failed to save')
       setSuccessMsg('Profile updated successfully!')
-      await update({ name: profile.name })
+      await refreshUser()
     } catch {
       setErrorMsg('Failed to save profile. Please try again.')
     } finally {
@@ -98,20 +89,21 @@ export default function EditProfilePage() {
     setIsSavingPw(true)
     setErrorMsg('')
     try {
-      // In a real app: validate current password and update
-      await new Promise((r) => setTimeout(r, 800))
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      if (error) throw error
       setSuccessMsg('Password changed successfully!')
-      setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
-    } catch {
-      setErrorMsg('Failed to change password.')
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to change password.'
+      setErrorMsg(message)
     } finally {
       setIsSavingPw(false)
     }
   }
 
-  if (!session) return null
+  if (!user) return null
 
   return (
     <div className="max-w-2xl">
@@ -190,10 +182,8 @@ export default function EditProfilePage() {
                 id="edit-email"
                 type="email"
                 value={profile.email}
-                onChange={(e) =>
-                  setProfile((p) => ({ ...p, email: e.target.value }))
-                }
-                required
+                disabled
+                className="opacity-60 cursor-not-allowed"
               />
             </div>
             <div className="space-y-1.5 sm:col-span-2">
@@ -247,29 +237,6 @@ export default function EditProfilePage() {
           </h3>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label>Current Password</Label>
-              <div className="relative">
-                <Input
-                  type={showCurrentPw ? 'text' : 'password'}
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Your current password"
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowCurrentPw(!showCurrentPw)}
-                  className="absolute right-3 top-3 text-[#8b8178] hover:text-[#5f554d]"
-                >
-                  {showCurrentPw ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-            <div className="space-y-1.5">
               <Label>New Password</Label>
               <div className="relative">
                 <Input
@@ -314,7 +281,7 @@ export default function EditProfilePage() {
           Current Plan
         </h3>
         <div className="flex items-center justify-between">
-          <PlanBadge plan={session.user.plan} />
+          <PlanBadge plan={user.plan} />
           <Button asChild variant="outline" size="sm">
             <Link href="/pricing">Upgrade Plan</Link>
           </Button>

@@ -3,12 +3,12 @@
 import { AlertCircle, Eye, EyeOff, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { createClient } from '@/lib/supabase/client'
 
 const registerSchema = z
   .object({
@@ -69,32 +69,28 @@ export default function RegisterPage() {
 
     setIsLoading(true)
     try {
-      const res = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          password: form.password,
-        }),
+      const supabase = createClient()
+
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+        options: {
+          data: { name: form.name, phone: form.phone },
+        },
       })
 
-      const data = (await res.json()) as { error?: string }
-
-      if (!res.ok) {
-        setServerError(data.error ?? 'Registration failed. Please try again.')
+      if (signUpError) {
+        setServerError(signUpError.message)
         return
       }
 
-      // Auto sign in
-      const signInResult = await signIn('credentials', {
+      // Auto sign in after registration
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email: form.email,
         password: form.password,
-        redirect: false,
       })
 
-      if (signInResult?.ok) {
+      if (!signInError) {
         router.push('/dashboard/profile')
         router.refresh()
       } else {

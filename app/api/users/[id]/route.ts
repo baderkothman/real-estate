@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { createClient } from '@/lib/supabase/server'
 import { getUserById, updateUser } from '@/services/user.service'
 
 interface Params {
@@ -14,40 +14,47 @@ export async function GET(_request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 })
   }
 
-  // Don't expose passwordHash
-  const { passwordHash: _, ...safeUser } = user
-  return NextResponse.json(safeUser)
+  return NextResponse.json(user)
 }
 
 export async function PUT(request: NextRequest, { params }: Params) {
   const { id } = await params
-  const session = await auth()
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session?.user) {
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Only self or admin
-  if (session.user.id !== id && session.user.role !== 'admin') {
+  const currentProfile = await getUserById(user.id)
+  const isAdmin = currentProfile?.role === 'admin'
+
+  if (user.id !== id && !isAdmin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   try {
     const body = (await request.json()) as Record<string, unknown>
-    // Remove sensitive fields
+    // Remove sensitive/protected fields
     const {
-      passwordHash: _,
-      role: __,
+      role: _role,
+      plan: _plan,
+      isBanned: _banned,
       ...safeData
-    } = body as { passwordHash?: unknown; role?: unknown }
+    } = body as {
+      role?: unknown
+      plan?: unknown
+      isBanned?: unknown
+    }
     const updated = await updateUser(id, safeData)
 
     if (!updated) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    const { passwordHash: _pw, ...safeUser } = updated
-    return NextResponse.json(safeUser)
+    return NextResponse.json(updated)
   } catch {
     return NextResponse.json(
       { error: 'Failed to update user' },

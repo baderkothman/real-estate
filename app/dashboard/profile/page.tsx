@@ -16,7 +16,7 @@ import { PropertyCard } from '@/components/property/property-card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { auth } from '@/lib/auth'
+import { createClient } from '@/lib/supabase/server'
 import { PLAN_LIMITS } from '@/lib/constants'
 import { cn, formatPrice, getInitials } from '@/lib/utils'
 import {
@@ -94,10 +94,13 @@ function PropertyRow({ property }: { property: Property }) {
 }
 
 export default async function DashboardProfilePage() {
-  const session = await auth()
-  if (!session?.user) redirect('/auth/login')
+  const supabase = await createClient()
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser()
+  if (!authUser) redirect('/auth/login')
 
-  const user = await getUserById(session.user.id)
+  const user = await getUserById(authUser.id)
   if (!user) redirect('/auth/login')
 
   const [allProperties, savedProperties] = await Promise.all([

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
-import { banUser, changeUserPlan } from '@/services/user.service'
+import { createClient } from '@/lib/supabase/server'
+import { banUser, changeUserPlan, getUserById } from '@/services/user.service'
 import type { Plan } from '@/types'
 
 interface Params {
@@ -9,9 +9,17 @@ interface Params {
 
 export async function POST(request: NextRequest, { params }: Params) {
   const { id } = await params
-  const session = await auth()
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!user) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const profile = await getUserById(user.id)
+  if (profile?.role !== 'admin') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

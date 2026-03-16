@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { SessionProvider } from 'next-auth/react'
 import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
+import { SupabaseProvider } from '@/components/providers/supabase-provider'
 import { APP_DESCRIPTION, APP_NAME } from '@/lib/constants'
 
 export const metadata: Metadata = {
@@ -32,11 +32,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-[#fcfaf7] text-[#181411] antialiased">
-        <SessionProvider>
+        <SupabaseProvider>
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
-        </SessionProvider>
+        </SupabaseProvider>
       </body>
     </html>
   )

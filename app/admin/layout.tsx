@@ -7,7 +7,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { auth } from '@/lib/auth'
+import { createClient } from '@/lib/supabase/server'
+import { getUserById } from '@/services/user.service'
 
 const adminNavItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -21,10 +22,15 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth()
+  const supabase = await createClient()
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser()
 
-  if (!session?.user) redirect('/auth/login')
-  if (session.user.role !== 'admin') redirect('/')
+  if (!authUser) redirect('/auth/login')
+
+  const profile = await getUserById(authUser.id)
+  if (!profile || profile.role !== 'admin') redirect('/')
 
   return (
     <div className="min-h-screen bg-[#fcfaf7]">
@@ -41,7 +47,7 @@ export default async function AdminLayout({
               </span>
             </div>
             <span className="text-xs text-[#8b8178]">
-              Signed in as {session.user.name}
+              Signed in as {profile.name}
             </span>
           </div>
         </div>
