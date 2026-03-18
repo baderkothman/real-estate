@@ -147,10 +147,10 @@ export function PropertyFilters() {
           </div>
         </div>
 
-        {/* IconSearch */}
+        {/* Search */}
         <Button onClick={handleSearch} className="w-full gap-2 mt-1">
           <IconSearch className="h-4 w-4" />
-          IconSearch Properties
+          Search Properties
         </Button>
       </div>
     </div>

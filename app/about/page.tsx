@@ -1,4 +1,4 @@
-import {
+﻿import {
   IconAward,
   IconBuilding,
   IconHeart,
@@ -12,7 +12,7 @@ import Image from 'next/image'
 export const metadata: Metadata = {
   title: 'About Us',
   description:
-    "Learn about Othman Real Estate — Lebanon's premier property marketplace.",
+    "Learn about Othman Real Estate - Lebanon's premier property marketplace.",
 }
 
 const teamMembers = [
@@ -50,13 +50,13 @@ const values = [
     icon: IconAward,
     title: 'Excellence',
     description:
-      "We are committed to showcasing Lebanon's finest properties with the presentation they deserve — beautiful photography and detailed descriptions.",
+      "We are committed to showcasing Lebanon's finest properties with the presentation they deserve - beautiful photography and detailed descriptions.",
   },
   {
     icon: IconHeart,
     title: 'Community',
     description:
-      'Real estate in Lebanon is personal. We connect people, not just properties — building relationships that last beyond the transaction.',
+      'Real estate in Lebanon is personal. We connect people, not just properties - building relationships that last beyond the transaction.',
   },
 ]
 
@@ -70,7 +70,7 @@ export default function AboutPage() {
           <div className="inline-flex items-center gap-2 rounded-full border border-[#fa6b05]/20 bg-[#fef0e6] px-4 py-1.5 mb-8">
             <IconMapPin className="h-3.5 w-3.5 text-[#fa6b05]" />
             <span className="text-xs font-medium text-[#964003] tracking-widest uppercase">
-              Est. 2022 — Beirut, Lebanon
+              Est. 2022 - Beirut, Lebanon
             </span>
           </div>
           <h1 className="font-display text-5xl md:text-6xl font-semibold text-[#181411] mb-6 tracking-wide">
@@ -101,14 +101,14 @@ export default function AboutPage() {
                   this platform to change that.
                 </p>
                 <p>
-                  Lebanon is a land of extraordinary beauty and character — from
+                  Lebanon is a land of extraordinary beauty and character - from
                   the snow-capped peaks of the Mount Lebanon range to the
                   ancient Phoenician harbours of Byblos and Tyre. Every property
                   here has a story, and we are passionate about telling it.
                 </p>
                 <p>
                   Our mission is to create the most trustworthy, transparent,
-                  and elegant real estate marketplace in Lebanon — one that
+                  and elegant real estate marketplace in Lebanon - one that
                   honours the sophistication of Lebanese property and the
                   intelligence of Lebanese buyers.
                 </p>
@@ -213,3 +213,4 @@ export default function AboutPage() {
     </div>
   )
 }
+

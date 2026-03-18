@@ -1,0 +1,44 @@
+
+> othman-real-estate@0.1.0 dev
+> next dev --port 3001
+
+   ▲ Next.js 15.5.13
+   - Local:        http://localhost:3001
+   - Network:      http://172.28.176.1:3001
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 2.4s
+ ✓ Compiled /middleware in 495ms (164 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 2.9s (947 modules)
+ ✓ Compiled in 918ms (348 modules)
+ GET / 200 in 4668ms
+ ○ Compiling /api/me ...
+ ✓ Compiled /api/me in 599ms (954 modules)
+ GET /api/me 200 in 1670ms
+ GET /api/me 200 in 877ms
+ ○ Compiling /auth/login ...
+ ✓ Compiled /auth/login in 913ms (980 modules)
+ GET /auth/login?registered=1&email=test@example.com 200 in 1523ms
+ GET /api/me 200 in 1283ms
+ GET /api/me 200 in 795ms
+ ✓ Compiled /privacy in 385ms (982 modules)
+ GET /privacy 200 in 1007ms
+ GET /api/me 200 in 856ms
+ GET /api/me 200 in 1469ms
+ ✓ Compiled in 500ms (996 modules)
+ GET /privacy 200 in 199ms
+ ✓ Compiled /terms in 348ms (984 modules)
+ GET /terms 200 in 800ms
+ GET /api/me 200 in 852ms
+ GET /api/me 200 in 813ms
+ GET /auth/login 200 in 377ms
+ ○ Compiling /dashboard/profile ...
+ ✓ Compiled /dashboard/profile in 1430ms (1052 modules)
+ GET /api/me 200 in 2360ms
+ GET /dashboard/profile 200 in 3288ms
+ GET /dashboard/profile 200 in 1474ms
+ GET / 200 in 1574ms
+ ✓ Compiled in 418ms (384 modules)
+ GET / 200 in 173ms

@@ -115,7 +115,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
               type="submit"
               className="h-10 px-4 rounded-lg bg-[#fa6b05] text-white text-sm font-semibold hover:bg-[#c85604] transition-colors shadow-[0_2px_8px_rgba(250,107,5,0.20)]"
             >
-              IconSearch
+              Search
             </button>
           </form>
         </div>

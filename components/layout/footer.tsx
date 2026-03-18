@@ -1,4 +1,4 @@
-import {
+﻿import {
   IconBrandFacebook,
   IconBrandInstagram,
   IconBrandLinkedin,
@@ -73,7 +73,7 @@ export function Footer() {
 
             <p className="text-[#8b8178] text-sm leading-relaxed max-w-sm">
               Lebanon&apos;s premier real estate marketplace. Connecting buyers,
-              sellers, and renters with exceptional properties — from the cedar
+              sellers, and renters with exceptional properties - from the cedar
               mountains to the Mediterranean coast.
             </p>
 
@@ -201,7 +201,7 @@ export function Footer() {
             >
               Privacy Policy
             </Link>
-            <span className="text-[rgba(34,24,18,0.20)] text-xs">·</span>
+            <span className="text-[rgba(34,24,18,0.20)] text-xs">&middot;</span>
             <Link
               href="/terms"
               className="text-xs text-[#8b8178] hover:text-[#5f554d] transition-colors duration-200"
@@ -214,3 +214,5 @@ export function Footer() {
     </footer>
   )
 }
+
+

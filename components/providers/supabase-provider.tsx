@@ -57,7 +57,29 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    void fetchProfile()
+    let isActive = true
+
+    const initializeUser = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+
+        if (session) {
+          await fetchProfile()
+          return
+        }
+      } catch {
+        // Fall back to the anonymous state if session lookup fails.
+      }
+
+      if (isActive) {
+        setUser(null)
+        setLoading(false)
+      }
+    }
+
+    void initializeUser()
 
     const {
       data: { subscription },
@@ -70,7 +92,10 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      isActive = false
+      subscription.unsubscribe()
+    }
   }, [supabase, fetchProfile])
 
   const value = useMemo(

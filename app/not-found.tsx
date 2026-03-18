@@ -20,7 +20,7 @@ export default function NotFound() {
           <Button asChild size="lg">
             <Link href="/" className="gap-2">
               <IconHome className="h-4 w-4" />
-              Go IconHome
+              Go Home
             </Link>
           </Button>
           <Button variant="secondary" asChild size="lg">

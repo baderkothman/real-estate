@@ -1,4 +1,4 @@
-import {
+﻿import {
   IconBath,
   IconBed,
   IconCalendar,
@@ -181,7 +181,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                         <span className="font-semibold text-[#181411]">
                           {property.areaSqM}
                         </span>{' '}
-                        m²
+                        sq m
                       </span>
                     </div>
                   )}
@@ -268,7 +268,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                   </p>
                 )}
 
-                {/* Contact — only for approved properties */}
+                {/* Contact â€” only for approved properties */}
                 {isApproved && (
                   <div className="space-y-2 border-t border-[rgba(34,24,18,0.08)] pt-4">
                     {user ? (
@@ -359,3 +359,4 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     </div>
   )
 }
+

@@ -1,4 +1,4 @@
-import {
+﻿import {
   IconArrowRight,
   IconKey,
   IconMessage,
@@ -25,7 +25,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* ── Hero ───────────────────────────────────────────────────────────── */}
+      {/* â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-[#fcfaf7]">
         {/* Warm radial gradient background */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_#fef3e7_0%,_#fcfaf7_65%)]" />
@@ -59,7 +59,7 @@ export default async function HomePage() {
             </h1>
 
             <p className="text-[#5f554d] text-lg md:text-xl leading-relaxed mb-10 max-w-xl">
-              From the shores of Byblos to the heights of Faraya — discover
+              From the shores of Byblos to the heights of Faraya - discover
               exceptional homes, apartments, and commercial spaces across
               Lebanon&apos;s most coveted addresses.
             </p>
@@ -107,7 +107,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Featured Properties ─────────────────────────────────────────────── */}
+      {/* â”€â”€ Featured Properties â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {featured.length > 0 && (
         <section className="py-20 bg-[#fcfaf7]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -126,7 +126,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── Latest Properties ───────────────────────────────────────────────── */}
+      {/* â”€â”€ Latest Properties â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className="py-20 bg-[#faf7eb]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeader
@@ -151,7 +151,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── How It Works ────────────────────────────────────────────────────── */}
+      {/* â”€â”€ How It Works â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className="py-20 bg-[#fcfaf7]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeader
@@ -174,7 +174,7 @@ export default async function HomePage() {
                 step: '02',
                 title: 'Connect Directly',
                 description:
-                  'Contact property owners and agents directly — no middlemen, no hidden fees. Get real information from real people who know their properties.',
+                  'Contact property owners and agents directly - no middlemen, no hidden fees. Get real information from real people who know their properties.',
               },
               {
                 icon: IconKey,
@@ -207,7 +207,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Testimonials ────────────────────────────────────────────────────── */}
+      {/* â”€â”€ Testimonials â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className="py-20 bg-[#faf7eb]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeader
@@ -261,7 +261,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── CTA ─────────────────────────────────────────────────────────────── */}
+      {/* â”€â”€ CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section className="py-24 bg-[#14110f]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-[24px] bg-[#211c18] border border-white/5 overflow-hidden px-8 py-16 text-center">
@@ -273,7 +273,7 @@ export default async function HomePage() {
               </h2>
               <p className="text-[#a09070] text-lg mb-8 max-w-xl mx-auto">
                 Join hundreds of owners and agents on Lebanon&apos;s leading
-                real estate platform. Start with a free account — no credit card
+                real estate platform. Start with a free account - no credit card
                 required.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -294,3 +294,4 @@ export default async function HomePage() {
     </div>
   )
 }
+

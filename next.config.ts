@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['127.0.0.1'],
   images: {
     // Serve remote images directly until the app is moved to a fully patched
     // Next.js line for the remaining image-optimizer advisory.

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useSupabase } from '@/components/providers/supabase-provider'
 
 interface UseSavePropertyReturn {
   isSaved: boolean
@@ -12,10 +13,24 @@ export function useSaveProperty(
   propertyId: string,
   initialSaved: boolean
 ): UseSavePropertyReturn {
+  const { user } = useSupabase()
   const [isSaved, setIsSaved] = useState(initialSaved)
   const [isLoading, setIsLoading] = useState(false)
+  const loginUrl = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return '/auth/login'
+    }
+
+    const callbackUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`
+    return `/auth/login?callbackUrl=${encodeURIComponent(callbackUrl)}`
+  }, [])
 
   const toggle = async () => {
+    if (!user) {
+      window.location.href = loginUrl
+      return
+    }
+
     setIsLoading(true)
     try {
       const res = await fetch(`/api/properties/${propertyId}/save`, {
@@ -24,8 +39,7 @@ export function useSaveProperty(
       })
 
       if (res.status === 401) {
-        // Redirect to login
-        window.location.href = '/auth/login'
+        window.location.href = loginUrl
         return
       }
 

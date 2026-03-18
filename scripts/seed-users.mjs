@@ -1,5 +1,3 @@
-// scripts/seed-users.mjs
-// Run: node --env-file=.env.local scripts/seed-users.mjs
 import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -16,16 +14,27 @@ const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 })
 
-// ── Admin ────────────────────────────────────────────────────────────────────
-const ADMIN = {
+const ADMIN_USER = {
   email: 'admin@othman.com',
-  password: 'Admin@1234!',
+  password: 'admin123',
   name: 'Othman Admin',
   phone: '+961 1 000 000',
+  plan: 'agency',
+  role: 'admin',
 }
 
-// ── 20 regular users ─────────────────────────────────────────────────────────
-const USERS = [
+const DEMO_USER = {
+  email: 'user@othman.com',
+  password: 'user123',
+  name: 'Othman Demo User',
+  phone: '+961 70 000 001',
+  plan: 'free',
+  role: 'user',
+}
+
+const SAMPLE_USER_PASSWORD = 'User@1234!'
+
+const SAMPLE_USERS = [
   {
     name: 'Rania Khoury',
     email: 'rania.khoury@example.com',
@@ -148,111 +157,117 @@ const USERS = [
   },
 ]
 
-const DEFAULT_PASSWORD = 'User@1234!'
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 async function listAllUsers() {
-  // Supabase paginates at 1000; one page is enough for seeding
   const { data, error } = await admin.auth.admin.listUsers({ perPage: 1000 })
-  if (error) throw new Error(`listUsers: ${error.message}`)
+  if (error) {
+    throw new Error(`listUsers: ${error.message}`)
+  }
   return data.users
 }
 
-async function upsertAuthUser(email, password, name, phone, existingUsers) {
-  const existing = existingUsers.find((u) => u.email === email)
+async function ensureAuthUser(account, existingUsers) {
+  const existing = existingUsers.get(account.email.toLowerCase())
 
   if (existing) {
-    // Update password so we always know the credential
-    const { error } = await admin.auth.admin.updateUserById(existing.id, {
-      password,
+    const { data, error } = await admin.auth.admin.updateUserById(existing.id, {
+      email: account.email,
+      password: account.password,
+      email_confirm: true,
+      user_metadata: {
+        name: account.name,
+        phone: account.phone,
+      },
     })
-    if (error) throw new Error(`updatePassword ${email}: ${error.message}`)
-    return { user: existing, created: false }
+
+    if (error) {
+      throw new Error(`updateUser ${account.email}: ${error.message}`)
+    }
+
+    return { user: data.user ?? existing, created: false }
   }
 
   const { data, error } = await admin.auth.admin.createUser({
-    email,
-    password,
+    email: account.email,
+    password: account.password,
     email_confirm: true,
-    user_metadata: { name, phone },
+    user_metadata: {
+      name: account.name,
+      phone: account.phone,
+    },
   })
-  if (error) throw new Error(`createUser ${email}: ${error.message}`)
+
+  if (error || !data.user) {
+    throw new Error(`createUser ${account.email}: ${error?.message}`)
+  }
+
   return { user: data.user, created: true }
 }
 
-async function setProfileRole(userId, role) {
-  const { error } = await admin
-    .from('profiles')
-    .update({ role })
-    .eq('id', userId)
-  if (error) throw new Error(`setRole ${userId}: ${error.message}`)
+async function syncProfile(userId, account) {
+  const { error } = await admin.from('profiles').upsert(
+    {
+      id: userId,
+      email: account.email.toLowerCase(),
+      name: account.name,
+      phone: account.phone,
+      plan: account.plan,
+      role: account.role,
+      is_banned: false,
+    },
+    {
+      onConflict: 'id',
+    }
+  )
+
+  if (error) {
+    throw new Error(`syncProfile ${account.email}: ${error.message}`)
+  }
 }
 
-async function setProfilePlan(userId, plan) {
-  const { error } = await admin
-    .from('profiles')
-    .update({ plan })
-    .eq('id', userId)
-  if (error) throw new Error(`setPlan ${userId}: ${error.message}`)
-}
+async function seedAccount(account, existingUsers) {
+  const { user, created } = await ensureAuthUser(account, existingUsers)
+  await syncProfile(user.id, account)
+  existingUsers.set(account.email.toLowerCase(), user)
 
-// ── Main ──────────────────────────────────────────────────────────────────────
+  console.log(
+    `${created ? 'created' : 'updated'} ${account.role.padEnd(5)} ${account.email} (${account.plan})`
+  )
+}
 
 async function main() {
-  // Load all existing auth users once to avoid N+1 listUsers calls
-  const existingUsers = await listAllUsers()
-  console.log(`Found ${existingUsers.length} existing auth user(s).\n`)
-
-  // ── Admin ─────────────────────────────────────────────────────────────────
-  console.log('── Seeding admin ──────────────────────────────────────')
-  const { user: adminUser, created: adminCreated } = await upsertAuthUser(
-    ADMIN.email,
-    ADMIN.password,
-    ADMIN.name,
-    ADMIN.phone,
-    existingUsers
-  )
-  await setProfileRole(adminUser.id, 'admin')
-  console.log(
-    `${adminCreated ? '✓ created' : '✓ updated'} admin: ${ADMIN.email}`
+  const existingUsers = new Map(
+    (await listAllUsers()).map((user) => [user.email?.toLowerCase(), user])
   )
 
-  // ── Regular users ─────────────────────────────────────────────────────────
-  console.log('\n── Seeding 20 users ───────────────────────────────────')
-  for (const u of USERS) {
-    const { user, created } = await upsertAuthUser(
-      u.email,
-      DEFAULT_PASSWORD,
-      u.name,
-      u.phone,
+  console.log(`Found ${existingUsers.size} existing auth user(s).`)
+  console.log('')
+  console.log('Seeding demo accounts...')
+
+  await seedAccount(ADMIN_USER, existingUsers)
+  await seedAccount(DEMO_USER, existingUsers)
+
+  console.log('')
+  console.log('Seeding sample directory users...')
+
+  for (const sampleUser of SAMPLE_USERS) {
+    await seedAccount(
+      {
+        ...sampleUser,
+        password: SAMPLE_USER_PASSWORD,
+        role: 'user',
+      },
       existingUsers
-    )
-    if (u.plan !== 'free') await setProfilePlan(user.id, u.plan)
-    const tag = created ? 'created' : 'updated'
-    console.log(
-      `✓ ${tag.padEnd(7)} ${u.name.padEnd(22)} ${u.email}  [${u.plan}]`
     )
   }
 
-  // ── Summary ───────────────────────────────────────────────────────────────
-  console.log(`
-── Security notes ──────────────────────────────────────
-  Passwords are stored by Supabase Auth as bcrypt hashes
-  in the internal auth.users table. The profiles table
-  has NO password column — credentials never touch it.
-
-── Admin credentials ────────────────────────────────────
-  Email   : ${ADMIN.email}
-  Password: ${ADMIN.password}
-  Role    : admin
-
-── Regular user password ────────────────────────────────
-  Password: ${DEFAULT_PASSWORD}  (same for all 20 users)
-`)
+  console.log('')
+  console.log('Demo credentials:')
+  console.log(`- Admin: ${ADMIN_USER.email} / ${ADMIN_USER.password}`)
+  console.log(`- User: ${DEMO_USER.email} / ${DEMO_USER.password}`)
+  console.log(`- Sample directory users: ${SAMPLE_USER_PASSWORD}`)
 }
 
-main().catch((err) => {
-  console.error(err)
+main().catch((error) => {
+  console.error(error)
   process.exit(1)
 })

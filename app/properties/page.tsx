@@ -82,7 +82,7 @@ async function PropertiesList({
           description={
             hasActiveFilters
               ? 'Try adjusting your filters to see more results.'
-              : 'No properties are listed at the moment. IconCheck back soon!'
+              : 'No properties are listed at the moment. Check back soon.'
           }
           actionLabel={hasActiveFilters ? 'Clear Filters' : undefined}
           actionHref={hasActiveFilters ? '/properties' : undefined}

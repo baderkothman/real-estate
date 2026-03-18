@@ -47,7 +47,6 @@ export function PropertyCard({
         className
       )}
     >
-      {/* Image */}
       <Link
         href={`/properties/${property.id}`}
         className="relative block aspect-[3/2] overflow-hidden"
@@ -60,10 +59,8 @@ export function PropertyCard({
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
 
-        {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#181411]/65 via-[#181411]/10 to-transparent" />
 
-        {/* Sold overlay */}
         {property.isSold && (
           <div className="absolute inset-0 bg-[#181411]/70 flex items-center justify-center backdrop-blur-[1px]">
             <div className="bg-[#181411] text-white font-display text-xl font-bold tracking-[0.2em] px-8 py-2.5 rotate-[-12deg] shadow-xl border-2 border-white/15">
@@ -72,7 +69,6 @@ export function PropertyCard({
           </div>
         )}
 
-        {/* Top badges */}
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
           {property.isFeatured && (
             <span className="inline-flex items-center gap-1 rounded-full bg-[#fa6b05] px-2.5 py-1 text-[10px] font-semibold text-white shadow-[0_2px_8px_rgba(250,107,5,0.35)]">
@@ -104,7 +100,6 @@ export function PropertyCard({
           )}
         </div>
 
-        {/* Save button */}
         <button
           type="button"
           onClick={(e) => {
@@ -124,7 +119,6 @@ export function PropertyCard({
           <IconHeart className={cn('h-3.5 w-3.5', isSaved && 'fill-current')} />
         </button>
 
-        {/* Bottom of image — image count + listing type */}
         <div className="absolute bottom-3 inset-x-3 flex items-end justify-between">
           {property.images.length > 1 && (
             <span className="flex items-center gap-1 rounded-full bg-[#181411]/50 backdrop-blur-sm px-2 py-1 text-[10px] text-white">
@@ -145,24 +139,18 @@ export function PropertyCard({
         </div>
       </Link>
 
-      {/* Body */}
       <div className="flex flex-col flex-1 p-4 pt-3.5">
-        {/* Location */}
         <div className="flex items-center gap-1 text-[#8b8178] mb-1.5">
           <IconMapPin className="h-3 w-3 shrink-0" />
-          <span className="text-xs tracking-wide truncate">
-            {property.city}
-          </span>
+          <span className="text-xs tracking-wide truncate">{property.city}</span>
         </div>
 
-        {/* Title */}
         <Link href={`/properties/${property.id}`}>
           <h3 className="font-display text-[#181411] font-medium text-[1.05rem] leading-snug line-clamp-2 hover:text-[#fa6b05] transition-colors duration-200 mb-2.5">
             {property.title}
           </h3>
         </Link>
 
-        {/* Price */}
         <div className="flex items-baseline gap-1.5 mb-3">
           <span className="font-mono text-[1.3rem] font-semibold text-[#fa6b05] leading-none">
             {formatPrice(property.price)}
@@ -172,7 +160,6 @@ export function PropertyCard({
           )}
         </div>
 
-        {/* Specs */}
         {(property.bedrooms || property.bathrooms || property.areaSqM) && (
           <div className="flex items-center gap-3 text-[#8b8178] text-xs pb-3.5 mb-3 border-b border-[rgba(34,24,18,0.08)]">
             {property.bedrooms !== undefined && property.bedrooms > 0 && (
@@ -190,13 +177,12 @@ export function PropertyCard({
             {property.areaSqM && (
               <span className="flex items-center gap-1">
                 <IconSquare className="h-3.5 w-3.5" />
-                {property.areaSqM.toLocaleString()} m²
+                {property.areaSqM.toLocaleString()} sq m
               </span>
             )}
           </div>
         )}
 
-        {/* Owner */}
         {property.ownerName && (
           <div className="mt-auto flex items-center gap-2">
             <div className="h-6 w-6 rounded-full bg-[#faf7eb] overflow-hidden shrink-0 ring-1 ring-[rgba(34,24,18,0.08)]">

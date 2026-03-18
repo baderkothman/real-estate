@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { IconCirclePlus, IconDeviceFloppy, IconX } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
@@ -271,7 +271,7 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Area (m²)</Label>
+              <Label>Area (sq m)</Label>
               <Input
                 type="number"
                 value={form.areaSqM}
@@ -299,7 +299,7 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
 
         <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
           <h3 className="font-display text-lg font-semibold text-[#181411]">
-            IconPhoto
+            Photos
           </h3>
           <div className="space-y-2">
             {imageUrls.map((url, idx) => (
@@ -376,3 +376,5 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
     </div>
   )
 }
+
+

@@ -56,7 +56,7 @@ export function HeroSearch() {
         ))}
       </div>
 
-      {/* IconSearch input row */}
+      {/* Search input row */}
       <div className="flex gap-2.5">
         <div className="relative flex-1">
           <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b8178]" />
@@ -88,7 +88,7 @@ export function HeroSearch() {
             'active:scale-[0.98]'
           )}
         >
-          IconSearch
+          Search
           <IconArrowRight className="h-4 w-4" />
         </button>
       </div>

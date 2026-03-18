@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { IconAlertTriangle, IconCirclePlus, IconX } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
@@ -217,7 +217,7 @@ export default function CreatePropertyPage() {
 
           <div className="space-y-1.5">
             <Label htmlFor="price">
-              Price (USD) * {form.listingType === 'rent' && '— per month'}
+              Price (USD) * {form.listingType === 'rent' && '- per month'}
             </Label>
             <Input
               id="price"
@@ -254,7 +254,7 @@ export default function CreatePropertyPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="area">Area (m²)</Label>
+              <Label htmlFor="area">Area (sq m)</Label>
               <Input
                 id="area"
                 type="number"
@@ -277,7 +277,7 @@ export default function CreatePropertyPage() {
             <textarea
               id="description"
               rows={6}
-              placeholder="Describe the property in detail — location, features, nearby amenities..."
+              placeholder="Describe the property in detail - location, features, nearby amenities..."
               value={form.description}
               onChange={(e) => setField('description', e.target.value)}
               className={`flex w-full rounded-lg border bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-[#8b8178] focus:outline-none focus:ring-2 transition-colors resize-none ${
@@ -292,11 +292,11 @@ export default function CreatePropertyPage() {
           </div>
         </div>
 
-        {/* IconPhoto */}
+        {/* Photos */}
         <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-display text-lg font-semibold text-[#181411]">
-              IconPhoto
+              Photos
             </h3>
             <span className="text-xs text-[#8b8178]">
               {imageUrls.filter((u) => u.trim()).length} / {planLimit.maxImages}{' '}
@@ -379,3 +379,7 @@ export default function CreatePropertyPage() {
     </div>
   )
 }
+
+
+
+
