@@ -14,10 +14,25 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
 
+const DEFAULT_CALLBACK_URL = '/dashboard/profile'
+
+function getSafeCallbackUrl(value: string | null) {
+  if (!value || !value.startsWith('/') || value.startsWith('//')) {
+    return DEFAULT_CALLBACK_URL
+  }
+
+  try {
+    const parsed = new URL(value, 'http://localhost')
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`
+  } catch {
+    return DEFAULT_CALLBACK_URL
+  }
+}
+
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard/profile'
+  const callbackUrl = getSafeCallbackUrl(searchParams.get('callbackUrl'))
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

@@ -16,8 +16,21 @@ export async function GET(request: NextRequest) {
   const page = parseInt(searchParams.get('page') ?? '1', 10)
   const pageSize = parseInt(searchParams.get('pageSize') ?? '12', 10)
   const status = searchParams.get('status') ?? undefined
+  const supabase = await createClient()
 
   if (isAdmin) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const profile = await getUserById(user.id)
+    if (profile?.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const result = await getAdminProperties(page, pageSize, status ?? 'all')
     return NextResponse.json(result)
   }
@@ -34,7 +47,6 @@ export async function GET(request: NextRequest) {
     search: searchParams.get('search') ?? undefined,
   }
 
-  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
