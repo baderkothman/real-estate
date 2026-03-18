@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { getInitials } from '@/lib/utils'
+import { getPasswordPolicyErrorMessage } from '@/lib/supabase/auth-errors'
 
 interface ProfileData {
   name: string
@@ -104,7 +105,7 @@ export default function EditProfilePage() {
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Failed to change password.'
-      setErrorMsg(message)
+      setErrorMsg(getPasswordPolicyErrorMessage(message))
     } finally {
       setIsSavingPw(false)
     }

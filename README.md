@@ -53,10 +53,10 @@ After running `npm run seed:users`:
 
 | Role  | Email             | Password |
 |-------|-------------------|----------|
-| Admin | admin@othman.com  | admin123 |
-| User  | user@othman.com   | user123  |
+| Admin | admin@othman.com  | OthmanAdmin#6421! |
+| User  | user@othman.com   | OthmanUser#6421! |
 
-The seed script also creates a directory of sample public users. Their shared password is `User@1234!`.
+The seed script also creates a directory of sample public users. Their shared password is `OthmanSample#6421!`.
 
 ## Commands
 

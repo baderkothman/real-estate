@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
+import { getRegisterErrorMessage } from '@/lib/supabase/auth-errors'
 
 const registerSchema = z
   .object({
@@ -30,18 +31,6 @@ const registerSchema = z
   })
 
 type RegisterForm = z.infer<typeof registerSchema>
-
-function getRegisterErrorMessage(message: string) {
-  if (/rate limit/i.test(message)) {
-    return 'Too many signup attempts were sent recently. Please wait a minute and try again.'
-  }
-
-  if (/already registered/i.test(message)) {
-    return 'An account with this email already exists. Try signing in instead.'
-  }
-
-  return message
-}
 
 export function RegisterPage() {
   const router = useRouter()

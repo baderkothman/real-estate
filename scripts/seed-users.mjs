@@ -16,7 +16,7 @@ const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
 
 const ADMIN_USER = {
   email: 'admin@othman.com',
-  password: 'admin123',
+  password: 'OthmanAdmin#6421!',
   name: 'Othman Admin',
   phone: '+961 1 000 000',
   plan: 'agency',
@@ -25,14 +25,14 @@ const ADMIN_USER = {
 
 const DEMO_USER = {
   email: 'user@othman.com',
-  password: 'user123',
+  password: 'OthmanUser#6421!',
   name: 'Othman Demo User',
   phone: '+961 70 000 001',
   plan: 'free',
   role: 'user',
 }
 
-const SAMPLE_USER_PASSWORD = 'User@1234!'
+const SAMPLE_USER_PASSWORD = 'OthmanSample#6421!'
 
 const SAMPLE_USERS = [
   {
