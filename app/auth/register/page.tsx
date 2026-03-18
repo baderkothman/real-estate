@@ -1,6 +1,11 @@
 'use client'
 
-import { AlertCircle, Eye, EyeOff, UserPlus } from 'lucide-react'
+import {
+  IconAlertCircle,
+  IconEye,
+  IconEyeOff,
+  IconUserPlus,
+} from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -127,7 +132,7 @@ export default function RegisterPage() {
         <div className="rounded-[20px] border border-[rgba(34,24,18,0.08)] bg-white shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-8">
           {serverError && (
             <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-              <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+              <IconAlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
               <p className="text-sm text-red-600">{serverError}</p>
             </div>
           )}
@@ -190,9 +195,9 @@ export default function RegisterPage() {
                   className="absolute right-3 top-3 text-[#8b8178] hover:text-[#5f554d] transition-colors"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
+                    <IconEyeOff className="h-4 w-4" />
                   ) : (
-                    <Eye className="h-4 w-4" />
+                    <IconEye className="h-4 w-4" />
                   )}
                 </button>
               </div>
@@ -217,9 +222,9 @@ export default function RegisterPage() {
                   className="absolute right-3 top-3 text-[#8b8178] hover:text-[#5f554d] transition-colors"
                 >
                   {showConfirm ? (
-                    <EyeOff className="h-4 w-4" />
+                    <IconEyeOff className="h-4 w-4" />
                   ) : (
-                    <Eye className="h-4 w-4" />
+                    <IconEye className="h-4 w-4" />
                   )}
                 </button>
               </div>
@@ -268,7 +273,7 @@ export default function RegisterPage() {
                 </span>
               ) : (
                 <>
-                  <UserPlus className="h-4 w-4" />
+                  <IconUserPlus className="h-4 w-4" />
                   Create Account
                 </>
               )}

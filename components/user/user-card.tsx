@@ -1,4 +1,4 @@
-import { Building2, Mail } from 'lucide-react'
+import { IconBuilding, IconMail } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { cn, getInitials, truncate } from '@/lib/utils'
@@ -76,12 +76,12 @@ export function UserCard({ user, propertyCount, className }: UserCardProps) {
       {/* Footer */}
       <div className="mt-auto space-y-2 pt-3 border-t border-[rgba(34,24,18,0.08)]">
         <div className="flex items-center gap-2 text-xs text-[#8b8178]">
-          <Mail className="h-3.5 w-3.5 shrink-0" />
+          <IconMail className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">{user.email}</span>
         </div>
         {propertyCount !== undefined && (
           <div className="flex items-center gap-2 text-xs text-[#8b8178]">
-            <Building2 className="h-3.5 w-3.5 shrink-0" />
+            <IconBuilding className="h-3.5 w-3.5 shrink-0" />
             <span>
               {propertyCount} propert{propertyCount !== 1 ? 'ies' : 'y'} listed
             </span>

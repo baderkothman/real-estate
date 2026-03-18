@@ -1,6 +1,10 @@
 'use client'
 
-import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconDots,
+} from '@tabler/icons-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
@@ -55,7 +59,7 @@ export function Pagination({ page, totalPages, className }: PaginationProps) {
         aria-label="Previous page"
         className={navBtn}
       >
-        <ChevronLeft className="h-4 w-4" />
+        <IconChevronLeft className="h-4 w-4" />
       </button>
 
       <div className="flex items-center gap-1">
@@ -65,7 +69,7 @@ export function Pagination({ page, totalPages, className }: PaginationProps) {
               key={`e-${idx}`}
               className="h-9 w-9 flex items-center justify-center text-[#8b8178]"
             >
-              <MoreHorizontal className="h-4 w-4" />
+              <IconDots className="h-4 w-4" />
             </span>
           ) : (
             <button
@@ -93,7 +97,7 @@ export function Pagination({ page, totalPages, className }: PaginationProps) {
         aria-label="Next page"
         className={navBtn}
       >
-        <ChevronRight className="h-4 w-4" />
+        <IconChevronRight className="h-4 w-4" />
       </button>
 
       <span className="hidden sm:block text-xs text-[#8b8178] ml-2">

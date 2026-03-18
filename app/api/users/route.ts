@@ -3,8 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import {
   createUser,
   getPublicUsers,
-  getUsers,
   getUserById,
+  getUsers,
 } from '@/services/user.service'
 
 export async function GET(request: NextRequest) {

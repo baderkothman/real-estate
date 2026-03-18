@@ -1,11 +1,11 @@
 import {
-  Facebook,
-  Instagram,
-  Linkedin,
-  Mail,
-  MapPin,
-  Phone,
-} from 'lucide-react'
+  IconBrandFacebook,
+  IconBrandInstagram,
+  IconBrandLinkedin,
+  IconMail,
+  IconMapPin,
+  IconPhone,
+} from '@tabler/icons-react'
 import Link from 'next/link'
 
 // WhatsApp icon (lucide doesn't include it)
@@ -37,10 +37,29 @@ export function Footer() {
           {/* Brand column */}
           <div className="lg:col-span-2 space-y-5">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#fa6b05] flex items-center justify-center shadow-[0_2px_12px_rgba(250,107,5,0.25)]">
-                <span className="font-display text-white text-base font-bold">
-                  O
-                </span>
+              <div className="rounded-[7px] overflow-hidden shadow-[0_2px_12px_rgba(250,107,5,0.25)] shrink-0">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 32 32"
+                  width="36"
+                  height="36"
+                  aria-hidden="true"
+                >
+                  <rect width="32" height="32" rx="7" fill="#fa6b05" />
+                  <path d="M16 4.5 L29 16 L3 16 Z" fill="white" />
+                  <rect
+                    x="8"
+                    y="14.5"
+                    width="16"
+                    height="13"
+                    rx="1.5"
+                    fill="white"
+                  />
+                  <path
+                    d="M13.5 27.5 L13.5 22 Q13.5 19 16 19 Q18.5 19 18.5 22 L18.5 27.5 Z"
+                    fill="#fa6b05"
+                  />
+                </svg>
               </div>
               <div>
                 <span className="font-display text-2xl font-semibold text-[#fa6b05] tracking-wide">
@@ -61,9 +80,9 @@ export function Footer() {
             {/* Contact info */}
             <div className="space-y-2.5">
               {[
-                { Icon: MapPin, text: 'Hamra Street, Beirut, Lebanon' },
-                { Icon: Phone, text: '+961 1 234 567' },
-                { Icon: Mail, text: 'hello@othmanre.com' },
+                { Icon: IconMapPin, text: 'Hamra Street, Beirut, Lebanon' },
+                { Icon: IconPhone, text: '+961 1 234 567' },
+                { Icon: IconMail, text: 'hello@othmanre.com' },
               ].map(({ Icon, text }) => (
                 <div
                   key={text}
@@ -80,12 +99,12 @@ export function Footer() {
               {[
                 {
                   href: 'https://instagram.com',
-                  Icon: Instagram,
+                  Icon: IconBrandInstagram,
                   label: 'Instagram',
                 },
                 {
                   href: 'https://facebook.com',
-                  Icon: Facebook,
+                  Icon: IconBrandFacebook,
                   label: 'Facebook',
                 },
                 {
@@ -95,7 +114,7 @@ export function Footer() {
                 },
                 {
                   href: 'https://linkedin.com',
-                  Icon: Linkedin,
+                  Icon: IconBrandLinkedin,
                   label: 'LinkedIn',
                 },
               ].map(({ href, Icon, label }) => (

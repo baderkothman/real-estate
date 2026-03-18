@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@latest/schema.json",
-  "ignore": [".next/**"],
   "ignoreDependencies": ["@biomejs/biome", "eslint", "eslint-config-next"],
-  "ignoreExportsUsedInFile": true
+  "ignoreExportsUsedInFile": true,
+  "ignore": ["scripts/**"]
 }

@@ -45,14 +45,6 @@ export function formatRelativeDate(date: Date | string): string {
   return `${diffYears} year${diffYears !== 1 ? 's' : ''} ago`
 }
 
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-}
-
 export function truncate(text: string, length: number): string {
   if (text.length <= length) return text
   return `${text.slice(0, length).trimEnd()}…`
@@ -65,21 +57,4 @@ export function getInitials(name: string): string {
     .join('')
     .toUpperCase()
     .slice(0, 2)
-}
-
-export function generateId(): string {
-  return Math.random().toString(36).slice(2, 11)
-}
-
-export function buildUrl(
-  base: string,
-  params: Record<string, string | number | undefined>
-): string {
-  const url = new URL(base, 'http://localhost')
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== '') {
-      url.searchParams.set(key, String(value))
-    }
-  })
-  return url.pathname + url.search
 }

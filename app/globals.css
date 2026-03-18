@@ -112,6 +112,17 @@
   }
 }
 
+@layer utilities {
+  /* Safe area padding for iOS notched devices */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  /* Main content bottom padding on mobile to clear fixed nav */
+  .mobile-nav-pad {
+    @apply pb-[76px] md:pb-0;
+  }
+}
+
 @layer components {
   .font-display {
     font-family: "Playfair Display", Georgia, serif;

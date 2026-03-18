@@ -19,7 +19,7 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noArrayIndexKey": "warn",
+        "noArrayIndexKey": "off",
         "useBiomeIgnoreFolder": "off"
       },
       "performance": {

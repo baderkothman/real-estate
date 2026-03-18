@@ -1,14 +1,14 @@
 'use client'
 
 import {
-  CheckCircle,
-  ChevronLeft,
-  ChevronRight,
-  Star,
-  StarOff,
-  Trash2,
-  XCircle,
-} from 'lucide-react'
+  IconChevronLeft,
+  IconChevronRight,
+  IconCircleCheck,
+  IconCircleX,
+  IconStar,
+  IconStarOff,
+  IconTrash,
+} from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
@@ -212,7 +212,7 @@ export default function AdminPropertiesPage() {
                                 className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 disabled:opacity-50 transition-colors"
                                 title="Approve"
                               >
-                                <CheckCircle className="h-3.5 w-3.5" />
+                                <IconCircleCheck className="h-3.5 w-3.5" />
                               </button>
                               <button
                                 type="button"
@@ -225,7 +225,7 @@ export default function AdminPropertiesPage() {
                                 className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 transition-colors"
                                 title="Reject"
                               >
-                                <XCircle className="h-3.5 w-3.5" />
+                                <IconCircleX className="h-3.5 w-3.5" />
                               </button>
                             </>
                           )}
@@ -259,7 +259,7 @@ export default function AdminPropertiesPage() {
                                   className="p-1.5 rounded-lg bg-[#fef0e6] text-[#fa6b05] hover:bg-[#fa6b05]/15 transition-colors"
                                   title="Feature"
                                 >
-                                  <Star className="h-3.5 w-3.5" />
+                                  <IconStar className="h-3.5 w-3.5" />
                                 </button>
                               </div>
                             )}
@@ -272,7 +272,7 @@ export default function AdminPropertiesPage() {
                               className="p-1.5 rounded-lg bg-[#faf7eb] text-[#8b8178] hover:bg-[rgba(34,24,18,0.08)] transition-colors"
                               title="Unfeature"
                             >
-                              <StarOff className="h-3.5 w-3.5" />
+                              <IconStarOff className="h-3.5 w-3.5" />
                             </button>
                           )}
                           <button
@@ -285,7 +285,7 @@ export default function AdminPropertiesPage() {
                             className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
                             title="Delete"
                           >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <IconTrash className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       </td>
@@ -305,7 +305,7 @@ export default function AdminPropertiesPage() {
                 onClick={() => setPage((p) => p - 1)}
                 disabled={page <= 1}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <IconChevronLeft className="h-4 w-4" />
               </Button>
               <span className="text-sm text-[#8b8178]">
                 Page {page} of {result.totalPages}
@@ -316,7 +316,7 @@ export default function AdminPropertiesPage() {
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= result.totalPages}
               >
-                <ChevronRight className="h-4 w-4" />
+                <IconChevronRight className="h-4 w-4" />
               </Button>
             </div>
           )}

@@ -1,6 +1,10 @@
 'use client'
 
-import { Search, SlidersHorizontal, X } from 'lucide-react'
+import {
+  IconAdjustmentsHorizontal,
+  IconSearch,
+  IconX,
+} from '@tabler/icons-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -60,7 +64,7 @@ export function PropertyFilters() {
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(34,24,18,0.08)] bg-[#faf7eb]">
         <div className="flex items-center gap-2.5">
-          <SlidersHorizontal className="h-4 w-4 text-[#fa6b05]" />
+          <IconAdjustmentsHorizontal className="h-4 w-4 text-[#fa6b05]" />
           <h2 className="font-display text-base font-semibold text-[#181411]">
             Filters
           </h2>
@@ -76,7 +80,7 @@ export function PropertyFilters() {
             onClick={handleReset}
             className="flex items-center gap-1 text-xs text-[#8b8178] hover:text-red-600 transition-colors duration-200"
           >
-            <X className="h-3.5 w-3.5" />
+            <IconX className="h-3.5 w-3.5" />
             Clear
           </button>
         )}
@@ -143,10 +147,10 @@ export function PropertyFilters() {
           </div>
         </div>
 
-        {/* Search */}
+        {/* IconSearch */}
         <Button onClick={handleSearch} className="w-full gap-2 mt-1">
-          <Search className="h-4 w-4" />
-          Search Properties
+          <IconSearch className="h-4 w-4" />
+          IconSearch Properties
         </Button>
       </div>
     </div>

@@ -163,10 +163,7 @@ export async function banUser(id: string, banned: boolean): Promise<boolean> {
 
 export async function changeUserPlan(id: string, plan: Plan): Promise<boolean> {
   const admin = createAdminClient()
-  const { error } = await admin
-    .from('profiles')
-    .update({ plan })
-    .eq('id', id)
+  const { error } = await admin.from('profiles').update({ plan }).eq('id', id)
   return !error
 }
 
@@ -185,9 +182,7 @@ export async function getPublicUsers(
     .order('created_at', { ascending: false })
 
   if (search) {
-    query = query.or(
-      `name.ilike.%${search}%,email.ilike.%${search}%`
-    )
+    query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%`)
   }
   if (plan && plan !== 'all') {
     query = query.eq('plan', plan)

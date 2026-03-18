@@ -1,4 +1,4 @@
-import { Users } from 'lucide-react'
+import { IconUsers } from '@tabler/icons-react'
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { EmptyState } from '@/components/common/empty-state'
@@ -45,7 +45,7 @@ async function UsersList({ searchParams }: { searchParams: SearchParams }) {
   if (result.data.length === 0) {
     return (
       <EmptyState
-        icon={Users}
+        icon={IconUsers}
         title="No users found"
         description="Try adjusting your search or filter criteria."
       />
@@ -115,7 +115,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
               type="submit"
               className="h-10 px-4 rounded-lg bg-[#fa6b05] text-white text-sm font-semibold hover:bg-[#c85604] transition-colors shadow-[0_2px_8px_rgba(250,107,5,0.20)]"
             >
-              Search
+              IconSearch
             </button>
           </form>
         </div>

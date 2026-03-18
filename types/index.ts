@@ -16,15 +16,6 @@ export interface User {
   createdAt: Date
 }
 
-export interface UserSession {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-  plan: Plan
-  profileImage?: string
-}
-
 // ─── Property Types ─────────────────────────────────────────────────────────────
 
 export type PropertyStatus = 'pending' | 'approved' | 'rejected'
@@ -92,20 +83,6 @@ export interface AnalyticsSummary {
   soldProperties: number
 }
 
-export interface PropertyStatRow {
-  label: string
-  count: number
-  percentage: number
-}
-
-// ─── Saved Property ─────────────────────────────────────────────────────────────
-
-export interface SavedProperty {
-  userId: string
-  propertyId: string
-  savedAt: Date
-}
-
 // ─── Pagination ─────────────────────────────────────────────────────────────────
 
 export interface PaginatedResult<T> {
@@ -114,17 +91,6 @@ export interface PaginatedResult<T> {
   page: number
   pageSize: number
   totalPages: number
-}
-
-// ─── Toast ──────────────────────────────────────────────────────────────────────
-
-export type ToastType = 'success' | 'error' | 'warning' | 'info'
-
-export interface ToastMessage {
-  id: string
-  message: string
-  type: ToastType
-  duration?: number
 }
 
 // ─── Create Inputs ──────────────────────────────────────────────────────────────

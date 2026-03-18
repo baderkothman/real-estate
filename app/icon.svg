@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Orange rounded-square background -->
+  <rect width="32" height="32" rx="7" fill="#fa6b05"/>
+
+  <!-- Roof (white triangle) -->
+  <path d="M16 4.5 L29 16 L3 16 Z" fill="white"/>
+
+  <!-- House body (white rect, overlaps base of roof for clean fill) -->
+  <rect x="8" y="14.5" width="16" height="13" rx="1.5" fill="white"/>
+
+  <!-- Arched door (orange = shows bg colour, reads as a cutout) -->
+  <path d="M13.5 27.5 L13.5 22 Q13.5 19 16 19 Q18.5 19 18.5 22 L18.5 27.5 Z" fill="#fa6b05"/>
+</svg>

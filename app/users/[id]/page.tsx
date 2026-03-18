@@ -1,4 +1,9 @@
-import { Building2, Calendar, Mail, Phone } from 'lucide-react'
+import {
+  IconBuilding,
+  IconCalendar,
+  IconMail,
+  IconPhone,
+} from '@tabler/icons-react'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
@@ -73,21 +78,21 @@ export default async function UserPage({ params }: UserPageProps) {
 
               <div className="flex flex-wrap gap-4 text-sm text-[#8b8178]">
                 <span className="flex items-center gap-1.5">
-                  <Mail className="h-4 w-4" />
+                  <IconMail className="h-4 w-4" />
                   {user.email}
                 </span>
                 {user.phone && (
                   <span className="flex items-center gap-1.5">
-                    <Phone className="h-4 w-4" />
+                    <IconPhone className="h-4 w-4" />
                     {user.phone}
                   </span>
                 )}
                 <span className="flex items-center gap-1.5">
-                  <Calendar className="h-4 w-4" />
+                  <IconCalendar className="h-4 w-4" />
                   Member since {formatDate(user.createdAt)}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Building2 className="h-4 w-4" />
+                  <IconBuilding className="h-4 w-4" />
                   {approvedProps.length} active listing
                   {approvedProps.length !== 1 ? 's' : ''}
                 </span>
@@ -105,7 +110,7 @@ export default async function UserPage({ params }: UserPageProps) {
 
         {approvedProps.length === 0 ? (
           <EmptyState
-            icon={Building2}
+            icon={IconBuilding}
             title="No listings yet"
             description={`${user.name} hasn't listed any properties yet.`}
           />

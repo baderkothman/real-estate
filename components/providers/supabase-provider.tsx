@@ -1,5 +1,6 @@
 'use client'
 
+import type { SupabaseClient } from '@supabase/supabase-js'
 import {
   createContext,
   useCallback,
@@ -8,7 +9,6 @@ import {
   useMemo,
   useState,
 } from 'react'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import type { Plan, UserRole } from '@/types'
 
@@ -31,7 +31,9 @@ interface SupabaseContextType {
   refreshUser: () => Promise<void>
 }
 
-const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined)
+const SupabaseContext = createContext<SupabaseContextType | undefined>(
+  undefined
+)
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const supabase = useMemo(() => createClient(), [])

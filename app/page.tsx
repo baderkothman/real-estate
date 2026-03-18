@@ -1,4 +1,10 @@
-import { ArrowRight, Key, MessageCircle, Search, Star } from 'lucide-react'
+import {
+  IconArrowRight,
+  IconKey,
+  IconMessage,
+  IconSearch,
+  IconStar,
+} from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { HeroSearch } from '@/components/common/hero-search'
@@ -58,7 +64,7 @@ export default async function HomePage() {
               Lebanon&apos;s most coveted addresses.
             </p>
 
-            {/* Search bar */}
+            {/* IconSearch bar */}
             <HeroSearch />
 
             {/* Quick filters */}
@@ -138,7 +144,7 @@ export default async function HomePage() {
             <Button asChild size="lg" variant="outline">
               <Link href="/properties" className="gap-2">
                 Browse All Properties
-                <ArrowRight className="h-4 w-4" />
+                <IconArrowRight className="h-4 w-4" />
               </Link>
             </Button>
           </div>
@@ -157,21 +163,21 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                icon: Search,
+                icon: IconSearch,
                 step: '01',
                 title: 'Browse & Filter',
                 description:
                   'Explore hundreds of verified listings across all Lebanese cities. Filter by location, price, type, and size to find exactly what you need.',
               },
               {
-                icon: MessageCircle,
+                icon: IconMessage,
                 step: '02',
                 title: 'Connect Directly',
                 description:
                   'Contact property owners and agents directly — no middlemen, no hidden fees. Get real information from real people who know their properties.',
               },
               {
-                icon: Key,
+                icon: IconKey,
                 step: '03',
                 title: 'Move In',
                 description:
@@ -219,7 +225,7 @@ export default async function HomePage() {
                 {/* Stars */}
                 <div className="flex gap-1 mb-4">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
+                    <IconStar
                       key={i}
                       className={`h-4 w-4 ${i < t.rating ? 'text-[#fa6b05] fill-[#fa6b05]' : 'text-[rgba(34,24,18,0.12)]'}`}
                     />
@@ -274,7 +280,7 @@ export default async function HomePage() {
                 <Button asChild size="xl">
                   <Link href="/auth/register">
                     Create Free Account
-                    <ArrowRight className="h-5 w-5" />
+                    <IconArrowRight className="h-5 w-5" />
                   </Link>
                 </Button>
                 <Button variant="secondary" asChild size="xl">

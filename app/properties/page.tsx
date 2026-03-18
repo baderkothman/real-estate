@@ -1,4 +1,4 @@
-import { Building2 } from 'lucide-react'
+import { IconBuilding } from '@tabler/icons-react'
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { EmptyState } from '@/components/common/empty-state'
@@ -77,12 +77,12 @@ async function PropertiesList({
 
       {result.data.length === 0 ? (
         <EmptyState
-          icon={Building2}
+          icon={IconBuilding}
           title="No properties found"
           description={
             hasActiveFilters
               ? 'Try adjusting your filters to see more results.'
-              : 'No properties are listed at the moment. Check back soon!'
+              : 'No properties are listed at the moment. IconCheck back soon!'
           }
           actionLabel={hasActiveFilters ? 'Clear Filters' : undefined}
           actionHref={hasActiveFilters ? '/properties' : undefined}

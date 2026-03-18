@@ -1,14 +1,19 @@
 'use client'
 
-import { CheckCircle, Eye, EyeOff, Save } from 'lucide-react'
+import {
+  IconCircleCheck,
+  IconDeviceFloppy,
+  IconEye,
+  IconEyeOff,
+} from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { PlanBadge } from '@/components/common/plan-badge'
+import { useSupabase } from '@/components/providers/supabase-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useSupabase } from '@/components/providers/supabase-provider'
 import { getInitials } from '@/lib/utils'
 
 interface ProfileData {
@@ -89,7 +94,9 @@ export default function EditProfilePage() {
     setIsSavingPw(true)
     setErrorMsg('')
     try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      })
       if (error) throw error
       setSuccessMsg('Password changed successfully!')
       setNewPassword('')
@@ -113,7 +120,7 @@ export default function EditProfilePage() {
 
       {successMsg && (
         <div className="mb-6 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-          <CheckCircle className="h-4 w-4 shrink-0" />
+          <IconCircleCheck className="h-4 w-4 shrink-0" />
           {successMsg}
         </div>
       )}
@@ -221,7 +228,7 @@ export default function EditProfilePage() {
               </span>
             ) : (
               <>
-                <Save className="h-4 w-4" />
+                <IconDeviceFloppy className="h-4 w-4" />
                 Save Changes
               </>
             )}
@@ -252,9 +259,9 @@ export default function EditProfilePage() {
                   className="absolute right-3 top-3 text-[#8b8178] hover:text-[#5f554d]"
                 >
                   {showNewPw ? (
-                    <EyeOff className="h-4 w-4" />
+                    <IconEyeOff className="h-4 w-4" />
                   ) : (
-                    <Eye className="h-4 w-4" />
+                    <IconEye className="h-4 w-4" />
                   )}
                 </button>
               </div>

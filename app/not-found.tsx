@@ -1,4 +1,4 @@
-import { Home, Search } from 'lucide-react'
+import { IconHome, IconSearch } from '@tabler/icons-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -19,13 +19,13 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button asChild size="lg">
             <Link href="/" className="gap-2">
-              <Home className="h-4 w-4" />
-              Go Home
+              <IconHome className="h-4 w-4" />
+              Go IconHome
             </Link>
           </Button>
           <Button variant="secondary" asChild size="lg">
             <Link href="/properties" className="gap-2">
-              <Search className="h-4 w-4" />
+              <IconSearch className="h-4 w-4" />
               Browse Properties
             </Link>
           </Button>

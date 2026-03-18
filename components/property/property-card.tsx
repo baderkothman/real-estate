@@ -1,16 +1,16 @@
 'use client'
 
 import {
-  Bath,
-  Bed,
-  CheckCircle,
-  Clock,
-  Heart,
-  Images,
-  MapPin,
-  Square,
-  Star,
-} from 'lucide-react'
+  IconBath,
+  IconBed,
+  IconCircleCheck,
+  IconClock,
+  IconHeart,
+  IconMapPin,
+  IconPhoto,
+  IconSquare,
+  IconStar,
+} from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useSaveProperty } from '@/hooks/use-save-property'
@@ -76,7 +76,7 @@ export function PropertyCard({
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
           {property.isFeatured && (
             <span className="inline-flex items-center gap-1 rounded-full bg-[#fa6b05] px-2.5 py-1 text-[10px] font-semibold text-white shadow-[0_2px_8px_rgba(250,107,5,0.35)]">
-              <Star className="h-2.5 w-2.5 fill-current" />
+              <IconStar className="h-2.5 w-2.5 fill-current" />
               Featured
             </span>
           )}
@@ -93,10 +93,10 @@ export function PropertyCard({
               )}
             >
               {property.status === 'approved' && (
-                <CheckCircle className="h-2.5 w-2.5" />
+                <IconCircleCheck className="h-2.5 w-2.5" />
               )}
               {property.status === 'pending' && (
-                <Clock className="h-2.5 w-2.5" />
+                <IconClock className="h-2.5 w-2.5" />
               )}
               {property.status.charAt(0).toUpperCase() +
                 property.status.slice(1)}
@@ -121,14 +121,14 @@ export function PropertyCard({
           )}
           aria-label={isSaved ? 'Remove from saved' : 'Save property'}
         >
-          <Heart className={cn('h-3.5 w-3.5', isSaved && 'fill-current')} />
+          <IconHeart className={cn('h-3.5 w-3.5', isSaved && 'fill-current')} />
         </button>
 
         {/* Bottom of image — image count + listing type */}
         <div className="absolute bottom-3 inset-x-3 flex items-end justify-between">
           {property.images.length > 1 && (
             <span className="flex items-center gap-1 rounded-full bg-[#181411]/50 backdrop-blur-sm px-2 py-1 text-[10px] text-white">
-              <Images className="h-3 w-3" />
+              <IconPhoto className="h-3 w-3" />
               {property.images.length}
             </span>
           )}
@@ -149,7 +149,7 @@ export function PropertyCard({
       <div className="flex flex-col flex-1 p-4 pt-3.5">
         {/* Location */}
         <div className="flex items-center gap-1 text-[#8b8178] mb-1.5">
-          <MapPin className="h-3 w-3 shrink-0" />
+          <IconMapPin className="h-3 w-3 shrink-0" />
           <span className="text-xs tracking-wide truncate">
             {property.city}
           </span>
@@ -177,19 +177,19 @@ export function PropertyCard({
           <div className="flex items-center gap-3 text-[#8b8178] text-xs pb-3.5 mb-3 border-b border-[rgba(34,24,18,0.08)]">
             {property.bedrooms !== undefined && property.bedrooms > 0 && (
               <span className="flex items-center gap-1">
-                <Bed className="h-3.5 w-3.5" />
+                <IconBed className="h-3.5 w-3.5" />
                 {property.bedrooms} bd
               </span>
             )}
             {property.bathrooms !== undefined && property.bathrooms > 0 && (
               <span className="flex items-center gap-1">
-                <Bath className="h-3.5 w-3.5" />
+                <IconBath className="h-3.5 w-3.5" />
                 {property.bathrooms} ba
               </span>
             )}
             {property.areaSqM && (
               <span className="flex items-center gap-1">
-                <Square className="h-3.5 w-3.5" />
+                <IconSquare className="h-3.5 w-3.5" />
                 {property.areaSqM.toLocaleString()} m²
               </span>
             )}

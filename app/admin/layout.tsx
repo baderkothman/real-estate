@@ -1,20 +1,20 @@
 import {
-  BarChart3,
-  Building2,
-  LayoutDashboard,
-  Shield,
-  Users,
-} from 'lucide-react'
+  IconBuilding,
+  IconChartBar,
+  IconLayoutDashboard,
+  IconShield,
+  IconUsers,
+} from '@tabler/icons-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getUserById } from '@/services/user.service'
 
 const adminNavItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/properties', label: 'Properties', icon: Building2 },
-  { href: '/admin/users', label: 'Users', icon: Users },
-  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/admin', label: 'Dashboard', icon: IconLayoutDashboard },
+  { href: '/admin/properties', label: 'Properties', icon: IconBuilding },
+  { href: '/admin/users', label: 'Users', icon: IconUsers },
+  { href: '/admin/analytics', label: 'Analytics', icon: IconChartBar },
 ]
 
 export default async function AdminLayout({
@@ -40,7 +40,7 @@ export default async function AdminLayout({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-8 w-8 rounded-lg bg-[#fa6b05] flex items-center justify-center shadow-[0_2px_8px_rgba(250,107,5,0.25)]">
-                <Shield className="h-4 w-4 text-white" />
+                <IconShield className="h-4 w-4 text-white" />
               </div>
               <span className="font-display text-lg font-semibold text-[#181411]">
                 Admin Panel

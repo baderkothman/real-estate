@@ -1,6 +1,6 @@
+import { ITEMS_PER_PAGE } from '@/lib/constants'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
-import { ITEMS_PER_PAGE } from '@/lib/constants'
 import type {
   CreatePropertyInput,
   PaginatedResult,
@@ -59,7 +59,9 @@ function dbRowToProperty(row: PropertyRow, savedSet?: Set<string>): Property {
     isSold: row.is_sold,
     soldAt: row.sold_at ? new Date(row.sold_at) : undefined,
     isFeatured: row.is_featured,
-    featuredUntil: row.featured_until ? new Date(row.featured_until) : undefined,
+    featuredUntil: row.featured_until
+      ? new Date(row.featured_until)
+      : undefined,
     images: row.images,
     coverImage: row.cover_image ?? undefined,
     createdAt: new Date(row.created_at),
@@ -82,7 +84,9 @@ export async function getProperties(
 
   let query = supabase
     .from('properties')
-    .select('*, profiles!user_id(name, profile_image, plan)', { count: 'exact' })
+    .select('*, profiles!user_id(name, profile_image, plan)', {
+      count: 'exact',
+    })
     .order('created_at', { ascending: false })
 
   // Default: approved properties for public view
@@ -383,9 +387,7 @@ export async function getSavedProperties(userId: string): Promise<Property[]> {
 
   return (data as unknown as { properties: PropertyRow | null }[])
     .map((item) => item.properties)
-    .filter(
-      (p): p is PropertyRow => p !== null && p.status === 'approved'
-    )
+    .filter((p): p is PropertyRow => p !== null && p.status === 'approved')
     .map((row) => dbRowToProperty(row, new Set([row.id])))
 }
 
@@ -440,7 +442,9 @@ export async function getAdminProperties(
 
   let query = admin
     .from('properties')
-    .select('*, profiles!user_id(name, profile_image, plan)', { count: 'exact' })
+    .select('*, profiles!user_id(name, profile_image, plan)', {
+      count: 'exact',
+    })
     .order('created_at', { ascending: false })
 
   if (statusFilter && statusFilter !== 'all') {

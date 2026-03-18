@@ -1,12 +1,12 @@
 import {
-  Building2,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  Edit,
-  Heart,
-  XCircle,
-} from 'lucide-react'
+  IconBuilding,
+  IconCircleCheck,
+  IconCircleX,
+  IconClock,
+  IconCurrencyDollar,
+  IconEdit,
+  IconHeart,
+} from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -16,8 +16,8 @@ import { PropertyCard } from '@/components/property/property-card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { createClient } from '@/lib/supabase/server'
 import { PLAN_LIMITS } from '@/lib/constants'
+import { createClient } from '@/lib/supabase/server'
 import { cn, formatPrice, getInitials } from '@/lib/utils'
 import {
   getSavedProperties,
@@ -66,10 +66,12 @@ function PropertyRow({ property }: { property: Property }) {
             )}
           >
             {property.status === 'approved' && (
-              <CheckCircle className="h-3 w-3" />
+              <IconCircleCheck className="h-3 w-3" />
             )}
-            {property.status === 'pending' && <Clock className="h-3 w-3" />}
-            {property.status === 'rejected' && <XCircle className="h-3 w-3" />}
+            {property.status === 'pending' && <IconClock className="h-3 w-3" />}
+            {property.status === 'rejected' && (
+              <IconCircleX className="h-3 w-3" />
+            )}
             {property.status}
           </span>
           {property.isFeatured && (
@@ -86,7 +88,7 @@ function PropertyRow({ property }: { property: Property }) {
       </div>
       <Button variant="ghost" size="icon-sm" asChild>
         <Link href={`/dashboard/properties/${property.id}/edit`}>
-          <Edit className="h-3.5 w-3.5" />
+          <IconEdit className="h-3.5 w-3.5" />
         </Link>
       </Button>
     </div>
@@ -194,7 +196,7 @@ export default async function DashboardProfilePage() {
           </div>
           {activeListings.length === 0 ? (
             <EmptyState
-              icon={Building2}
+              icon={IconBuilding}
               title="No listings yet"
               description="Create your first property listing to start connecting with buyers and renters."
               actionLabel="Create Listing"
@@ -212,7 +214,7 @@ export default async function DashboardProfilePage() {
         <TabsContent value="sold">
           {soldListings.length === 0 ? (
             <EmptyState
-              icon={DollarSign}
+              icon={IconCurrencyDollar}
               title="No sold properties"
               description="Mark a property as sold from your listings."
             />
@@ -228,7 +230,7 @@ export default async function DashboardProfilePage() {
         <TabsContent value="saved">
           {savedProperties.length === 0 ? (
             <EmptyState
-              icon={Heart}
+              icon={IconHeart}
               title="No saved properties"
               description="Save properties you love by clicking the heart icon on any listing."
               actionLabel="Browse Properties"

@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { IconArrowRight } from '@tabler/icons-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
@@ -60,7 +60,7 @@ export function SectionHeader({
           className="group flex items-center gap-1.5 text-sm text-[#5f554d] hover:text-[#fa6b05] font-medium transition-all duration-200 shrink-0 px-4 py-2 rounded-lg border border-transparent hover:border-[#fa6b05]/20 hover:bg-[#fef0e6]"
         >
           {viewAllLabel}
-          <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+          <IconArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
         </Link>
       )}
 
@@ -70,7 +70,7 @@ export function SectionHeader({
           className="group flex items-center gap-1.5 text-sm text-[#fa6b05] hover:text-[#c85604] font-medium transition-colors mt-2"
         >
           {viewAllLabel}
-          <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+          <IconArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
         </Link>
       )}
     </div>

@@ -1,4 +1,4 @@
-import { User } from 'lucide-react'
+import { IconUser } from '@tabler/icons-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -33,7 +33,7 @@ export default async function DashboardLayout({
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-[#fa6b05] flex items-center justify-center text-white font-bold shadow-[0_2px_8px_rgba(250,107,5,0.25)]">
-              <User className="h-5 w-5" />
+              <IconUser className="h-5 w-5" />
             </div>
             <div>
               <h1 className="font-display text-2xl font-semibold text-[#181411] tracking-wide">

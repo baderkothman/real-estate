@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckCircle, XCircle } from 'lucide-react'
+import { IconCircleCheck, IconCircleX } from '@tabler/icons-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { formatRelativeDate } from '@/lib/utils'
@@ -52,7 +52,7 @@ export function AdminPendingActions({ properties }: AdminPendingActionsProps) {
               title="Approve"
               onClick={() => void doAction(property.id, 'approve')}
             >
-              <CheckCircle className="h-4 w-4" />
+              <IconCircleCheck className="h-4 w-4" />
             </button>
             <button
               type="button"
@@ -60,7 +60,7 @@ export function AdminPendingActions({ properties }: AdminPendingActionsProps) {
               title="Reject"
               onClick={() => void doAction(property.id, 'reject')}
             >
-              <XCircle className="h-4 w-4" />
+              <IconCircleX className="h-4 w-4" />
             </button>
           </div>
         </div>

@@ -1,4 +1,11 @@
-import { Award, Building2, Heart, MapPin, Shield, Users } from 'lucide-react'
+import {
+  IconAward,
+  IconBuilding,
+  IconHeart,
+  IconMapPin,
+  IconShield,
+  IconUsers,
+} from '@tabler/icons-react'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 
@@ -34,19 +41,19 @@ const teamMembers = [
 
 const values = [
   {
-    icon: Shield,
+    icon: IconShield,
     title: 'Trust & Transparency',
     description:
       'Every property listing is verified by our team. We maintain strict standards to ensure honest, accurate information for our users.',
   },
   {
-    icon: Award,
+    icon: IconAward,
     title: 'Excellence',
     description:
       "We are committed to showcasing Lebanon's finest properties with the presentation they deserve — beautiful photography and detailed descriptions.",
   },
   {
-    icon: Heart,
+    icon: IconHeart,
     title: 'Community',
     description:
       'Real estate in Lebanon is personal. We connect people, not just properties — building relationships that last beyond the transaction.',
@@ -61,7 +68,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_#fef3e7_0%,_#fcfaf7_70%)]" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#fa6b05]/20 bg-[#fef0e6] px-4 py-1.5 mb-8">
-            <MapPin className="h-3.5 w-3.5 text-[#fa6b05]" />
+            <IconMapPin className="h-3.5 w-3.5 text-[#fa6b05]" />
             <span className="text-xs font-medium text-[#964003] tracking-widest uppercase">
               Est. 2022 — Beirut, Lebanon
             </span>
@@ -111,10 +118,10 @@ export default function AboutPage() {
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4">
               {[
-                { value: '500+', label: 'Active Listings', icon: Building2 },
-                { value: '200+', label: 'Happy Clients', icon: Users },
-                { value: '15+', label: 'Cities Covered', icon: MapPin },
-                { value: '4 Yrs', label: 'In the Market', icon: Award },
+                { value: '500+', label: 'Active Listings', icon: IconBuilding },
+                { value: '200+', label: 'Happy Clients', icon: IconUsers },
+                { value: '15+', label: 'Cities Covered', icon: IconMapPin },
+                { value: '4 Yrs', label: 'In the Market', icon: IconAward },
               ].map((stat) => (
                 <div
                   key={stat.label}

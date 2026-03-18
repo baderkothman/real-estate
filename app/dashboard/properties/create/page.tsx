@@ -1,9 +1,10 @@
 'use client'
 
-import { AlertTriangle, PlusCircle, X } from 'lucide-react'
+import { IconAlertTriangle, IconCirclePlus, IconX } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { z } from 'zod'
+import { useSupabase } from '@/components/providers/supabase-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useSupabase } from '@/components/providers/supabase-provider'
 import { CITIES_LEBANON, PLAN_LIMITS } from '@/lib/constants'
 
 const propertySchema = z.object({
@@ -292,11 +292,11 @@ export default function CreatePropertyPage() {
           </div>
         </div>
 
-        {/* Images */}
+        {/* IconPhoto */}
         <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-display text-lg font-semibold text-[#181411]">
-              Images
+              IconPhoto
             </h3>
             <span className="text-xs text-[#8b8178]">
               {imageUrls.filter((u) => u.trim()).length} / {planLimit.maxImages}{' '}
@@ -310,7 +310,7 @@ export default function CreatePropertyPage() {
 
           <div className="space-y-2">
             {imageUrls.map((url, idx) => (
-              <div key={idx} className="flex gap-2">
+              <div key={url || String(idx)} className="flex gap-2">
                 <Input
                   placeholder={`Image URL ${idx + 1} (e.g. https://picsum.photos/seed/${idx}/800/600)`}
                   value={url}
@@ -325,7 +325,7 @@ export default function CreatePropertyPage() {
                     onClick={() => removeImageField(idx)}
                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
                   >
-                    <X className="h-4 w-4" />
+                    <IconX className="h-4 w-4" />
                   </Button>
                 )}
               </div>
@@ -340,14 +340,14 @@ export default function CreatePropertyPage() {
               onClick={addImageField}
               className="gap-2"
             >
-              <PlusCircle className="h-4 w-4" />
+              <IconCirclePlus className="h-4 w-4" />
               Add Image URL
             </Button>
           )}
 
           {imageUrls.length >= planLimit.maxImages && (
             <div className="flex items-center gap-2 text-xs text-amber-600">
-              <AlertTriangle className="h-3.5 w-3.5" />
+              <IconAlertTriangle className="h-3.5 w-3.5" />
               Maximum images reached for your plan.{' '}
               <a href="/pricing" className="underline">
                 Upgrade
@@ -370,7 +370,7 @@ export default function CreatePropertyPage() {
             </span>
           ) : (
             <>
-              <PlusCircle className="h-4 w-4" />
+              <IconCirclePlus className="h-4 w-4" />
               Submit Listing for Review
             </>
           )}

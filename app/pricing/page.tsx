@@ -1,6 +1,11 @@
 'use client'
 
-import { Building2, Check, Star, Zap } from 'lucide-react'
+import {
+  IconBolt,
+  IconBuilding,
+  IconCheck,
+  IconStar,
+} from '@tabler/icons-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useSupabase } from '@/components/providers/supabase-provider'
@@ -56,7 +61,7 @@ export default function PricingPage() {
     {
       id: 'free' as const,
       name: 'Free',
-      icon: Star,
+      icon: IconStar,
       description: 'Perfect for individual owners listing a few properties.',
       price: 0,
       priceLabel: 'Free forever',
@@ -68,7 +73,7 @@ export default function PricingPage() {
     {
       id: 'pro' as const,
       name: 'Pro',
-      icon: Zap,
+      icon: IconBolt,
       description: 'For active agents managing multiple listings and leads.',
       price: PLAN_PRICES.pro[billing],
       priceLabel: null,
@@ -80,7 +85,7 @@ export default function PricingPage() {
     {
       id: 'agency' as const,
       name: 'Agency',
-      icon: Building2,
+      icon: IconBuilding,
       description: 'For agencies and developers with large portfolios.',
       price: PLAN_PRICES.agency[billing],
       priceLabel: null,
@@ -228,7 +233,7 @@ export default function PricingPage() {
                         key={feature}
                         className="flex items-start gap-3 text-sm text-[#5f554d]"
                       >
-                        <Check
+                        <IconCheck
                           className={cn(
                             'h-4 w-4 shrink-0 mt-0.5',
                             plan.highlighted
@@ -299,7 +304,7 @@ export default function PricingPage() {
               <tbody>
                 {[
                   ['Max Listings', '3', '12', '100'],
-                  ['Images per Listing', '5', '8', '20'],
+                  ['Photos per Listing', '5', '8', '20'],
                   ['Featured Listings', '✗', '✓', 'Unlimited'],
                   ['Analytics Dashboard', '✗', '✓', '✓'],
                   ['Priority Support', '✗', '✓', '✓'],
@@ -317,7 +322,7 @@ export default function PricingPage() {
                     {[free, pro, agency].map((val, i) => (
                       <td key={i} className="p-4 text-sm text-center">
                         {val === '✓' ? (
-                          <Check className="h-4 w-4 text-[#379579] mx-auto" />
+                          <IconCheck className="h-4 w-4 text-[#379579] mx-auto" />
                         ) : val === '✗' ? (
                           <span className="text-[#8b8178]">—</span>
                         ) : (

@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { getUserById } from '@/services/user.service'
 import {
   deleteProperty,
   featureProperty,
   updateProperty,
 } from '@/services/property.service'
+import { getUserById } from '@/services/user.service'
 
 interface Params {
   params: Promise<{ id: string }>

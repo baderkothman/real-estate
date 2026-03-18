@@ -1,6 +1,11 @@
 'use client'
 
-import { AlertCircle, Eye, EyeOff, LogIn } from 'lucide-react'
+import {
+  IconAlertCircle,
+  IconEye,
+  IconEyeOff,
+  IconLogin,
+} from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
@@ -50,7 +55,7 @@ function LoginForm() {
     <div className="rounded-[20px] border border-[rgba(34,24,18,0.08)] bg-white shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-8">
       {error && (
         <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-          <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+          <IconAlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
           <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
@@ -89,9 +94,9 @@ function LoginForm() {
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? (
-                <EyeOff className="h-4 w-4" />
+                <IconEyeOff className="h-4 w-4" />
               ) : (
-                <Eye className="h-4 w-4" />
+                <IconEye className="h-4 w-4" />
               )}
             </button>
           </div>
@@ -128,7 +133,7 @@ function LoginForm() {
             </span>
           ) : (
             <>
-              <LogIn className="h-4 w-4" />
+              <IconLogin className="h-4 w-4" />
               Sign In
             </>
           )}

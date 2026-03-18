@@ -1,11 +1,11 @@
 import {
-  Building2,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  Star,
-  Users,
-} from 'lucide-react'
+  IconBuilding,
+  IconCircleCheck,
+  IconClock,
+  IconCurrencyDollar,
+  IconStar,
+  IconUsers,
+} from '@tabler/icons-react'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -29,37 +29,37 @@ export default async function AdminDashboardPage() {
     {
       label: 'Total Users',
       value: summary.totalUsers,
-      icon: Users,
+      icon: IconUsers,
       color: 'text-blue-500',
     },
     {
       label: 'Total Properties',
       value: summary.totalProperties,
-      icon: Building2,
+      icon: IconBuilding,
       color: 'text-[#fa6b05]',
     },
     {
       label: 'Pending Review',
       value: summary.pendingProperties,
-      icon: Clock,
+      icon: IconClock,
       color: 'text-amber-500',
     },
     {
       label: 'Featured',
       value: summary.featuredProperties,
-      icon: Star,
+      icon: IconStar,
       color: 'text-[#fa6b05]',
     },
     {
       label: 'Approved',
       value: summary.approvedProperties,
-      icon: CheckCircle,
+      icon: IconCircleCheck,
       color: 'text-emerald-500',
     },
     {
       label: 'Sold',
       value: summary.soldProperties,
-      icon: DollarSign,
+      icon: IconCurrencyDollar,
       color: 'text-[#379579]',
     },
   ]

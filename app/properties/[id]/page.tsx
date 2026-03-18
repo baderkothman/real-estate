@@ -1,17 +1,17 @@
 import {
-  Bath,
-  Bed,
-  Calendar,
-  CheckCircle,
-  Clock,
-  ExternalLink,
-  Heart,
-  Mail,
-  MapPin,
-  Phone,
-  Square,
-  XCircle,
-} from 'lucide-react'
+  IconBath,
+  IconBed,
+  IconCalendar,
+  IconCircleCheck,
+  IconCircleX,
+  IconClock,
+  IconExternalLink,
+  IconHeart,
+  IconMail,
+  IconMapPin,
+  IconPhone,
+  IconSquare,
+} from '@tabler/icons-react'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -109,13 +109,13 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                   )}
                 >
                   {property.status === 'approved' && (
-                    <CheckCircle className="h-3 w-3" />
+                    <IconCircleCheck className="h-3 w-3" />
                   )}
                   {property.status === 'pending' && (
-                    <Clock className="h-3 w-3" />
+                    <IconClock className="h-3 w-3" />
                   )}
                   {property.status === 'rejected' && (
-                    <XCircle className="h-3 w-3" />
+                    <IconCircleX className="h-3 w-3" />
                   )}
                   {property.status.charAt(0).toUpperCase() +
                     property.status.slice(1)}
@@ -129,7 +129,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
               {/* Location */}
               <div className="flex items-center gap-1.5 text-[#5f554d] mb-4">
-                <MapPin className="h-4 w-4 text-[#fa6b05]" />
+                <IconMapPin className="h-4 w-4 text-[#fa6b05]" />
                 <span>
                   {property.address ? `${property.address}, ` : ''}
                   {property.city}
@@ -153,7 +153,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                 <div className="flex flex-wrap gap-6 mb-8 p-4 rounded-xl bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_2px_8px_rgba(24,20,17,0.04)]">
                   {property.bedrooms !== undefined && property.bedrooms > 0 && (
                     <div className="flex items-center gap-2 text-[#5f554d]">
-                      <Bed className="h-5 w-5 text-[#fa6b05]" />
+                      <IconBed className="h-5 w-5 text-[#fa6b05]" />
                       <span>
                         <span className="font-semibold text-[#181411]">
                           {property.bedrooms}
@@ -165,7 +165,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                   {property.bathrooms !== undefined &&
                     property.bathrooms > 0 && (
                       <div className="flex items-center gap-2 text-[#5f554d]">
-                        <Bath className="h-5 w-5 text-[#fa6b05]" />
+                        <IconBath className="h-5 w-5 text-[#fa6b05]" />
                         <span>
                           <span className="font-semibold text-[#181411]">
                             {property.bathrooms}
@@ -176,7 +176,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                     )}
                   {property.areaSqM && (
                     <div className="flex items-center gap-2 text-[#5f554d]">
-                      <Square className="h-5 w-5 text-[#fa6b05]" />
+                      <IconSquare className="h-5 w-5 text-[#fa6b05]" />
                       <span>
                         <span className="font-semibold text-[#181411]">
                           {property.areaSqM}
@@ -200,7 +200,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
               {/* Dates */}
               <div className="flex items-center gap-2 text-sm text-[#8b8178]">
-                <Calendar className="h-4 w-4" />
+                <IconCalendar className="h-4 w-4" />
                 <span>
                   Listed {formatRelativeDate(property.createdAt)} &middot;{' '}
                   {formatDate(property.createdAt)}
@@ -208,7 +208,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
               </div>
               {property.isSold && property.soldAt && (
                 <div className="flex items-center gap-2 text-sm text-[#964003] mt-1">
-                  <CheckCircle className="h-4 w-4" />
+                  <IconCircleCheck className="h-4 w-4" />
                   <span>Sold on {formatDate(property.soldAt)}</span>
                 </div>
               )}
@@ -277,7 +277,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                           href={`mailto:${owner.email}`}
                           className="flex items-center gap-2 text-sm text-[#5f554d] hover:text-[#fa6b05] transition-colors"
                         >
-                          <Mail className="h-4 w-4 shrink-0" />
+                          <IconMail className="h-4 w-4 shrink-0" />
                           <span className="truncate">{owner.email}</span>
                         </a>
                         {owner.phone && (
@@ -285,7 +285,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                             href={`tel:${owner.phone}`}
                             className="flex items-center gap-2 text-sm text-[#5f554d] hover:text-[#fa6b05] transition-colors"
                           >
-                            <Phone className="h-4 w-4 shrink-0" />
+                            <IconPhone className="h-4 w-4 shrink-0" />
                             {owner.phone}
                           </a>
                         )}
@@ -314,7 +314,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                   className="w-full mt-4"
                 >
                   <Link href={`/users/${owner.id}`} className="gap-2">
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <IconExternalLink className="h-3.5 w-3.5" />
                     View Profile
                   </Link>
                 </Button>
@@ -323,7 +323,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
             {/* Save card */}
             <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-5 text-center">
-              <Heart className="h-6 w-6 text-[#fa6b05] mx-auto mb-3" />
+              <IconHeart className="h-6 w-6 text-[#fa6b05] mx-auto mb-3" />
               <p className="text-sm text-[#5f554d] mb-4">
                 {user
                   ? 'Save this property to revisit it later.'

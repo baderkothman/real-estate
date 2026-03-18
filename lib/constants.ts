@@ -5,7 +5,6 @@ export const APP_DESCRIPTION =
   'Find your perfect property in Lebanon. Buy, sell, or rent premium real estate in Beirut and beyond.'
 
 export const ITEMS_PER_PAGE = 12
-export const ADMIN_ITEMS_PER_PAGE = 25
 
 export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
   free: {
@@ -57,8 +56,6 @@ export const CITIES_LEBANON = [
   'Akkar',
   'Hermel',
 ] as const
-
-export type LebanonCity = (typeof CITIES_LEBANON)[number]
 
 export const PLAN_FEATURES: Record<Plan, string[]> = {
   free: [

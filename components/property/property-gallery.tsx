@@ -1,6 +1,10 @@
 'use client'
 
-import { ChevronLeft, ChevronRight, Images } from 'lucide-react'
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconPhoto,
+} from '@tabler/icons-react'
 import Image from 'next/image'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -43,7 +47,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
               className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 text-[#181411] hover:bg-white backdrop-blur-sm transition-colors shadow-[0_2px_8px_rgba(24,20,17,0.15)]"
               aria-label="Previous image"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <IconChevronLeft className="h-5 w-5" />
             </button>
             <button
               type="button"
@@ -51,14 +55,14 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
               className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 text-[#181411] hover:bg-white backdrop-blur-sm transition-colors shadow-[0_2px_8px_rgba(24,20,17,0.15)]"
               aria-label="Next image"
             >
-              <ChevronRight className="h-5 w-5" />
+              <IconChevronRight className="h-5 w-5" />
             </button>
           </>
         )}
 
         {/* Counter */}
         <div className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm text-xs text-[#181411] shadow-[0_2px_8px_rgba(24,20,17,0.10)]">
-          <Images className="h-3.5 w-3.5 text-[#fa6b05]" />
+          <IconPhoto className="h-3.5 w-3.5 text-[#fa6b05]" />
           {activeIndex + 1} / {validImages.length}
         </div>
       </div>
@@ -69,7 +73,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
           {validImages.map((img, idx) => (
             <button
               type="button"
-              key={idx}
+              key={img || String(idx)}
               onClick={() => setActiveIndex(idx)}
               className={cn(
                 'relative h-16 w-24 shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-200',

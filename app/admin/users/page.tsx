@@ -1,6 +1,11 @@
 'use client'
 
-import { Ban, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  IconBan,
+  IconChevronLeft,
+  IconChevronRight,
+  IconCircleCheck,
+} from '@tabler/icons-react'
 import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -267,9 +272,9 @@ export default function AdminUsersPage() {
                               title={user.isBanned ? 'Unban user' : 'Ban user'}
                             >
                               {user.isBanned ? (
-                                <CheckCircle className="h-3.5 w-3.5" />
+                                <IconCircleCheck className="h-3.5 w-3.5" />
                               ) : (
-                                <Ban className="h-3.5 w-3.5" />
+                                <IconBan className="h-3.5 w-3.5" />
                               )}
                             </button>
                           )}
@@ -290,7 +295,7 @@ export default function AdminUsersPage() {
                 onClick={() => setPage((p) => p - 1)}
                 disabled={page <= 1}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <IconChevronLeft className="h-4 w-4" />
               </Button>
               <span className="text-sm text-[#8b8178]">
                 Page {page} of {result.totalPages}
@@ -301,7 +306,7 @@ export default function AdminUsersPage() {
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= result.totalPages}
               >
-                <ChevronRight className="h-4 w-4" />
+                <IconChevronRight className="h-4 w-4" />
               </Button>
             </div>
           )}

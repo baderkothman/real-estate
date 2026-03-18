@@ -1,6 +1,11 @@
 'use client'
 
-import { ArrowRight, Home, Key, Search } from 'lucide-react'
+import {
+  IconArrowRight,
+  IconHome,
+  IconKey,
+  IconSearch,
+} from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -26,8 +31,8 @@ export function HeroSearch() {
         {(
           [
             { value: 'all', label: 'All' },
-            { value: 'sale', label: 'For Sale', Icon: Home },
-            { value: 'rent', label: 'For Rent', Icon: Key },
+            { value: 'sale', label: 'For Sale', Icon: IconHome },
+            { value: 'rent', label: 'For Rent', Icon: IconKey },
           ] as {
             value: 'all' | 'sale' | 'rent'
             label: string
@@ -51,10 +56,10 @@ export function HeroSearch() {
         ))}
       </div>
 
-      {/* Search input row */}
+      {/* IconSearch input row */}
       <div className="flex gap-2.5">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b8178]" />
+          <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b8178]" />
           <input
             type="text"
             placeholder="Search by city or neighbourhood..."
@@ -83,8 +88,8 @@ export function HeroSearch() {
             'active:scale-[0.98]'
           )}
         >
-          Search
-          <ArrowRight className="h-4 w-4" />
+          IconSearch
+          <IconArrowRight className="h-4 w-4" />
         </button>
       </div>
     </div>

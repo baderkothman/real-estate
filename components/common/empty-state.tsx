@@ -1,11 +1,11 @@
-import type { LucideIcon } from 'lucide-react'
-import { Building2 } from 'lucide-react'
+import type { Icon as TablerIconComponent } from '@tabler/icons-react'
+import { IconBuilding } from '@tabler/icons-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 interface EmptyStateProps {
-  icon?: LucideIcon
+  icon?: TablerIconComponent
   title: string
   description?: string
   actionLabel?: string
@@ -15,7 +15,7 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({
-  icon: Icon = Building2,
+  icon: Icon = IconBuilding,
   title,
   description,
   actionLabel,
