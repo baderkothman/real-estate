@@ -95,7 +95,14 @@ function PropertyRow({ property }: { property: Property }) {
   )
 }
 
-export default async function DashboardProfilePage() {
+interface DashboardProfilePageProps {
+  searchParams: Promise<{ tab?: string }>
+}
+
+export default async function DashboardProfilePage({
+  searchParams,
+}: DashboardProfilePageProps) {
+  const { tab } = await searchParams
   const supabase = await createClient()
   const {
     data: { user: authUser },
@@ -174,7 +181,7 @@ export default async function DashboardProfilePage() {
         </Button>
       </div>
 
-      <Tabs defaultValue="listings">
+      <Tabs defaultValue={tab === 'saved' || tab === 'sold' ? tab : 'listings'}>
         <TabsList className="mb-6">
           <TabsTrigger value="listings">
             My Listings ({activeListings.length})

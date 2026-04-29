@@ -10,5 +10,8 @@
       "Bash(sleep 5:*)",
       "Bash(grep 3002:*)"
     ]
+  },
+  "enabledPlugins": {
+    "skill-creator@claude-plugins-official": true
   }
 }

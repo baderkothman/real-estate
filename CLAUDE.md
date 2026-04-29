@@ -1,107 +1,126 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides repository-specific guidance to coding agents working in this project.
 
-## Commands
+## Quick Commands
 
 ```bash
-npm run dev      # Start development server (Next.js 15)
-npm run build    # Production build
-npm run lint     # ESLint check
-npm run start    # Start production server
+npm run dev
+npm run build
+npm run start
+npm run lint
+npm run seed:users
 ```
 
-No test suite is configured.
+No automated test suite is currently configured.
 
-## Architecture Overview
+## Project Reality (Important)
 
-**Othman Real Estate** — a Lebanon-focused property listing platform (Next.js 15 App Router, TypeScript, Tailwind CSS).
+- Auth is handled by Supabase Auth, not NextAuth.
+- Data is stored in Supabase (Postgres), not in-memory arrays.
+- Core domain tables are `profiles`, `properties`, and `saved_properties`.
+- Middleware and server routes enforce auth/role checks.
 
-### Data Layer (Mock / In-Memory)
+## Stack
 
-This app uses **no database**. All data lives in module-level in-memory stores that reset on server restart:
+- Next.js 15 App Router
+- React 19 + TypeScript
+- Tailwind CSS + shadcn/ui primitives
+- Supabase (`@supabase/ssr`, `@supabase/supabase-js`)
+- Stripe subscriptions
 
-- `data/mock-properties.ts` — seed data for properties
-- `data/mock-users.ts` — seed data for users
-- `services/property.service.ts` — in-memory `propertiesStore` array + `savedStore` Map
-- `services/user.service.ts` — in-memory users store
-- `services/analytics.service.ts` — derived analytics from in-memory data
+## Architecture
 
-When replacing with a real database, these service files are the only layer to change — all route handlers and components call service functions.
+### Supabase Clients
 
-### Auth
+- `lib/supabase/server.ts`: request-scoped server client (cookies-aware).
+- `lib/supabase/client.ts`: browser client for client components.
+- `lib/supabase/admin.ts`: service-role admin client for privileged operations.
 
-NextAuth v5 (beta) with Credentials provider only. Auth config is in `lib/auth.ts`. The session extends with `role` (`user` | `admin`) and `plan` (`free` | `pro` | `agency`). Passwords are stored as plain strings in mock data (`passwordHash` field).
+Use server client for user-scoped actions and admin client only on trusted server paths.
 
-Middleware in `middleware.ts` protects `/dashboard/*` (requires any session) and `/admin/*` (requires `role === 'admin'`).
+### Services Layer
 
-### Route Structure
+Route handlers are intentionally thin and call services:
 
-```
-app/
-  page.tsx                  # Homepage
-  properties/[id]/          # Public property detail
-  pricing/                  # Pricing page
-  about/
-  auth/                     # Login / Register
-  dashboard/                # Authenticated user area
-    properties/             # User's own listings (create, edit)
-    profile/
-  admin/                    # Admin-only area
-    properties/             # Approve/reject/feature listings
-    users/                  # Ban/unban, change plans
-    analytics/
-  api/
-    auth/[...nextauth]/     # NextAuth handler
-    properties/             # GET list, POST create, [id] PATCH/DELETE
-    users/                  # User CRUD
-    admin/                  # Admin actions (approve, ban, feature)
-    checkout/               # Stripe checkout session creation
-```
+- `services/property.service.ts`
+- `services/user.service.ts`
+- `services/analytics.service.ts`
 
-### Plans & Billing
+When changing business rules, start in services first, then update route handlers/components.
 
-Three tiers: `free`, `pro`, `agency`. Limits and prices defined in `lib/constants.ts`. Stripe integration in `lib/stripe.ts` uses environment variables for price IDs (`STRIPE_PRICE_PRO_MONTH`, etc.). In dev, Stripe runs in mock mode if `STRIPE_SECRET_KEY` is not set.
+### Auth and Authorization
 
-### Component Organization
+- Use `supabase.auth.getUser()` for server-side auth checks.
+- `/dashboard/*` requires an authenticated user.
+- `/admin/*` requires authenticated user with `profiles.role = 'admin'`.
+- Role is read from `profiles` (database source of truth), not trusted from client state.
 
-- `components/ui/` — shadcn/ui primitives (Button, Card, Dialog, Input, etc.)
-- `components/layout/` — Header, Footer
-- `components/property/` — PropertyCard, PropertyFilters, PropertyGallery
-- `components/common/` — EmptyState, HeroSearch, Pagination, PlanBadge, SectionHeader
-- `components/user/` and `components/auth/` — user-specific forms
+### Property Lifecycle
 
-### Styling
+- New properties are created with `status = 'pending'`.
+- Public listing queries default to approved properties.
+- Admin can approve/reject/feature/unfeature/delete properties.
+- Owners can edit/delete their own properties; admins can manage all.
 
-Dark theme by default (`<html class="dark">`). Background `#0d0c09`, text `#f0e6d0`. Tailwind CSS with shadcn/ui component conventions (`class-variance-authority`, `clsx`, `tailwind-merge` via `lib/utils.ts`).
+### Plans and Limits
 
-## UI / Frontend Workflow
+- Plans: `free`, `pro`, `agency`.
+- Limits/pricing are defined in `lib/constants.ts`.
+- Listing-count limits are enforced in `POST /api/properties`.
+- UI enforces image count based on plan during listing creation.
 
-**Every UI or frontend edit MUST follow the design system defined in `SYTEM-DESIGN.md`.**
+### Billing
 
-Key rules from that document:
-- Warm off-white/vanilla cream backgrounds, deep charcoal text
-- Primary CTA: `--brand` (`#fa6b05`), hover `--brand-hover` (`#c85604`)
-- Secondary accent: `--accent` (`#379579`)
-- Cards: white, `24px` radius, soft shadow, subtle border
-- Typography: Playfair Display (headings) + Inter (body)
-- 70/20/10 color balance — orange as accent only, not dominant
+- Stripe checkout is created in `app/api/checkout/route.ts`.
+- Price mapping lives in `lib/stripe.ts`.
+- If Stripe keys/price IDs are not configured, checkout responds with a friendly `503` error.
 
-### Required steps for any UI change
+## Database and Migrations
 
-1. **Invoke `/frontend-design`** before implementing — this skill generates production-grade, design-system-aligned code.
-2. **Follow `SYTEM-DESIGN.md`** for tokens, spacing, radius, motion, and component patterns.
-3. **Take a screenshot** after completing the change to visually verify it matches the intended design before committing.
+SQL migrations live in `supabase/migrations/`:
+
+1. `001_init.sql` creates schema, RLS policies, and analytics SQL functions.
+2. `002_security_hardening.sql` hardens signup defaults and profile update policy.
+3. `003_harden_function_search_path.sql` hardens SQL function execution context and grants.
+
+Any schema or policy change should be implemented through a new migration.
+
+## Frontend and Design System
+
+For any UI change, follow `SYTEM-DESIGN.md`.
+
+Key expectations:
+
+- Warm neutral palette with orange brand accent.
+- Playfair Display for display typography, Inter for body text.
+- Soft cards, rounded corners, and subtle shadow treatment.
+- Preserve the established visual language across pages.
+
+## Development Notes
+
+- Prefer path aliases (`@/`) over deep relative imports.
+- Keep API handlers defensive (`401`/`403`/`404`/`500`) and explicit.
+- Avoid exposing service-role logic to client components.
+- Keep docs and env examples in sync when adding new configuration.
 
 ## Environment Variables
 
-```
-AUTH_SECRET                     # NextAuth secret
-STRIPE_SECRET_KEY               # Stripe secret (optional in dev)
-STRIPE_PRICE_PRO_MONTH          # Stripe price IDs
-STRIPE_PRICE_PRO_QUARTER
-STRIPE_PRICE_PRO_YEAR
-STRIPE_PRICE_AGENCY_MONTH
-STRIPE_PRICE_AGENCY_QUARTER
-STRIPE_PRICE_AGENCY_YEAR
-```
+Required for core app behavior:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Used for Stripe checkout:
+
+- `STRIPE_SECRET_KEY`
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- `STRIPE_PRICE_PRO_MONTH`
+- `STRIPE_PRICE_PRO_QUARTER`
+- `STRIPE_PRICE_PRO_YEAR`
+- `STRIPE_PRICE_AGENCY_MONTH`
+- `STRIPE_PRICE_AGENCY_QUARTER`
+- `STRIPE_PRICE_AGENCY_YEAR`
+
+`STRIPE_WEBHOOK_SECRET` is present in env templates but there is currently no webhook route in this codebase.

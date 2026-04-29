@@ -165,7 +165,8 @@ export async function getPropertyById(
     .eq('id', id)
     .single()
 
-  if (error || !row) return null
+  if (error) throw error
+  if (!row) return null
 
   let savedByCurrentUser = false
   if (currentUserId) {
@@ -290,7 +291,8 @@ export async function updateProperty(
     .select('*, profiles!user_id(name, profile_image, plan)')
     .single()
 
-  if (error || !row) return null
+  if (error) throw error
+  if (!row) return null
   return dbRowToProperty(row as PropertyRow)
 }
 
@@ -429,7 +431,8 @@ export async function featureProperty(
     .select('*, profiles!user_id(name, profile_image, plan)')
     .single()
 
-  if (error || !row) return null
+  if (error) throw error
+  if (!row) return null
   return dbRowToProperty(row as PropertyRow)
 }
 

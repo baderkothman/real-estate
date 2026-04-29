@@ -30,7 +30,7 @@ const billingDiscount: Record<Billing, string | null> = {
 const comparisonRows = [
   { feature: 'Max Listings', values: ['3', '12', '100'] },
   { feature: 'Photos per Listing', values: ['5', '8', '20'] },
-  { feature: 'Featured Listings', values: ['-', 'Yes', 'Unlimited'] },
+  { feature: 'Featured Listings', values: ['-', 'Yes', 'Yes'] },
   { feature: 'Analytics Dashboard', values: ['-', 'Yes', 'Yes'] },
   { feature: 'Priority Support', values: ['-', 'Yes', 'Yes'] },
   { feature: 'Dedicated Manager', values: ['-', '-', 'Yes'] },

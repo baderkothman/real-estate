@@ -5,8 +5,9 @@ import { createClient } from '@/lib/supabase/server'
 import { getUserById } from '@/services/user.service'
 
 const navItems = [
-  { href: '/dashboard/profile', label: 'My Listings' },
+  { href: '/dashboard/profile', label: 'My Dashboard' },
   { href: '/dashboard/properties/create', label: 'Create Listing' },
+  { href: '/dashboard/saved', label: 'Saved Properties' },
   { href: '/dashboard/profile/edit', label: 'Edit Profile' },
 ]
 
