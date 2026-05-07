@@ -3,6 +3,7 @@
 import { IconCircleCheck, IconCircleX } from '@tabler/icons-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { adminPropertyAction } from '@/app/actions/properties'
 import { formatRelativeDate } from '@/lib/utils'
 import type { Property } from '@/types'
 
@@ -14,11 +15,7 @@ export function AdminPendingActions({ properties }: AdminPendingActionsProps) {
   const router = useRouter()
 
   const doAction = async (propertyId: string, action: 'approve' | 'reject') => {
-    await fetch(`/api/admin/properties/${propertyId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action }),
-    })
+    await adminPropertyAction(propertyId, { action })
     router.refresh()
   }
 

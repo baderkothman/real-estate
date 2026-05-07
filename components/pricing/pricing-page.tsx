@@ -8,6 +8,7 @@ import {
 } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { createCheckoutSessionAction } from '@/app/actions/checkout'
 import { useSupabase } from '@/components/providers/supabase-provider'
 import { Button } from '@/components/ui/button'
 import { PLAN_FEATURES, PLAN_PRICES } from '@/lib/constants'
@@ -48,12 +49,7 @@ export function PricingPage() {
     }
 
     try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan, billing }),
-      })
-      const data = (await res.json()) as { url?: string; error?: string }
+      const data = await createCheckoutSessionAction({ plan, billing })
       if (data.url) {
         window.location.href = data.url
       } else {
@@ -313,7 +309,9 @@ export function PricingPage() {
                       idx % 2 === 1 && 'bg-[#faf7eb]/50'
                     )}
                   >
-                    <td className="p-4 text-sm text-[#5f554d]">{row.feature}</td>
+                    <td className="p-4 text-sm text-[#5f554d]">
+                      {row.feature}
+                    </td>
                     {row.values.map((value, valueIdx) => (
                       <td key={valueIdx} className="p-4 text-sm text-center">
                         {value === 'Yes' ? (

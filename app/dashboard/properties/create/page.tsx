@@ -4,6 +4,7 @@ import { IconAlertTriangle, IconCirclePlus, IconX } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { z } from 'zod'
+import { createPropertyAction } from '@/app/actions/properties'
 import { useSupabase } from '@/components/providers/supabase-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -102,14 +103,8 @@ export default function CreatePropertyPage() {
 
     setIsSubmitting(true)
     try {
-      const res = await fetch('/api/properties', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(parsed.data),
-      })
-
-      const data = (await res.json()) as { id?: string; error?: string }
-      if (!res.ok) {
+      const data = await createPropertyAction(parsed.data)
+      if ('error' in data) {
         setServerError(data.error ?? 'Failed to create listing')
         return
       }
@@ -379,7 +374,3 @@ export default function CreatePropertyPage() {
     </div>
   )
 }
-
-
-
-

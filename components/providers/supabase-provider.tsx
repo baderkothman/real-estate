@@ -9,6 +9,7 @@ import {
   useMemo,
   useState,
 } from 'react'
+import { getCurrentUserProfileAction } from '@/app/actions/users'
 import { createClient } from '@/lib/supabase/client'
 import type { Plan, UserRole } from '@/types'
 
@@ -42,10 +43,9 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const res = await fetch('/api/me')
-      if (res.ok) {
-        const data = (await res.json()) as UserProfile
-        setUser(data)
+      const result = await getCurrentUserProfileAction()
+      if (result.profile) {
+        setUser(result.profile)
       } else {
         setUser(null)
       }

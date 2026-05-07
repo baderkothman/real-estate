@@ -8,6 +8,7 @@ import {
 } from '@tabler/icons-react'
 import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
+import { adminUserAction, getAdminUsersAction } from '@/app/actions/users'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -17,7 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn, formatDate } from '@/lib/utils'
-import type { PaginatedResult, User } from '@/types'
+import type { PaginatedResult, Plan, User } from '@/types'
 
 export default function AdminUsersPage() {
   const [search, setSearch] = useState('')
@@ -37,9 +38,17 @@ export default function AdminUsersPage() {
         ...(search ? { search } : {}),
         ...(planFilter !== 'all' ? { plan: planFilter } : {}),
       })
-      const res = await fetch(`/api/users?${params.toString()}&admin=1`)
-      const data = (await res.json()) as PaginatedResult<User>
-      setResult(data)
+      const data = await getAdminUsersAction({
+        page: Number(params.get('page')),
+        pageSize: Number(params.get('pageSize')),
+        search: params.get('search') ?? undefined,
+        plan: params.get('plan') ?? undefined,
+      })
+      if (data.result) {
+        setResult(data.result)
+      } else if (data.error) {
+        console.error(data.error)
+      }
     } finally {
       setIsLoading(false)
     }
@@ -52,16 +61,13 @@ export default function AdminUsersPage() {
 
   const adminAction = async (
     userId: string,
-    action: string,
-    extra?: object
+    action: 'ban' | 'unban' | 'change_plan',
+    extra?: { plan?: Plan }
   ) => {
     setActionLoading(userId + action)
     try {
-      await fetch(`/api/admin/users/${userId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, ...extra }),
-      })
+      const result = await adminUserAction(userId, { action, ...extra })
+      if (result?.error) console.error(result.error)
       await fetchUsers()
     } finally {
       setActionLoading(null)
@@ -236,7 +242,9 @@ export default function AdminUsersPage() {
                           <Select
                             value={user.plan}
                             onValueChange={(plan) =>
-                              void adminAction(user.id, 'change_plan', { plan })
+                              void adminAction(user.id, 'change_plan', {
+                                plan: plan as Plan,
+                              })
                             }
                           >
                             <SelectTrigger className="h-7 w-24 text-xs">

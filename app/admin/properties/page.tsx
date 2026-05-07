@@ -12,6 +12,10 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
+import {
+  adminPropertyAction,
+  getAdminPropertiesAction,
+} from '@/app/actions/properties'
 import { Button } from '@/components/ui/button'
 import { cn, formatPrice, formatRelativeDate } from '@/lib/utils'
 import type { PaginatedResult, Property } from '@/types'
@@ -23,6 +27,13 @@ const statusTabs = [
   { value: 'rejected', label: 'Rejected' },
   { value: 'featured', label: 'Featured' },
 ]
+
+type AdminPropertyActionName =
+  | 'approve'
+  | 'reject'
+  | 'feature'
+  | 'unfeature'
+  | 'delete'
 
 export default function AdminPropertiesPage() {
   const [status, setStatus] = useState('all')
@@ -40,9 +51,16 @@ export default function AdminPropertiesPage() {
         pageSize: '25',
         ...(status !== 'all' ? { status } : {}),
       })
-      const res = await fetch(`/api/properties?${params.toString()}&admin=1`)
-      const data = (await res.json()) as PaginatedResult<Property>
-      setResult(data)
+      const data = await getAdminPropertiesAction({
+        page: Number(params.get('page')),
+        pageSize: Number(params.get('pageSize')),
+        status: params.get('status') ?? 'all',
+      })
+      if (data.result) {
+        setResult(data.result)
+      } else if (data.error) {
+        console.error(data.error)
+      }
     } catch (err) {
       console.error(err)
     } finally {
@@ -56,16 +74,13 @@ export default function AdminPropertiesPage() {
 
   const adminAction = async (
     propertyId: string,
-    action: string,
-    extra?: object
+    action: AdminPropertyActionName,
+    extra?: { days?: number }
   ) => {
     setActionLoading(propertyId + action)
     try {
-      await fetch(`/api/admin/properties/${propertyId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, ...extra }),
-      })
+      const result = await adminPropertyAction(propertyId, { action, ...extra })
+      if (result?.error) console.error(result.error)
       await fetchProperties()
     } finally {
       setActionLoading(null)

@@ -4,6 +4,10 @@ import { IconCirclePlus, IconDeviceFloppy, IconX } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 import { use, useEffect, useState } from 'react'
 import { z } from 'zod'
+import {
+  getPropertyAction,
+  updatePropertyAction,
+} from '@/app/actions/properties'
 import { useSupabase } from '@/components/providers/supabase-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -59,9 +63,18 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    fetch(`/api/properties/${id}`)
-      .then((r) => r.json())
-      .then((data: Property) => {
+    let isActive = true
+
+    setIsLoading(true)
+    getPropertyAction(id)
+      .then((result) => {
+        if (!isActive) return
+        if (!result.property) {
+          setProperty(null)
+          return
+        }
+
+        const data = result.property
         setProperty(data)
         setForm({
           title: data.title,
@@ -77,7 +90,13 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
         setImageUrls(data.images.length > 0 ? data.images : [''])
       })
       .catch(() => null)
-      .finally(() => setIsLoading(false))
+      .finally(() => {
+        if (isActive) setIsLoading(false)
+      })
+
+    return () => {
+      isActive = false
+    }
   }, [id])
 
   const planLimit = user?.plan ? PLAN_LIMITS[user.plan] : PLAN_LIMITS.free
@@ -122,13 +141,11 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
 
     setIsSubmitting(true)
     try {
-      const res = await fetch(`/api/properties/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...parsed.data, status: 'pending' }),
+      const data = await updatePropertyAction(id, {
+        ...parsed.data,
+        status: 'pending',
       })
-      const data = (await res.json()) as { error?: string }
-      if (!res.ok) {
+      if ('error' in data) {
         setServerError(data.error ?? 'Failed to update')
         return
       }
@@ -376,5 +393,3 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
     </div>
   )
 }
-
-

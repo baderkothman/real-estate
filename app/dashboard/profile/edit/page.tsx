@@ -9,13 +9,14 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { updateUserProfileAction } from '@/app/actions/users'
 import { PlanBadge } from '@/components/common/plan-badge'
 import { useSupabase } from '@/components/providers/supabase-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { getInitials } from '@/lib/utils'
 import { getPasswordPolicyErrorMessage } from '@/lib/supabase/auth-errors'
+import { getInitials } from '@/lib/utils'
 
 interface ProfileData {
   name: string
@@ -62,17 +63,13 @@ export default function EditProfilePage() {
     setErrorMsg('')
     setSuccessMsg('')
     try {
-      const res = await fetch(`/api/users/${user.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: profile.name,
-          phone: profile.phone,
-          bio: profile.bio,
-          profileImage: profile.profileImage,
-        }),
+      const result = await updateUserProfileAction(user.id, {
+        name: profile.name,
+        phone: profile.phone,
+        bio: profile.bio,
+        profileImage: profile.profileImage,
       })
-      if (!res.ok) throw new Error('Failed to save')
+      if ('error' in result) throw new Error(result.error)
       setSuccessMsg('Profile updated successfully!')
       await refreshUser()
     } catch {

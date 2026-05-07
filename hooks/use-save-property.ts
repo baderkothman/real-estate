@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { toggleSavePropertyAction } from '@/app/actions/properties'
 import { useSupabase } from '@/components/providers/supabase-provider'
 
 interface UseSavePropertyReturn {
@@ -33,21 +34,14 @@ export function useSaveProperty(
 
     setIsLoading(true)
     try {
-      const res = await fetch(`/api/properties/${propertyId}/save`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-
-      if (res.status === 401) {
+      const data = await toggleSavePropertyAction(propertyId)
+      if ('error' in data && data.error === 'Unauthorized') {
         window.location.href = loginUrl
         return
       }
 
-      if (!res.ok) {
-        throw new Error('Failed to toggle save')
-      }
+      if ('error' in data) throw new Error(data.error)
 
-      const data = (await res.json()) as { saved: boolean }
       setIsSaved(data.saved)
     } catch (err) {
       console.error('Save toggle error:', err)
