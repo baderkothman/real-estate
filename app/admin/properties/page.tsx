@@ -35,6 +35,158 @@ type AdminPropertyActionName =
   | 'unfeature'
   | 'delete'
 
+function AdminPropertyRow({
+  property,
+  actionLoading,
+  featDaysValue,
+  onFeatDaysChange,
+  onAction,
+}: {
+  property: Property
+  actionLoading: string | null
+  featDaysValue: string
+  onFeatDaysChange: (value: string) => void
+  onAction: (action: AdminPropertyActionName, extra?: { days?: number }) => void
+}) {
+  return (
+    <tr className="hover:bg-[#faf7eb]/50 transition-colors">
+      <td className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="relative h-10 w-14 rounded overflow-hidden shrink-0">
+            <Image
+              src={
+                property.coverImage ??
+                `https://picsum.photos/seed/${property.id}/400/300`
+              }
+              alt={property.title}
+              fill
+              className="object-cover"
+              sizes="56px"
+            />
+          </div>
+          <div>
+            <Link
+              href={`/properties/${property.id}`}
+              className="text-[#181411] hover:text-[#a34702] transition-colors line-clamp-1 text-sm"
+            >
+              {property.title}
+            </Link>
+            <p className="text-xs text-[#5f554d]">{property.city}</p>
+          </div>
+        </div>
+      </td>
+      <td className="p-4 hidden md:table-cell">
+        <span className="text-[#5f554d] text-xs">{property.ownerName}</span>
+      </td>
+      <td className="p-4 hidden sm:table-cell">
+        <span
+          className={cn(
+            'text-xs px-2 py-0.5 rounded-full border',
+            property.status === 'approved' &&
+              'bg-emerald-50 border-emerald-200 text-emerald-700',
+            property.status === 'pending' &&
+              'bg-amber-50 border-amber-200 text-amber-700',
+            property.status === 'rejected' &&
+              'bg-red-50 border-red-200 text-red-700'
+          )}
+        >
+          {property.status}
+          {property.isFeatured && ' ★'}
+        </span>
+      </td>
+      <td className="p-4 hidden lg:table-cell">
+        <span className="font-mono text-xs text-[#a34702]">
+          {formatPrice(property.price)}
+        </span>
+      </td>
+      <td className="p-4 hidden xl:table-cell">
+        <span className="text-xs text-[#5f554d]">
+          {formatRelativeDate(property.createdAt)}
+        </span>
+      </td>
+      <td className="p-4">
+        <div className="flex items-center justify-end gap-1 flex-wrap">
+          {property.status === 'pending' && (
+            <>
+              <button
+                type="button"
+                onClick={() => onAction('approve')}
+                disabled={actionLoading === `${property.id}approve`}
+                className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 disabled:opacity-50 transition-colors"
+                title="Approve"
+                aria-label={`Approve "${property.title}"`}
+              >
+                <IconCircleCheck className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => onAction('reject')}
+                disabled={actionLoading === `${property.id}reject`}
+                className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 transition-colors"
+                title="Reject"
+                aria-label={`Reject "${property.title}"`}
+              >
+                <IconCircleX className="h-3.5 w-3.5" />
+              </button>
+            </>
+          )}
+          {property.status === 'approved' && !property.isFeatured && (
+            <div className="flex items-center gap-1">
+              <input
+                type="number"
+                placeholder="Days"
+                value={featDaysValue}
+                onChange={(e) => onFeatDaysChange(e.target.value)}
+                className="w-14 h-7 rounded-md bg-white border border-[rgba(34,24,18,0.14)] text-[#181411] text-xs px-2 focus:outline-none focus:border-[#fa6b05]"
+                min={1}
+                max={365}
+                aria-label={`Days to feature "${property.title}"`}
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  onAction('feature', {
+                    days: parseInt(featDaysValue || '30', 10),
+                  })
+                }
+                className="p-1.5 rounded-lg bg-[#fef0e6] text-[#a34702] hover:bg-[#fa6b05]/15 transition-colors"
+                title="Feature"
+                aria-label={`Feature "${property.title}"`}
+              >
+                <IconStar className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+          {property.isFeatured && (
+            <button
+              type="button"
+              onClick={() => onAction('unfeature')}
+              className="p-1.5 rounded-lg bg-[#faf7eb] text-[#5f554d] hover:bg-[rgba(34,24,18,0.08)] transition-colors"
+              title="Unfeature"
+              aria-label={`Unfeature "${property.title}"`}
+            >
+              <IconStarOff className="h-3.5 w-3.5" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm('Delete this property?')) {
+                onAction('delete')
+              }
+            }}
+            className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+            title="Delete"
+            aria-label={`Delete "${property.title}"`}
+          >
+            <IconTrash className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </td>
+    </tr>
+  )
+}
+
 export default function AdminPropertiesPage() {
   const [status, setStatus] = useState('all')
   const [page, setPage] = useState(1)
@@ -150,167 +302,21 @@ export default function AdminPropertiesPage() {
                 </thead>
                 <tbody className="divide-y divide-[rgba(34,24,18,0.05)]">
                   {result?.data.map((property) => (
-                    <tr
+                    <AdminPropertyRow
                       key={property.id}
-                      className="hover:bg-[#faf7eb]/50 transition-colors"
-                    >
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="relative h-10 w-14 rounded overflow-hidden shrink-0">
-                            <Image
-                              src={
-                                property.coverImage ??
-                                `https://picsum.photos/seed/${property.id}/400/300`
-                              }
-                              alt={property.title}
-                              fill
-                              className="object-cover"
-                              sizes="56px"
-                            />
-                          </div>
-                          <div>
-                            <Link
-                              href={`/properties/${property.id}`}
-                              className="text-[#181411] hover:text-[#a34702] transition-colors line-clamp-1 text-sm"
-                            >
-                              {property.title}
-                            </Link>
-                            <p className="text-xs text-[#5f554d]">
-                              {property.city}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 hidden md:table-cell">
-                        <span className="text-[#5f554d] text-xs">
-                          {property.ownerName}
-                        </span>
-                      </td>
-                      <td className="p-4 hidden sm:table-cell">
-                        <span
-                          className={cn(
-                            'text-xs px-2 py-0.5 rounded-full border',
-                            property.status === 'approved' &&
-                              'bg-emerald-50 border-emerald-200 text-emerald-700',
-                            property.status === 'pending' &&
-                              'bg-amber-50 border-amber-200 text-amber-700',
-                            property.status === 'rejected' &&
-                              'bg-red-50 border-red-200 text-red-700'
-                          )}
-                        >
-                          {property.status}
-                          {property.isFeatured && ' ★'}
-                        </span>
-                      </td>
-                      <td className="p-4 hidden lg:table-cell">
-                        <span className="font-mono text-xs text-[#a34702]">
-                          {formatPrice(property.price)}
-                        </span>
-                      </td>
-                      <td className="p-4 hidden xl:table-cell">
-                        <span className="text-xs text-[#5f554d]">
-                          {formatRelativeDate(property.createdAt)}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center justify-end gap-1 flex-wrap">
-                          {property.status === 'pending' && (
-                            <>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  void adminAction(property.id, 'approve')
-                                }
-                                disabled={
-                                  actionLoading === `${property.id}approve`
-                                }
-                                className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 disabled:opacity-50 transition-colors"
-                                title="Approve"
-                                aria-label={`Approve "${property.title}"`}
-                              >
-                                <IconCircleCheck className="h-3.5 w-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  void adminAction(property.id, 'reject')
-                                }
-                                disabled={
-                                  actionLoading === `${property.id}reject`
-                                }
-                                className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 transition-colors"
-                                title="Reject"
-                                aria-label={`Reject "${property.title}"`}
-                              >
-                                <IconCircleX className="h-3.5 w-3.5" />
-                              </button>
-                            </>
-                          )}
-                          {property.status === 'approved' &&
-                            !property.isFeatured && (
-                              <div className="flex items-center gap-1">
-                                <input
-                                  type="number"
-                                  placeholder="Days"
-                                  value={featDays[property.id] ?? ''}
-                                  onChange={(e) =>
-                                    setFeatDays((prev) => ({
-                                      ...prev,
-                                      [property.id]: e.target.value,
-                                    }))
-                                  }
-                                  className="w-14 h-7 rounded-md bg-white border border-[rgba(34,24,18,0.14)] text-[#181411] text-xs px-2 focus:outline-none focus:border-[#fa6b05]"
-                                  min={1}
-                                  max={365}
-                                  aria-label={`Days to feature "${property.title}"`}
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    void adminAction(property.id, 'feature', {
-                                      days: parseInt(
-                                        featDays[property.id] ?? '30',
-                                        10
-                                      ),
-                                    })
-                                  }
-                                  className="p-1.5 rounded-lg bg-[#fef0e6] text-[#a34702] hover:bg-[#fa6b05]/15 transition-colors"
-                                  title="Feature"
-                                  aria-label={`Feature "${property.title}"`}
-                                >
-                                  <IconStar className="h-3.5 w-3.5" />
-                                </button>
-                              </div>
-                            )}
-                          {property.isFeatured && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                void adminAction(property.id, 'unfeature')
-                              }
-                              className="p-1.5 rounded-lg bg-[#faf7eb] text-[#5f554d] hover:bg-[rgba(34,24,18,0.08)] transition-colors"
-                              title="Unfeature"
-                              aria-label={`Unfeature "${property.title}"`}
-                            >
-                              <IconStarOff className="h-3.5 w-3.5" />
-                            </button>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (confirm('Delete this property?')) {
-                                void adminAction(property.id, 'delete')
-                              }
-                            }}
-                            className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                            title="Delete"
-                            aria-label={`Delete "${property.title}"`}
-                          >
-                            <IconTrash className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                      property={property}
+                      actionLoading={actionLoading}
+                      featDaysValue={featDays[property.id] ?? ''}
+                      onFeatDaysChange={(value) =>
+                        setFeatDays((prev) => ({
+                          ...prev,
+                          [property.id]: value,
+                        }))
+                      }
+                      onAction={(action, extra) =>
+                        void adminAction(property.id, action, extra)
+                      }
+                    />
                   ))}
                 </tbody>
               </table>

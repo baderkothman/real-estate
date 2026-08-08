@@ -20,6 +20,140 @@ import {
 import { cn, formatDate } from '@/lib/utils'
 import type { PaginatedResult, Plan, User } from '@/types'
 
+function AdminUserRow({
+  user,
+  actionLoading,
+  onAction,
+}: {
+  user: User
+  actionLoading: string | null
+  onAction: (
+    action: 'ban' | 'unban' | 'change_plan',
+    extra?: { plan?: Plan }
+  ) => void
+}) {
+  return (
+    <tr className="hover:bg-[#faf7eb]/50 transition-colors">
+      <td className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="relative h-8 w-8 rounded-full overflow-hidden bg-[#fef0e6] shrink-0">
+            {user.profileImage ? (
+              <Image
+                src={user.profileImage}
+                alt={user.name}
+                fill
+                className="object-cover"
+                sizes="32px"
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center text-[#a34702] text-xs font-bold">
+                {user.name[0]}
+              </div>
+            )}
+          </div>
+          <div>
+            <p className="text-[#181411] text-sm">{user.name}</p>
+            <p className="text-[#5f554d] text-xs truncate max-w-[160px]">
+              {user.email}
+            </p>
+          </div>
+        </div>
+      </td>
+      <td className="p-4 hidden sm:table-cell">
+        <span
+          className={cn(
+            'text-xs px-2 py-0.5 rounded-full border capitalize',
+            user.plan === 'agency' &&
+              'bg-[#ecf8f5] border-[#379579]/25 text-[#1c4a3c]',
+            user.plan === 'pro' &&
+              'bg-[#fef0e6] border-[#fa6b05]/25 text-[#964003]',
+            user.plan === 'free' &&
+              'bg-[#faf7eb] border-[rgba(34,24,18,0.12)] text-[#5f554d]'
+          )}
+        >
+          {user.plan}
+        </span>
+      </td>
+      <td className="p-4 hidden md:table-cell">
+        <span
+          className={cn(
+            'text-xs',
+            user.role === 'admin' ? 'text-violet-600' : 'text-[#5f554d]'
+          )}
+        >
+          {user.role}
+        </span>
+      </td>
+      <td className="p-4 hidden lg:table-cell">
+        <span className="text-xs text-[#5f554d]">
+          {formatDate(user.createdAt)}
+        </span>
+      </td>
+      <td className="p-4 hidden sm:table-cell">
+        {user.isBanned ? (
+          <span className="text-xs px-2 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-700">
+            Banned
+          </span>
+        ) : (
+          <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700">
+            Active
+          </span>
+        )}
+      </td>
+      <td className="p-4">
+        <div className="flex items-center justify-end gap-2">
+          {/* Change plan */}
+          <Select
+            value={user.plan}
+            onValueChange={(plan) =>
+              onAction('change_plan', { plan: plan as Plan })
+            }
+          >
+            <SelectTrigger
+              className="h-7 w-24 text-xs"
+              aria-label={`Change plan for ${user.name}`}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="free">Free</SelectItem>
+              <SelectItem value="pro">Pro</SelectItem>
+              <SelectItem value="agency">Agency</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Ban/Unban */}
+          {user.role !== 'admin' && (
+            <button
+              type="button"
+              onClick={() => onAction(user.isBanned ? 'unban' : 'ban')}
+              disabled={
+                actionLoading === user.id + (user.isBanned ? 'unban' : 'ban')
+              }
+              className={cn(
+                'p-1.5 rounded-lg transition-colors disabled:opacity-50',
+                user.isBanned
+                  ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                  : 'bg-red-50 text-red-600 hover:bg-red-100'
+              )}
+              title={user.isBanned ? 'Unban user' : 'Ban user'}
+              aria-label={
+                user.isBanned ? `Unban ${user.name}` : `Ban ${user.name}`
+              }
+            >
+              {user.isBanned ? (
+                <IconCircleCheck className="h-3.5 w-3.5" />
+              ) : (
+                <IconBan className="h-3.5 w-3.5" />
+              )}
+            </button>
+          )}
+        </div>
+      </td>
+    </tr>
+  )
+}
+
 export default function AdminUsersPage() {
   const [search, setSearch] = useState('')
   const [planFilter, setPlanFilter] = useState('all')
@@ -166,141 +300,14 @@ export default function AdminUsersPage() {
                 </thead>
                 <tbody className="divide-y divide-[rgba(34,24,18,0.05)]">
                   {filteredUsers.map((user) => (
-                    <tr
+                    <AdminUserRow
                       key={user.id}
-                      className="hover:bg-[#faf7eb]/50 transition-colors"
-                    >
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="relative h-8 w-8 rounded-full overflow-hidden bg-[#fef0e6] shrink-0">
-                            {user.profileImage ? (
-                              <Image
-                                src={user.profileImage}
-                                alt={user.name}
-                                fill
-                                className="object-cover"
-                                sizes="32px"
-                              />
-                            ) : (
-                              <div className="h-full w-full flex items-center justify-center text-[#a34702] text-xs font-bold">
-                                {user.name[0]}
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <p className="text-[#181411] text-sm">
-                              {user.name}
-                            </p>
-                            <p className="text-[#5f554d] text-xs truncate max-w-[160px]">
-                              {user.email}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 hidden sm:table-cell">
-                        <span
-                          className={cn(
-                            'text-xs px-2 py-0.5 rounded-full border capitalize',
-                            user.plan === 'agency' &&
-                              'bg-[#ecf8f5] border-[#379579]/25 text-[#1c4a3c]',
-                            user.plan === 'pro' &&
-                              'bg-[#fef0e6] border-[#fa6b05]/25 text-[#964003]',
-                            user.plan === 'free' &&
-                              'bg-[#faf7eb] border-[rgba(34,24,18,0.12)] text-[#5f554d]'
-                          )}
-                        >
-                          {user.plan}
-                        </span>
-                      </td>
-                      <td className="p-4 hidden md:table-cell">
-                        <span
-                          className={cn(
-                            'text-xs',
-                            user.role === 'admin'
-                              ? 'text-violet-600'
-                              : 'text-[#5f554d]'
-                          )}
-                        >
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="p-4 hidden lg:table-cell">
-                        <span className="text-xs text-[#5f554d]">
-                          {formatDate(user.createdAt)}
-                        </span>
-                      </td>
-                      <td className="p-4 hidden sm:table-cell">
-                        {user.isBanned ? (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-700">
-                            Banned
-                          </span>
-                        ) : (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700">
-                            Active
-                          </span>
-                        )}
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center justify-end gap-2">
-                          {/* Change plan */}
-                          <Select
-                            value={user.plan}
-                            onValueChange={(plan) =>
-                              void adminAction(user.id, 'change_plan', {
-                                plan: plan as Plan,
-                              })
-                            }
-                          >
-                            <SelectTrigger
-                              className="h-7 w-24 text-xs"
-                              aria-label={`Change plan for ${user.name}`}
-                            >
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="free">Free</SelectItem>
-                              <SelectItem value="pro">Pro</SelectItem>
-                              <SelectItem value="agency">Agency</SelectItem>
-                            </SelectContent>
-                          </Select>
-
-                          {/* Ban/Unban */}
-                          {user.role !== 'admin' && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                void adminAction(
-                                  user.id,
-                                  user.isBanned ? 'unban' : 'ban'
-                                )
-                              }
-                              disabled={
-                                actionLoading ===
-                                user.id + (user.isBanned ? 'unban' : 'ban')
-                              }
-                              className={cn(
-                                'p-1.5 rounded-lg transition-colors disabled:opacity-50',
-                                user.isBanned
-                                  ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
-                                  : 'bg-red-50 text-red-600 hover:bg-red-100'
-                              )}
-                              title={user.isBanned ? 'Unban user' : 'Ban user'}
-                              aria-label={
-                                user.isBanned
-                                  ? `Unban ${user.name}`
-                                  : `Ban ${user.name}`
-                              }
-                            >
-                              {user.isBanned ? (
-                                <IconCircleCheck className="h-3.5 w-3.5" />
-                              ) : (
-                                <IconBan className="h-3.5 w-3.5" />
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
+                      user={user}
+                      actionLoading={actionLoading}
+                      onAction={(action, extra) =>
+                        void adminAction(user.id, action, extra)
+                      }
+                    />
                   ))}
                 </tbody>
               </table>

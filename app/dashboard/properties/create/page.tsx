@@ -36,6 +36,278 @@ const propertySchema = z.object({
 
 type FieldErrors = Partial<Record<string, string>>
 
+type CreateForm = {
+  title: string
+  city: string
+  address: string
+  listingType: 'sale' | 'rent'
+  price: string
+  bedrooms: string
+  bathrooms: string
+  areaSqM: string
+  description: string
+}
+
+function CreateBasicInfoFields({
+  form,
+  errors,
+  setField,
+}: {
+  form: CreateForm
+  errors: FieldErrors
+  setField: (field: string, value: string) => void
+}) {
+  return (
+    <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
+      <h3 className="font-display text-lg font-semibold text-[#181411]">
+        Basic Information
+      </h3>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="title">Property Title *</Label>
+        <Input
+          id="title"
+          placeholder="e.g. Luxury Apartment in Achrafieh"
+          value={form.title}
+          onChange={(e) => setField('title', e.target.value)}
+          error={errors.title}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="create-city">City *</Label>
+          <Select value={form.city} onValueChange={(v) => setField('city', v)}>
+            <SelectTrigger
+              id="create-city"
+              className={errors.city ? 'border-red-400' : ''}
+            >
+              <SelectValue placeholder="Select city" />
+            </SelectTrigger>
+            <SelectContent>
+              {CITIES_LEBANON.map((city) => (
+                <SelectItem key={city} value={city}>
+                  {city}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.city && <p className="text-xs text-red-600">{errors.city}</p>}
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="create-listing-type">Listing Type *</Label>
+          <Select
+            value={form.listingType}
+            onValueChange={(v: 'sale' | 'rent') => setField('listingType', v)}
+          >
+            <SelectTrigger id="create-listing-type">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sale">For Sale</SelectItem>
+              <SelectItem value="rent">For Rent</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="address">Full Address (optional)</Label>
+        <Input
+          id="address"
+          placeholder="Street, neighbourhood, etc."
+          value={form.address}
+          onChange={(e) => setField('address', e.target.value)}
+        />
+      </div>
+    </div>
+  )
+}
+
+function CreatePricingSpecsFields({
+  form,
+  errors,
+  setField,
+}: {
+  form: CreateForm
+  errors: FieldErrors
+  setField: (field: string, value: string) => void
+}) {
+  return (
+    <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
+      <h3 className="font-display text-lg font-semibold text-[#181411]">
+        Pricing & Specs
+      </h3>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="price">
+          Price (USD) * {form.listingType === 'rent' && '- per month'}
+        </Label>
+        <Input
+          id="price"
+          type="number"
+          placeholder="e.g. 250000"
+          value={form.price}
+          onChange={(e) => setField('price', e.target.value)}
+          error={errors.price}
+          min={0}
+        />
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="bedrooms">Bedrooms</Label>
+          <Input
+            id="bedrooms"
+            type="number"
+            placeholder="0"
+            value={form.bedrooms}
+            onChange={(e) => setField('bedrooms', e.target.value)}
+            min={0}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="bathrooms">Bathrooms</Label>
+          <Input
+            id="bathrooms"
+            type="number"
+            placeholder="0"
+            value={form.bathrooms}
+            onChange={(e) => setField('bathrooms', e.target.value)}
+            min={0}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="area">Area (sq m)</Label>
+          <Input
+            id="area"
+            type="number"
+            placeholder="0"
+            value={form.areaSqM}
+            onChange={(e) => setField('areaSqM', e.target.value)}
+            min={0}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CreateDescriptionField({
+  description,
+  error,
+  setField,
+}: {
+  description: string
+  error?: string
+  setField: (field: string, value: string) => void
+}) {
+  return (
+    <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
+      <h3 className="font-display text-lg font-semibold text-[#181411]">
+        Description
+      </h3>
+      <div className="space-y-1.5">
+        <Label htmlFor="description">Property Description *</Label>
+        <textarea
+          id="description"
+          rows={6}
+          placeholder="Describe the property in detail - location, features, nearby amenities..."
+          value={description}
+          onChange={(e) => setField('description', e.target.value)}
+          className={`flex w-full rounded-lg border bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-[#5f554d] focus:outline-none focus:ring-2 transition-colors resize-none ${
+            error
+              ? 'border-red-400 focus:ring-red-400/30 focus:border-red-400'
+              : 'border-[rgba(34,24,18,0.14)] focus:ring-[#fa6b05]/30 focus:border-[#fa6b05]'
+          }`}
+        />
+        {error && <p className="text-xs text-red-600">{error}</p>}
+      </div>
+    </div>
+  )
+}
+
+function CreatePhotosField({
+  imageUrls,
+  errors,
+  maxImages,
+  onUpdateImageUrl,
+  onRemoveImageField,
+  onAddImageField,
+}: {
+  imageUrls: { id: string; url: string }[]
+  errors: FieldErrors
+  maxImages: number
+  onUpdateImageUrl: (id: string, val: string) => void
+  onRemoveImageField: (id: string) => void
+  onAddImageField: () => void
+}) {
+  return (
+    <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="font-display text-lg font-semibold text-[#181411]">
+          Photos
+        </h3>
+        <span className="text-xs text-[#5f554d]">
+          {imageUrls.filter((row) => row.url.trim()).length} / {maxImages} max
+        </span>
+      </div>
+
+      {errors.images && <p className="text-xs text-red-600">{errors.images}</p>}
+
+      <div className="space-y-2">
+        {imageUrls.map((row, idx) => (
+          <div key={row.id} className="flex gap-2">
+            <Input
+              placeholder={`Image URL ${idx + 1} (e.g. https://picsum.photos/seed/${idx}/800/600)`}
+              value={row.url}
+              onChange={(e) => onUpdateImageUrl(row.id, e.target.value)}
+              className="flex-1"
+            />
+            {imageUrls.length > 1 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => onRemoveImageField(row.id)}
+                className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                aria-label={`Remove image ${idx + 1}`}
+              >
+                <IconX className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {imageUrls.length < maxImages && (
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={onAddImageField}
+          className="gap-2"
+        >
+          <IconCirclePlus className="h-4 w-4" />
+          Add Image URL
+        </Button>
+      )}
+
+      {imageUrls.length >= maxImages && (
+        <div className="flex items-center gap-2 text-xs text-amber-600">
+          <IconAlertTriangle className="h-3.5 w-3.5" />
+          Maximum images reached for your plan.{' '}
+          <Link href="/pricing" className="underline">
+            Upgrade
+          </Link>{' '}
+          for more.
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function CreatePropertyPage() {
   const { user } = useSupabase()
   const router = useRouter()
@@ -51,9 +323,9 @@ export default function CreatePropertyPage() {
     areaSqM: '',
     description: '',
   })
-  const [imageUrls, setImageUrls] = useState<
-    { id: string; url: string }[]
-  >(() => [{ id: crypto.randomUUID(), url: '' }])
+  const [imageUrls, setImageUrls] = useState<{ id: string; url: string }[]>(
+    () => [{ id: crypto.randomUUID(), url: '' }]
+  )
   const [errors, setErrors] = useState<FieldErrors>({})
   const [serverError, setServerError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -85,9 +357,9 @@ export default function CreatePropertyPage() {
     e.preventDefault()
     setServerError('')
 
-    const validImages = imageUrls
-      .map((row) => row.url)
-      .filter((u) => u.trim() !== '')
+    const validImages = imageUrls.flatMap((row) =>
+      row.url.trim() !== '' ? [row.url] : []
+    )
 
     const parsed = propertySchema.safeParse({
       ...form,
@@ -141,227 +413,29 @@ export default function CreatePropertyPage() {
       )}
 
       <form onSubmit={(e) => void handleSubmit(e)} className="space-y-8">
-        {/* Basic Info */}
-        <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
-          <h3 className="font-display text-lg font-semibold text-[#181411]">
-            Basic Information
-          </h3>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="title">Property Title *</Label>
-            <Input
-              id="title"
-              placeholder="e.g. Luxury Apartment in Achrafieh"
-              value={form.title}
-              onChange={(e) => setField('title', e.target.value)}
-              error={errors.title}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="create-city">City *</Label>
-              <Select
-                value={form.city}
-                onValueChange={(v) => setField('city', v)}
-              >
-                <SelectTrigger
-                  id="create-city"
-                  className={errors.city ? 'border-red-400' : ''}
-                >
-                  <SelectValue placeholder="Select city" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CITIES_LEBANON.map((city) => (
-                    <SelectItem key={city} value={city}>
-                      {city}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.city && (
-                <p className="text-xs text-red-600">{errors.city}</p>
-              )}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="create-listing-type">Listing Type *</Label>
-              <Select
-                value={form.listingType}
-                onValueChange={(v: 'sale' | 'rent') =>
-                  setField('listingType', v)
-                }
-              >
-                <SelectTrigger id="create-listing-type">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sale">For Sale</SelectItem>
-                  <SelectItem value="rent">For Rent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="address">Full Address (optional)</Label>
-            <Input
-              id="address"
-              placeholder="Street, neighbourhood, etc."
-              value={form.address}
-              onChange={(e) => setField('address', e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* Pricing & Specs */}
-        <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
-          <h3 className="font-display text-lg font-semibold text-[#181411]">
-            Pricing & Specs
-          </h3>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="price">
-              Price (USD) * {form.listingType === 'rent' && '- per month'}
-            </Label>
-            <Input
-              id="price"
-              type="number"
-              placeholder="e.g. 250000"
-              value={form.price}
-              onChange={(e) => setField('price', e.target.value)}
-              error={errors.price}
-              min={0}
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="bedrooms">Bedrooms</Label>
-              <Input
-                id="bedrooms"
-                type="number"
-                placeholder="0"
-                value={form.bedrooms}
-                onChange={(e) => setField('bedrooms', e.target.value)}
-                min={0}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="bathrooms">Bathrooms</Label>
-              <Input
-                id="bathrooms"
-                type="number"
-                placeholder="0"
-                value={form.bathrooms}
-                onChange={(e) => setField('bathrooms', e.target.value)}
-                min={0}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="area">Area (sq m)</Label>
-              <Input
-                id="area"
-                type="number"
-                placeholder="0"
-                value={form.areaSqM}
-                onChange={(e) => setField('areaSqM', e.target.value)}
-                min={0}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Description */}
-        <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
-          <h3 className="font-display text-lg font-semibold text-[#181411]">
-            Description
-          </h3>
-          <div className="space-y-1.5">
-            <Label htmlFor="description">Property Description *</Label>
-            <textarea
-              id="description"
-              rows={6}
-              placeholder="Describe the property in detail - location, features, nearby amenities..."
-              value={form.description}
-              onChange={(e) => setField('description', e.target.value)}
-              className={`flex w-full rounded-lg border bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-[#5f554d] focus:outline-none focus:ring-2 transition-colors resize-none ${
-                errors.description
-                  ? 'border-red-400 focus:ring-red-400/30 focus:border-red-400'
-                  : 'border-[rgba(34,24,18,0.14)] focus:ring-[#fa6b05]/30 focus:border-[#fa6b05]'
-              }`}
-            />
-            {errors.description && (
-              <p className="text-xs text-red-600">{errors.description}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Photos */}
-        <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold text-[#181411]">
-              Photos
-            </h3>
-            <span className="text-xs text-[#5f554d]">
-              {imageUrls.filter((row) => row.url.trim()).length} /{' '}
-              {planLimit.maxImages} max
-            </span>
-          </div>
-
-          {errors.images && (
-            <p className="text-xs text-red-600">{errors.images}</p>
-          )}
-
-          <div className="space-y-2">
-            {imageUrls.map((row, idx) => (
-              <div key={row.id} className="flex gap-2">
-                <Input
-                  placeholder={`Image URL ${idx + 1} (e.g. https://picsum.photos/seed/${idx}/800/600)`}
-                  value={row.url}
-                  onChange={(e) => updateImageUrl(row.id, e.target.value)}
-                  className="flex-1"
-                />
-                {imageUrls.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => removeImageField(row.id)}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                    aria-label={`Remove image ${idx + 1}`}
-                  >
-                    <IconX className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {imageUrls.length < planLimit.maxImages && (
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={addImageField}
-              className="gap-2"
-            >
-              <IconCirclePlus className="h-4 w-4" />
-              Add Image URL
-            </Button>
-          )}
-
-          {imageUrls.length >= planLimit.maxImages && (
-            <div className="flex items-center gap-2 text-xs text-amber-600">
-              <IconAlertTriangle className="h-3.5 w-3.5" />
-              Maximum images reached for your plan.{' '}
-              <Link href="/pricing" className="underline">
-                Upgrade
-              </Link>{' '}
-              for more.
-            </div>
-          )}
-        </div>
+        <CreateBasicInfoFields
+          form={form}
+          errors={errors}
+          setField={setField}
+        />
+        <CreatePricingSpecsFields
+          form={form}
+          errors={errors}
+          setField={setField}
+        />
+        <CreateDescriptionField
+          description={form.description}
+          error={errors.description}
+          setField={setField}
+        />
+        <CreatePhotosField
+          imageUrls={imageUrls}
+          errors={errors}
+          maxImages={planLimit.maxImages}
+          onUpdateImageUrl={updateImageUrl}
+          onRemoveImageField={removeImageField}
+          onAddImageField={addImageField}
+        />
 
         <Button
           type="submit"

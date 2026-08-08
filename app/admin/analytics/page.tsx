@@ -12,6 +12,18 @@ import {
 
 export const metadata: Metadata = { title: 'Analytics' }
 
+const statusColors: Record<string, string> = {
+  approved: 'bg-emerald-500',
+  pending: 'bg-amber-500',
+  rejected: 'bg-red-500',
+}
+
+const planColors: Record<string, string> = {
+  free: 'bg-[#8b8178]',
+  pro: 'bg-[#fa6b05]',
+  agency: 'bg-[#379579]',
+}
+
 function BarChartRow({
   label,
   count,
@@ -97,18 +109,6 @@ export default async function AdminAnalyticsPage() {
   const maxCityCount = topCities.reduce((m, c) => Math.max(m, c.count), 0)
   const maxStatusCount = byStatus.reduce((m, s) => Math.max(m, s.count), 0)
   const maxPlanCount = byPlan.reduce((m, p) => Math.max(m, p.count), 0)
-
-  const statusColors: Record<string, string> = {
-    approved: 'bg-emerald-500',
-    pending: 'bg-amber-500',
-    rejected: 'bg-red-500',
-  }
-
-  const planColors: Record<string, string> = {
-    free: 'bg-[#8b8178]',
-    pro: 'bg-[#fa6b05]',
-    agency: 'bg-[#379579]',
-  }
 
   return (
     <div>

@@ -95,6 +95,218 @@ function ctaFormReducer(
   }
 }
 
+function InquiryForm({
+  question,
+  isSubmitting,
+  onQuestionChange,
+  onSubmit,
+}: {
+  question: string
+  isSubmitting: boolean
+  onQuestionChange: (value: string) => void
+  onSubmit: () => void
+}) {
+  return (
+    <div className="mt-4 space-y-3 border-t border-[rgba(34,24,18,0.08)] pt-4">
+      <Textarea
+        placeholder="Ask about this property — availability, condition, neighborhood..."
+        value={question}
+        onChange={(e) => onQuestionChange(e.target.value)}
+        rows={3}
+      />
+      <Button
+        size="sm"
+        className="w-full"
+        disabled={isSubmitting || question.trim().length < 5}
+        onClick={onSubmit}
+      >
+        {isSubmitting ? 'Sending...' : 'Send Question'}
+      </Button>
+    </div>
+  )
+}
+
+function ViewingForm({
+  viewingDate,
+  viewingTime,
+  viewingNote,
+  isSubmitting,
+  todayIsoDate,
+  onFieldChange,
+  onSubmit,
+}: {
+  viewingDate: string
+  viewingTime: string
+  viewingNote: string
+  isSubmitting: boolean
+  todayIsoDate: string
+  onFieldChange: (
+    field: 'viewingDate' | 'viewingTime' | 'viewingNote',
+    value: string
+  ) => void
+  onSubmit: () => void
+}) {
+  return (
+    <div className="mt-4 space-y-3 border-t border-[rgba(34,24,18,0.08)] pt-4">
+      <div className="grid grid-cols-2 gap-2">
+        <Input
+          type="date"
+          value={viewingDate}
+          onChange={(e) => onFieldChange('viewingDate', e.target.value)}
+          min={todayIsoDate}
+        />
+        <Input
+          type="time"
+          value={viewingTime}
+          onChange={(e) => onFieldChange('viewingTime', e.target.value)}
+        />
+      </div>
+      <Textarea
+        placeholder="Anything the owner should know (optional)"
+        value={viewingNote}
+        onChange={(e) => onFieldChange('viewingNote', e.target.value)}
+        rows={2}
+      />
+      <p className="text-xs text-[#5f554d]">
+        This proposes a time — it isn't confirmed until the owner accepts it.
+      </p>
+      <Button
+        size="sm"
+        className="w-full"
+        disabled={isSubmitting}
+        onClick={onSubmit}
+      >
+        {isSubmitting ? 'Sending...' : 'Request Viewing'}
+      </Button>
+    </div>
+  )
+}
+
+function OfferForm({
+  offerPrice,
+  offerMessage,
+  isSubmitting,
+  onFieldChange,
+  onSubmit,
+}: {
+  offerPrice: string
+  offerMessage: string
+  isSubmitting: boolean
+  onFieldChange: (field: 'offerPrice' | 'offerMessage', value: string) => void
+  onSubmit: () => void
+}) {
+  return (
+    <div className="mt-4 space-y-3 border-t border-[rgba(34,24,18,0.08)] pt-4">
+      <Input
+        type="number"
+        placeholder="Offer amount (USD)"
+        value={offerPrice}
+        onChange={(e) => onFieldChange('offerPrice', e.target.value)}
+        min={0}
+      />
+      <Textarea
+        placeholder="Anything the seller should know (optional)"
+        value={offerMessage}
+        onChange={(e) => onFieldChange('offerMessage', e.target.value)}
+        rows={2}
+      />
+      <p className="text-xs text-[#5f554d]">
+        You'll manage negotiation and see the seller's response from your
+        dashboard.
+      </p>
+      <Button
+        size="sm"
+        className="w-full"
+        disabled={isSubmitting}
+        onClick={onSubmit}
+      >
+        {isSubmitting ? 'Submitting...' : 'Submit Offer'}
+      </Button>
+    </div>
+  )
+}
+
+function ApplicationForm({
+  monthlyIncome,
+  occupantsCount,
+  moveInDate,
+  hasPets,
+  applicationNotes,
+  isSubmitting,
+  todayIsoDate,
+  onFieldChange,
+  onSubmit,
+}: {
+  monthlyIncome: string
+  occupantsCount: string
+  moveInDate: string
+  hasPets: boolean
+  applicationNotes: string
+  isSubmitting: boolean
+  todayIsoDate: string
+  onFieldChange: (
+    field:
+      | 'monthlyIncome'
+      | 'occupantsCount'
+      | 'moveInDate'
+      | 'hasPets'
+      | 'applicationNotes',
+    value: string | boolean
+  ) => void
+  onSubmit: () => void
+}) {
+  return (
+    <div className="mt-4 space-y-3 border-t border-[rgba(34,24,18,0.08)] pt-4">
+      <Input
+        type="number"
+        placeholder="Monthly income (optional)"
+        value={monthlyIncome}
+        onChange={(e) => onFieldChange('monthlyIncome', e.target.value)}
+        min={0}
+      />
+      <div className="grid grid-cols-2 gap-2">
+        <Input
+          type="number"
+          placeholder="Occupants"
+          value={occupantsCount}
+          onChange={(e) => onFieldChange('occupantsCount', e.target.value)}
+          min={1}
+        />
+        <Input
+          type="date"
+          placeholder="Move-in date"
+          value={moveInDate}
+          onChange={(e) => onFieldChange('moveInDate', e.target.value)}
+          min={todayIsoDate}
+        />
+      </div>
+      <label className="flex items-center gap-2 text-sm text-[#5f554d]">
+        <input
+          type="checkbox"
+          checked={hasPets}
+          onChange={(e) => onFieldChange('hasPets', e.target.checked)}
+          className="h-4 w-4 rounded border-[rgba(34,24,18,0.2)] text-[#a34702] focus:ring-[#fa6b05]/30"
+        />
+        I have pets
+      </label>
+      <Textarea
+        placeholder="Anything the landlord should know (optional)"
+        value={applicationNotes}
+        onChange={(e) => onFieldChange('applicationNotes', e.target.value)}
+        rows={2}
+      />
+      <Button
+        size="sm"
+        className="w-full"
+        disabled={isSubmitting}
+        onClick={onSubmit}
+      >
+        {isSubmitting ? 'Submitting...' : 'Submit Application'}
+      </Button>
+    </div>
+  )
+}
+
 /**
  * Replaces the previous bare mailto/tel contact block with context-specific
  * actions matching the actual next step in a buyer/renter's journey — each
@@ -297,139 +509,48 @@ export function PropertyCtaPanel({
       )}
 
       {mode === 'inquiry' && (
-        <div className="mt-4 space-y-3 border-t border-[rgba(34,24,18,0.08)] pt-4">
-          <Textarea
-            placeholder="Ask about this property — availability, condition, neighborhood..."
-            value={question}
-            onChange={(e) => setField('question', e.target.value)}
-            rows={3}
-          />
-          <Button
-            size="sm"
-            className="w-full"
-            disabled={isSubmitting || question.trim().length < 5}
-            onClick={submitInquiry}
-          >
-            {isSubmitting ? 'Sending...' : 'Send Question'}
-          </Button>
-        </div>
+        <InquiryForm
+          question={question}
+          isSubmitting={isSubmitting}
+          onQuestionChange={(value) => setField('question', value)}
+          onSubmit={() => void submitInquiry()}
+        />
       )}
 
       {mode === 'viewing' && (
-        <div className="mt-4 space-y-3 border-t border-[rgba(34,24,18,0.08)] pt-4">
-          <div className="grid grid-cols-2 gap-2">
-            <Input
-              type="date"
-              value={viewingDate}
-              onChange={(e) => setField('viewingDate', e.target.value)}
-              min={todayIsoDate}
-            />
-            <Input
-              type="time"
-              value={viewingTime}
-              onChange={(e) => setField('viewingTime', e.target.value)}
-            />
-          </div>
-          <Textarea
-            placeholder="Anything the owner should know (optional)"
-            value={viewingNote}
-            onChange={(e) => setField('viewingNote', e.target.value)}
-            rows={2}
-          />
-          <p className="text-xs text-[#5f554d]">
-            This proposes a time — it isn't confirmed until the owner accepts
-            it.
-          </p>
-          <Button
-            size="sm"
-            className="w-full"
-            disabled={isSubmitting}
-            onClick={submitViewing}
-          >
-            {isSubmitting ? 'Sending...' : 'Request Viewing'}
-          </Button>
-        </div>
+        <ViewingForm
+          viewingDate={viewingDate}
+          viewingTime={viewingTime}
+          viewingNote={viewingNote}
+          isSubmitting={isSubmitting}
+          todayIsoDate={todayIsoDate}
+          onFieldChange={(field, value) => setField(field, value)}
+          onSubmit={() => void submitViewing()}
+        />
       )}
 
       {mode === 'offer' && (
-        <div className="mt-4 space-y-3 border-t border-[rgba(34,24,18,0.08)] pt-4">
-          <Input
-            type="number"
-            placeholder="Offer amount (USD)"
-            value={offerPrice}
-            onChange={(e) => setField('offerPrice', e.target.value)}
-            min={0}
-          />
-          <Textarea
-            placeholder="Anything the seller should know (optional)"
-            value={offerMessage}
-            onChange={(e) => setField('offerMessage', e.target.value)}
-            rows={2}
-          />
-          <p className="text-xs text-[#5f554d]">
-            You'll manage negotiation and see the seller's response from your
-            dashboard.
-          </p>
-          <Button
-            size="sm"
-            className="w-full"
-            disabled={isSubmitting}
-            onClick={submitOffer}
-          >
-            {isSubmitting ? 'Submitting...' : 'Submit Offer'}
-          </Button>
-        </div>
+        <OfferForm
+          offerPrice={offerPrice}
+          offerMessage={offerMessage}
+          isSubmitting={isSubmitting}
+          onFieldChange={(field, value) => setField(field, value)}
+          onSubmit={() => void submitOffer()}
+        />
       )}
 
       {mode === 'application' && (
-        <div className="mt-4 space-y-3 border-t border-[rgba(34,24,18,0.08)] pt-4">
-          <Input
-            type="number"
-            placeholder="Monthly income (optional)"
-            value={monthlyIncome}
-            onChange={(e) => setField('monthlyIncome', e.target.value)}
-            min={0}
-          />
-          <div className="grid grid-cols-2 gap-2">
-            <Input
-              type="number"
-              placeholder="Occupants"
-              value={occupantsCount}
-              onChange={(e) => setField('occupantsCount', e.target.value)}
-              min={1}
-            />
-            <Input
-              type="date"
-              placeholder="Move-in date"
-              value={moveInDate}
-              onChange={(e) => setField('moveInDate', e.target.value)}
-              min={todayIsoDate}
-            />
-          </div>
-          <label className="flex items-center gap-2 text-sm text-[#5f554d]">
-            <input
-              type="checkbox"
-              checked={hasPets}
-              onChange={(e) => setField('hasPets', e.target.checked)}
-              className="h-4 w-4 rounded border-[rgba(34,24,18,0.2)] text-[#a34702] focus:ring-[#fa6b05]/30"
-            />
-            I have pets
-          </label>
-          <Textarea
-            placeholder="Anything the landlord should know (optional)"
-            value={applicationNotes}
-            onChange={(e) => setField('applicationNotes', e.target.value)}
-            rows={2}
-          />
-          <Button
-            size="sm"
-            className="w-full"
-            disabled={isSubmitting}
-            onClick={submitApplication}
-          >
-            {isSubmitting ? 'Submitting...' : 'Submit Application'}
-          </Button>
-        </div>
+        <ApplicationForm
+          monthlyIncome={monthlyIncome}
+          occupantsCount={occupantsCount}
+          moveInDate={moveInDate}
+          hasPets={hasPets}
+          applicationNotes={applicationNotes}
+          isSubmitting={isSubmitting}
+          todayIsoDate={todayIsoDate}
+          onFieldChange={(field, value) => setField(field, value)}
+          onSubmit={() => void submitApplication()}
+        />
       )}
     </div>
   )
