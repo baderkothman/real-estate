@@ -72,7 +72,8 @@ function DocumentRow({
       setError(result.error)
       return
     }
-    if ('url' in result) window.open(result.url, '_blank')
+    if ('url' in result)
+      window.open(result.url, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -298,6 +299,7 @@ export function DocumentList({
           <input
             ref={fileInputRef}
             type="file"
+            aria-label="Document file"
             className="flex h-10 w-full rounded-lg border border-[rgba(34,24,18,0.14)] bg-white px-3 py-2 text-sm text-[#181411] file:mr-2 file:rounded-md file:border-0 file:bg-[#fef0e6] file:px-2 file:py-1 file:text-xs file:text-[#a34702]"
           />
         </div>

@@ -115,7 +115,9 @@ export async function getAuditLog(
 
   // One batched follow-up query for every distinct actor on this page,
   // instead of resolving a name per row (N+1).
-  const actorIds = [...new Set(rows.map((r) => r.actor_id).filter(Boolean))]
+  const actorIds = [
+    ...new Set(rows.flatMap((r) => (r.actor_id ? [r.actor_id] : []))),
+  ]
   const actorsById = new Map<string, { name: string; email: string }>()
   if (actorIds.length > 0) {
     const { data: actors } = await admin

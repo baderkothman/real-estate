@@ -129,14 +129,16 @@ export async function sendMessageAction(conversationId: string, body: string) {
       .eq('conversation_id', conversationId)
       .neq('profile_id', userId)
 
-    for (const p of otherParticipants ?? []) {
-      await createNotification({
-        profileId: p.profile_id,
-        type: 'message_received',
-        title: 'You have a new message',
-        linkHref: `/dashboard/messages/${conversationId}`,
-      })
-    }
+    await Promise.all(
+      (otherParticipants ?? []).map((p) =>
+        createNotification({
+          profileId: p.profile_id,
+          type: 'message_received',
+          title: 'You have a new message',
+          linkHref: `/dashboard/messages/${conversationId}`,
+        })
+      )
+    )
 
     revalidatePath(`/dashboard/messages/${conversationId}`)
     return { success: true }

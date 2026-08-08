@@ -186,7 +186,7 @@ export default async function HomePage() {
             ].map(({ icon: Icon, step, title, description }) => (
               <div
                 key={step}
-                className="relative rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] p-8 hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.08)] transition-all duration-300"
+                className="relative rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] p-8 hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.08)] transition-[border-color,box-shadow] duration-300"
               >
                 {/* Step number */}
                 <div className="font-display text-5xl font-bold text-[#a34702]/8 absolute top-4 right-5 select-none">
@@ -220,7 +220,7 @@ export default async function HomePage() {
             {testimonials.slice(0, 3).map((t) => (
               <div
                 key={t.id}
-                className="flex flex-col rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] p-6 hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.08)] transition-all duration-300"
+                className="flex flex-col rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] p-6 hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.08)] transition-[border-color,box-shadow] duration-300"
               >
                 {/* Stars */}
                 <div className="flex gap-1 mb-4">

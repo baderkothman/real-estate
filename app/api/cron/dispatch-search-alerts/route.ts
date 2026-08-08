@@ -22,28 +22,35 @@ export async function POST(request: Request) {
   }
 
   const alerts = await getActiveSearchAlerts()
-  let notified = 0
 
-  for (const alert of alerts) {
-    const since = alert.lastRunAt ?? new Date(Date.now() - 24 * 60 * 60 * 1000)
-    const matches = await getNewMatchingListings(alert.filters, since)
+  // Each alert belongs to a different saved search/profile and touches no
+  // state shared with any other alert, so alerts — and, within one alert,
+  // its matching listings — are safe to dispatch concurrently.
+  const notifiedCounts = await Promise.all(
+    alerts.map(async (alert) => {
+      const since =
+        alert.lastRunAt ?? new Date(Date.now() - 24 * 60 * 60 * 1000)
+      const matches = await getNewMatchingListings(alert.filters, since)
 
-    for (const listing of matches) {
-      await createNotification({
-        profileId: alert.profileId,
-        type: 'search_alert_match',
-        title: `New listing matches your saved search: "${listing.title}"`,
-        linkHref: `/properties/${listing.id}`,
-      })
-      notified++
-    }
+      await Promise.all(
+        matches.map((listing) =>
+          createNotification({
+            profileId: alert.profileId,
+            type: 'search_alert_match',
+            title: `New listing matches your saved search: "${listing.title}"`,
+            linkHref: `/properties/${listing.id}`,
+          })
+        )
+      )
 
-    await markAlertRun(alert.alertId)
-  }
+      await markAlertRun(alert.alertId)
+      return matches.length
+    })
+  )
 
   return NextResponse.json({
     alertsChecked: alerts.length,
-    notificationsSent: notified,
+    notificationsSent: notifiedCounts.reduce((sum, n) => sum + n, 0),
   })
 }
 

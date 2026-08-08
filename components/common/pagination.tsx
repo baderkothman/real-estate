@@ -27,17 +27,24 @@ export function Pagination({ page, totalPages, className }: PaginationProps) {
     router.push(`${pathname}?${params.toString()}`)
   }
 
-  const getPageNumbers = (): (number | 'ellipsis')[] => {
+  type PageItem =
+    | { key: string; num: number }
+    | { key: 'ellipsis-start' | 'ellipsis-end'; num: 'ellipsis' }
+
+  const getPageItems = (): PageItem[] => {
     if (totalPages <= 7)
-      return Array.from({ length: totalPages }, (_, i) => i + 1)
-    const pages: (number | 'ellipsis')[] = [1]
-    if (page > 3) pages.push('ellipsis')
+      return Array.from({ length: totalPages }, (_, i) => ({
+        key: `page-${i + 1}`,
+        num: i + 1,
+      }))
+    const items: PageItem[] = [{ key: 'page-1', num: 1 }]
+    if (page > 3) items.push({ key: 'ellipsis-start', num: 'ellipsis' })
     const start = Math.max(2, page - 1)
     const end = Math.min(totalPages - 1, page + 1)
-    for (let i = start; i <= end; i++) pages.push(i)
-    if (page < totalPages - 2) pages.push('ellipsis')
-    pages.push(totalPages)
-    return pages
+    for (let i = start; i <= end; i++) items.push({ key: `page-${i}`, num: i })
+    if (page < totalPages - 2) items.push({ key: 'ellipsis-end', num: 'ellipsis' })
+    items.push({ key: `page-${totalPages}`, num: totalPages })
+    return items
   }
 
   const navBtn = cn(
@@ -63,10 +70,10 @@ export function Pagination({ page, totalPages, className }: PaginationProps) {
       </button>
 
       <div className="flex items-center gap-1">
-        {getPageNumbers().map((num, idx) =>
-          num === 'ellipsis' ? (
+        {getPageItems().map((item) =>
+          item.num === 'ellipsis' ? (
             <span
-              key={`e-${idx}`}
+              key={item.key}
               className="h-9 w-9 flex items-center justify-center text-[#5f554d]"
             >
               <IconDots className="h-4 w-4" />
@@ -74,17 +81,17 @@ export function Pagination({ page, totalPages, className }: PaginationProps) {
           ) : (
             <button
               type="button"
-              key={num}
-              onClick={() => navigateTo(num)}
-              aria-current={num === page ? 'page' : undefined}
+              key={item.key}
+              onClick={() => navigateTo(item.num)}
+              aria-current={item.num === page ? 'page' : undefined}
               className={cn(
                 'h-9 w-9 rounded-xl text-sm font-medium transition-all duration-200',
-                num === page
+                item.num === page
                   ? 'bg-[#a34702] text-white font-semibold shadow-[0_2px_8px_rgba(250,107,5,0.25)]'
                   : 'text-[#5f554d] hover:bg-white hover:text-[#181411] border border-transparent hover:border-[rgba(34,24,18,0.12)] hover:shadow-[0_2px_8px_rgba(24,20,17,0.06)]'
               )}
             >
-              {num}
+              {item.num}
             </button>
           )
         )}

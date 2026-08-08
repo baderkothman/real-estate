@@ -56,8 +56,7 @@ function nextActionFor(status: string, openTaskTitle?: string) {
 export default async function TransactionPage({
   params,
 }: TransactionPageProps) {
-  const { id } = await params
-  const supabase = await createClient()
+  const [{ id }, supabase] = await Promise.all([params, createClient()])
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -127,7 +126,7 @@ export default async function TransactionPage({
             </div>
             <div className="h-1.5 rounded-full bg-[#fef0e6] overflow-hidden">
               <div
-                className="h-full rounded-full bg-[#fa6b05] transition-all"
+                className="h-full rounded-full bg-[#fa6b05] transition-[width]"
                 style={{
                   width: `${Math.min(100, (doneCount / tasks.length) * 100)}%`,
                 }}

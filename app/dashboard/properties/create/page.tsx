@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { IconAlertTriangle, IconCirclePlus, IconX } from '@tabler/icons-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { z } from 'zod'
@@ -50,7 +51,9 @@ export default function CreatePropertyPage() {
     areaSqM: '',
     description: '',
   })
-  const [imageUrls, setImageUrls] = useState<string[]>([''])
+  const [imageUrls, setImageUrls] = useState<
+    { id: string; url: string }[]
+  >(() => [{ id: crypto.randomUUID(), url: '' }])
   const [errors, setErrors] = useState<FieldErrors>({})
   const [serverError, setServerError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -64,23 +67,27 @@ export default function CreatePropertyPage() {
 
   const addImageField = () => {
     if (imageUrls.length < planLimit.maxImages) {
-      setImageUrls((prev) => [...prev, ''])
+      setImageUrls((prev) => [...prev, { id: crypto.randomUUID(), url: '' }])
     }
   }
 
-  const removeImageField = (idx: number) => {
-    setImageUrls((prev) => prev.filter((_, i) => i !== idx))
+  const removeImageField = (id: string) => {
+    setImageUrls((prev) => prev.filter((row) => row.id !== id))
   }
 
-  const updateImageUrl = (idx: number, val: string) => {
-    setImageUrls((prev) => prev.map((url, i) => (i === idx ? val : url)))
+  const updateImageUrl = (id: string, val: string) => {
+    setImageUrls((prev) =>
+      prev.map((row) => (row.id === id ? { ...row, url: val } : row))
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setServerError('')
 
-    const validImages = imageUrls.filter((u) => u.trim() !== '')
+    const validImages = imageUrls
+      .map((row) => row.url)
+      .filter((u) => u.trim() !== '')
 
     const parsed = propertySchema.safeParse({
       ...form,
@@ -297,8 +304,8 @@ export default function CreatePropertyPage() {
               Photos
             </h3>
             <span className="text-xs text-[#5f554d]">
-              {imageUrls.filter((u) => u.trim()).length} / {planLimit.maxImages}{' '}
-              max
+              {imageUrls.filter((row) => row.url.trim()).length} /{' '}
+              {planLimit.maxImages} max
             </span>
           </div>
 
@@ -307,12 +314,12 @@ export default function CreatePropertyPage() {
           )}
 
           <div className="space-y-2">
-            {imageUrls.map((url, idx) => (
-              <div key={url || String(idx)} className="flex gap-2">
+            {imageUrls.map((row, idx) => (
+              <div key={row.id} className="flex gap-2">
                 <Input
                   placeholder={`Image URL ${idx + 1} (e.g. https://picsum.photos/seed/${idx}/800/600)`}
-                  value={url}
-                  onChange={(e) => updateImageUrl(idx, e.target.value)}
+                  value={row.url}
+                  onChange={(e) => updateImageUrl(row.id, e.target.value)}
                   className="flex-1"
                 />
                 {imageUrls.length > 1 && (
@@ -320,7 +327,7 @@ export default function CreatePropertyPage() {
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    onClick={() => removeImageField(idx)}
+                    onClick={() => removeImageField(row.id)}
                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
                     aria-label={`Remove image ${idx + 1}`}
                   >
@@ -348,9 +355,9 @@ export default function CreatePropertyPage() {
             <div className="flex items-center gap-2 text-xs text-amber-600">
               <IconAlertTriangle className="h-3.5 w-3.5" />
               Maximum images reached for your plan.{' '}
-              <a href="/pricing" className="underline">
+              <Link href="/pricing" className="underline">
                 Upgrade
-              </a>{' '}
+              </Link>{' '}
               for more.
             </div>
           )}

@@ -60,7 +60,11 @@ export function HeroSearch() {
       <div className="flex gap-2.5">
         <div className="relative flex-1">
           <IconSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#5f554d]" />
+          <label htmlFor="hero-search-city" className="sr-only">
+            Search by city or neighbourhood
+          </label>
           <input
+            id="hero-search-city"
             type="text"
             placeholder="Search by city or neighbourhood..."
             value={query}

@@ -28,7 +28,7 @@ export function UserCard({ user, propertyCount, className }: UserCardProps) {
     >
       {/* Header */}
       <div className="flex items-start gap-4 mb-4">
-        <div className="relative h-14 w-14 rounded-full overflow-hidden bg-[#fef0e6] shrink-0 ring-2 ring-[#fa6b05]/10 group-hover:ring-[#fa6b05]/30 transition-all">
+        <div className="relative h-14 w-14 rounded-full overflow-hidden bg-[#fef0e6] shrink-0 ring-2 ring-[#fa6b05]/10 group-hover:ring-[#fa6b05]/30 transition-shadow">
           {user.profileImage ? (
             <Image
               src={user.profileImage}

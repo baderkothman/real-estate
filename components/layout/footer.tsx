@@ -124,7 +124,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="p-2.5 rounded-xl bg-white border border-[rgba(34,24,18,0.10)] text-[#5f554d] hover:text-[#a34702] hover:border-[#fa6b05]/25 hover:bg-[#fef0e6] transition-all duration-200"
+                  className="p-2.5 rounded-xl bg-white border border-[rgba(34,24,18,0.10)] text-[#5f554d] hover:text-[#a34702] hover:border-[#fa6b05]/25 hover:bg-[#fef0e6] transition-colors duration-200"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -150,7 +150,7 @@ export function Footer() {
                     href={link.href}
                     className="group flex items-center gap-2 text-sm text-[#5f554d] hover:text-[#a34702] transition-colors duration-200"
                   >
-                    <span className="h-px w-0 bg-[#fa6b05]/50 transition-all duration-300 group-hover:w-3 shrink-0" />
+                    <span className="h-px w-0 bg-[#fa6b05]/50 transition-[width] duration-300 group-hover:w-3 shrink-0" />
                     {link.label}
                   </Link>
                 </li>
@@ -179,7 +179,7 @@ export function Footer() {
                     href={link.href}
                     className="group flex items-center gap-2 text-sm text-[#5f554d] hover:text-[#a34702] transition-colors duration-200"
                   >
-                    <span className="h-px w-0 bg-[#fa6b05]/50 transition-all duration-300 group-hover:w-3 shrink-0" />
+                    <span className="h-px w-0 bg-[#fa6b05]/50 transition-[width] duration-300 group-hover:w-3 shrink-0" />
                     {link.label}
                   </Link>
                 </li>

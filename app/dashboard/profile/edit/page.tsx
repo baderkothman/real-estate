@@ -254,6 +254,7 @@ export default function EditProfilePage() {
                 <button
                   type="button"
                   onClick={() => setShowNewPw(!showNewPw)}
+                  aria-label={showNewPw ? 'Hide password' : 'Show password'}
                   className="absolute right-3 top-3 text-[#5f554d] hover:text-[#5f554d]"
                 >
                   {showNewPw ? (

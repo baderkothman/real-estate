@@ -125,7 +125,7 @@ export default function AboutPage() {
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 text-center hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.10)] transition-all duration-300"
+                  className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 text-center hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.10)] transition-[border-color,box-shadow] duration-300"
                 >
                   <stat.icon className="h-6 w-6 text-[#a34702] mx-auto mb-3" />
                   <div className="font-display text-3xl font-bold text-[#a34702] mb-1">
@@ -152,7 +152,7 @@ export default function AboutPage() {
             {values.map(({ icon: Icon, title, description }) => (
               <div
                 key={title}
-                className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-8 hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.10)] transition-all duration-300"
+                className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-8 hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.10)] transition-[border-color,box-shadow] duration-300"
               >
                 <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#fef0e6] border border-[#fa6b05]/20">
                   <Icon className="h-6 w-6 text-[#a34702]" />
@@ -187,7 +187,7 @@ export default function AboutPage() {
             {teamMembers.map((member) => (
               <div
                 key={member.id}
-                className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-8 text-center hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.10)] transition-all duration-300"
+                className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-8 text-center hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.10)] transition-[border-color,box-shadow] duration-300"
               >
                 <div className="relative h-20 w-20 rounded-full overflow-hidden mx-auto mb-4 ring-2 ring-[#fa6b05]/20">
                   <Image

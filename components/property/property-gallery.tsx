@@ -73,7 +73,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
           {validImages.map((img, idx) => (
             <button
               type="button"
-              key={img || String(idx)}
+              key={img}
               onClick={() => setActiveIndex(idx)}
               className={cn(
                 'relative h-16 w-24 shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-200',

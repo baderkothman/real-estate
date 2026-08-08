@@ -257,14 +257,16 @@ async function notifyTransactionParties(
     if (row?.listings?.listed_by) profileIds.push(row.listings.listed_by)
   }
 
-  for (const profileId of profileIds) {
-    await createNotification({
-      profileId,
-      type: notification.type,
-      title: notification.title,
-      linkHref: `/dashboard/transactions/${transactionId}`,
-    })
-  }
+  await Promise.all(
+    profileIds.map((profileId) =>
+      createNotification({
+        profileId,
+        type: notification.type,
+        title: notification.title,
+        linkHref: `/dashboard/transactions/${transactionId}`,
+      })
+    )
+  )
 }
 
 export async function recordDisputeOpened(input: {

@@ -6,7 +6,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useState } from 'react'
+import { useCallback, useReducer } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,20 +18,78 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+// One filter form — all seven fields are read together into the query
+// string and cleared together on reset, so they're one related state slice
+// rather than seven independent ones.
+interface FilterFormState {
+  search: string
+  city: string
+  listingType: string
+  minPrice: string
+  maxPrice: string
+  minBeds: string
+  minBaths: string
+}
+
+type FilterFormAction =
+  | {
+      [K in keyof FilterFormState]: {
+        type: 'fieldChanged'
+        name: K
+        value: FilterFormState[K]
+      }
+    }[keyof FilterFormState]
+  | { type: 'reset' }
+
+const emptyFilterFormState: FilterFormState = {
+  search: '',
+  city: '',
+  listingType: '',
+  minPrice: '',
+  maxPrice: '',
+  minBeds: '',
+  minBaths: '',
+}
+
+function filterFormReducer(
+  state: FilterFormState,
+  action: FilterFormAction
+): FilterFormState {
+  switch (action.type) {
+    case 'fieldChanged':
+      return { ...state, [action.name]: action.value }
+    case 'reset':
+      return emptyFilterFormState
+    default:
+      return state
+  }
+}
+
 export function PropertyFilters() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [search, setSearch] = useState(searchParams.get('search') ?? '')
-  const [city, setCity] = useState(searchParams.get('city') ?? '')
-  const [listingType, setListingType] = useState(
-    searchParams.get('listingType') ?? ''
-  )
-  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') ?? '')
-  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') ?? '')
-  const [minBeds, setMinBeds] = useState(searchParams.get('minBeds') ?? '')
-  const [minBaths, setMinBaths] = useState(searchParams.get('minBaths') ?? '')
+  // Lazy init (the 3-arg useReducer form): reading each query param only
+  // needs to happen once, at mount — without it, every re-render would
+  // rebuild this object from searchParams just to have React discard it.
+  const [
+    { search, city, listingType, minPrice, maxPrice, minBeds, minBaths },
+    dispatch,
+  ] = useReducer(filterFormReducer, searchParams, (params) => ({
+    search: params.get('search') ?? '',
+    city: params.get('city') ?? '',
+    listingType: params.get('listingType') ?? '',
+    minPrice: params.get('minPrice') ?? '',
+    maxPrice: params.get('maxPrice') ?? '',
+    minBeds: params.get('minBeds') ?? '',
+    minBaths: params.get('minBaths') ?? '',
+  }))
+
+  const setField = <K extends keyof FilterFormState>(
+    name: K,
+    value: FilterFormState[K]
+  ) => dispatch({ type: 'fieldChanged', name, value } as FilterFormAction)
 
   const buildQuery = useCallback(() => {
     const params = new URLSearchParams()
@@ -52,13 +110,7 @@ export function PropertyFilters() {
   }
 
   const handleReset = () => {
-    setSearch('')
-    setCity('')
-    setListingType('')
-    setMinPrice('')
-    setMaxPrice('')
-    setMinBeds('')
-    setMinBaths('')
+    dispatch({ type: 'reset' })
     router.push(pathname)
   }
 
@@ -115,7 +167,7 @@ export function PropertyFilters() {
             id="search-filter"
             placeholder="Pool, sea view, renovated..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => setField('search', e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
@@ -132,7 +184,7 @@ export function PropertyFilters() {
             id="city-filter"
             placeholder="Beirut, Jounieh, Byblos..."
             value={city}
-            onChange={(e) => setCity(e.target.value)}
+            onChange={(e) => setField('city', e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
@@ -147,7 +199,7 @@ export function PropertyFilters() {
           </Label>
           <Select
             value={listingType || 'all'}
-            onValueChange={(v) => setListingType(v === 'all' ? '' : v)}
+            onValueChange={(v) => setField('listingType', v === 'all' ? '' : v)}
           >
             <SelectTrigger id="listing-type-filter">
               <SelectValue placeholder="All types" />
@@ -170,14 +222,14 @@ export function PropertyFilters() {
               placeholder="Min"
               type="number"
               value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
+              onChange={(e) => setField('minPrice', e.target.value)}
               min={0}
             />
             <Input
               placeholder="Max"
               type="number"
               value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
+              onChange={(e) => setField('maxPrice', e.target.value)}
               min={0}
             />
           </div>
@@ -194,7 +246,7 @@ export function PropertyFilters() {
             </Label>
             <Select
               value={minBeds || 'any'}
-              onValueChange={(v) => setMinBeds(v === 'any' ? '' : v)}
+              onValueChange={(v) => setField('minBeds', v === 'any' ? '' : v)}
             >
               <SelectTrigger id="min-beds-filter">
                 <SelectValue placeholder="Any" />
@@ -218,7 +270,7 @@ export function PropertyFilters() {
             </Label>
             <Select
               value={minBaths || 'any'}
-              onValueChange={(v) => setMinBaths(v === 'any' ? '' : v)}
+              onValueChange={(v) => setField('minBaths', v === 'any' ? '' : v)}
             >
               <SelectTrigger id="min-baths-filter">
                 <SelectValue placeholder="Any" />

@@ -13,24 +13,29 @@ export function formatPrice(price: number, currency = 'USD'): string {
   }).format(price)
 }
 
+// Fixed locale/options — safe to build once instead of on every call.
+const dateFormatter = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+})
+
+const dateTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+})
+
 export function formatDate(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(d)
+  return dateFormatter.format(d)
 }
 
 export function formatDateTime(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(d)
+  return dateTimeFormatter.format(d)
 }
 
 export function formatRelativeDate(date: Date | string): string {
@@ -54,6 +59,20 @@ export function formatRelativeDate(date: Date | string): string {
   if (diffMonths < 12)
     return `${diffMonths} month${diffMonths !== 1 ? 's' : ''} ago`
   return `${diffYears} year${diffYears !== 1 ? 's' : ''} ago`
+}
+
+/**
+ * JSON.stringify does not HTML-escape its output, so a value containing
+ * `</script>` (or a bare `<`/`&`) can break out of a `<script>` sink and
+ * become XSS. Escape the characters that matter to an HTML/script parser;
+ * the `<`-style escapes are still valid JSON and decode back to the
+ * original characters via JSON.parse.
+ */
+export function safeJsonLdStringify(data: unknown): string {
+  return JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
 }
 
 export function truncate(text: string, length: number): string {

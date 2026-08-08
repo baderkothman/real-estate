@@ -33,6 +33,10 @@ const STATUS_LABELS: Record<Viewing['status'], string> = {
   no_show: 'No-show',
 }
 
+// Explicit locale AND timeZone — viewings are always Lebanon-local
+// properties, and without a fixed timeZone this renders in whatever zone
+// the server happens to run in vs. the visitor's browser zone, producing a
+// hydration mismatch.
 function formatSlot(iso: string) {
   return new Date(iso).toLocaleString('en-US', {
     weekday: 'short',
@@ -40,6 +44,7 @@ function formatSlot(iso: string) {
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
+    timeZone: 'Asia/Beirut',
   })
 }
 

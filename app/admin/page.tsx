@@ -75,7 +75,7 @@ export default async function AdminDashboardPage() {
         {stats.map(({ label, value, icon: Icon, color }) => (
           <div
             key={label}
-            className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-4 text-center hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.10)] transition-all duration-300"
+            className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-4 text-center hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.10)] transition-[border-color,box-shadow] duration-300"
           >
             <Icon className={cn('h-5 w-5 mx-auto mb-2', color)} />
             <div className="font-display text-2xl font-bold text-[#181411]">

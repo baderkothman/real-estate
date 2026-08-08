@@ -62,7 +62,7 @@ export default async function AdminLayout({
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-[#5f554d] hover:text-[#181411] hover:bg-white hover:shadow-[0_2px_8px_rgba(24,20,17,0.06)] transition-all duration-200"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-[#5f554d] hover:text-[#181411] hover:bg-white hover:shadow-[0_2px_8px_rgba(24,20,17,0.06)] transition-colors duration-200"
             >
               <Icon className="h-4 w-4" />
               {label}

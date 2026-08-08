@@ -131,7 +131,7 @@ export function PropertyCard({
                 void hide()
               }}
               disabled={isHiding}
-              className="p-2 rounded-full backdrop-blur-md transition-all duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.4)] bg-white/80 text-[#5f554d] hover:bg-[#181411] hover:text-white hover:scale-110"
+              className="p-2 rounded-full backdrop-blur-md transition-[color,background-color,transform] duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.4)] bg-white/80 text-[#5f554d] hover:bg-[#181411] hover:text-white hover:scale-110"
               aria-label="Hide this listing"
             >
               <IconEyeOff className="h-3.5 w-3.5" />

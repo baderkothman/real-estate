@@ -145,8 +145,10 @@ export async function sendDocumentForSignature(
   documentId: string,
   documentTitle: string
 ): Promise<void> {
-  const supabase = await createClient()
-  const envelope = await getEsignProvider().createEnvelope({ documentTitle })
+  const [supabase, envelope] = await Promise.all([
+    createClient(),
+    getEsignProvider().createEnvelope({ documentTitle }),
+  ])
 
   const { error } = await supabase.rpc('send_document_for_signature', {
     p_document_id: documentId,

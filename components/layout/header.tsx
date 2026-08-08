@@ -9,6 +9,7 @@ import {
   IconSettings,
   IconShield,
 } from '@tabler/icons-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -118,7 +119,7 @@ export function Header() {
             {/* Mobile search shortcut — visible only on mobile */}
             <Link
               href="/properties"
-              className="md:hidden p-2 rounded-xl text-[#5f554d] hover:text-[#181411] hover:bg-[#faf7eb] transition-all duration-200"
+              className="md:hidden p-2 rounded-xl text-[#5f554d] hover:text-[#181411] hover:bg-[#faf7eb] transition-colors duration-200"
               aria-label="Search properties"
             >
               <IconSearch className="h-5 w-5" stroke={1.75} />
@@ -134,15 +135,16 @@ export function Header() {
                   <button
                     type="button"
                     onClick={() => setProfileOpen(!profileOpen)}
-                    className="flex items-center gap-2.5 rounded-xl px-3 py-1.5 text-sm text-[#181411] hover:bg-[#faf7eb] transition-all duration-200 border border-transparent hover:border-[rgba(34,24,18,0.12)]"
+                    className="flex items-center gap-2.5 rounded-xl px-3 py-1.5 text-sm text-[#181411] hover:bg-[#faf7eb] transition-colors duration-200 border border-transparent hover:border-[rgba(34,24,18,0.12)]"
                   >
-                    <div className="h-7 w-7 rounded-full bg-[#a34702] flex items-center justify-center text-white font-bold text-xs overflow-hidden ring-2 ring-[#fa6b05]/20">
+                    <div className="relative h-7 w-7 rounded-full bg-[#a34702] flex items-center justify-center text-white font-bold text-xs overflow-hidden ring-2 ring-[#fa6b05]/20">
                       {user.profileImage ? (
-                        // biome-ignore lint/performance/noImgElement: user-supplied URL, domain unknown
-                        <img
+                        <Image
                           src={user.profileImage}
                           alt={user.name}
-                          className="h-full w-full object-cover"
+                          fill
+                          className="object-cover"
+                          sizes="28px"
                         />
                       ) : (
                         getInitials(user.name)

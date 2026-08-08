@@ -185,16 +185,17 @@ export async function getConversationsForUser(
 
   if (conversationsError || !conversations) return []
 
-  const { data: allParticipants } = await supabase
-    .from('conversation_participants')
-    .select('conversation_id, profile_id, profiles(name, profile_image)')
-    .in('conversation_id', conversationIds)
-
-  const { data: allMessages } = await supabase
-    .from('messages')
-    .select('conversation_id, body, created_at')
-    .in('conversation_id', conversationIds)
-    .order('created_at', { ascending: false })
+  const [{ data: allParticipants }, { data: allMessages }] = await Promise.all([
+    supabase
+      .from('conversation_participants')
+      .select('conversation_id, profile_id, profiles(name, profile_image)')
+      .in('conversation_id', conversationIds),
+    supabase
+      .from('messages')
+      .select('conversation_id, body, created_at')
+      .in('conversation_id', conversationIds)
+      .order('created_at', { ascending: false }),
+  ])
 
   const lastMessageByConversation = new Map<
     string,

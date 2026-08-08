@@ -8,7 +8,7 @@ import {
   IconReceipt2,
 } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useMemo, useReducer } from 'react'
 import { submitRentalApplicationAction } from '@/app/actions/applications'
 import { sendInquiryAction } from '@/app/actions/messaging'
 import { submitOfferAction } from '@/app/actions/offers'
@@ -25,6 +25,76 @@ interface PropertyCtaPanelProps {
   listingType: ListingType
 }
 
+// All of the panel's mode-switching, submission-lifecycle, and per-mode form
+// fields are one related state machine — only one mode's fields are ever
+// visible/relevant at a time, and opening a mode or submitting touches
+// several of these together. Grouped into a reducer instead of ~15 separate
+// useState calls.
+interface CtaFormState {
+  mode: PanelMode
+  isSubmitting: boolean
+  error: string | null
+  success: string | null
+  question: string
+  viewingDate: string
+  viewingTime: string
+  viewingNote: string
+  offerPrice: string
+  offerMessage: string
+  monthlyIncome: string
+  occupantsCount: string
+  hasPets: boolean
+  moveInDate: string
+  applicationNotes: string
+}
+
+const initialCtaFormState: CtaFormState = {
+  mode: 'closed',
+  isSubmitting: false,
+  error: null,
+  success: null,
+  question: '',
+  viewingDate: '',
+  viewingTime: '',
+  viewingNote: '',
+  offerPrice: '',
+  offerMessage: '',
+  monthlyIncome: '',
+  occupantsCount: '',
+  hasPets: false,
+  moveInDate: '',
+  applicationNotes: '',
+}
+
+type CtaFormAction =
+  | { type: 'openMode'; mode: PanelMode }
+  | {
+      [K in keyof CtaFormState]: {
+        type: 'fieldChanged'
+        name: K
+        value: CtaFormState[K]
+      }
+    }[keyof CtaFormState]
+
+function ctaFormReducer(
+  state: CtaFormState,
+  action: CtaFormAction
+): CtaFormState {
+  switch (action.type) {
+    case 'openMode':
+      return {
+        ...state,
+        error: null,
+        success: null,
+        mode: state.mode === action.mode ? 'closed' : action.mode,
+      }
+    case 'fieldChanged':
+      return { ...state, [action.name]: action.value }
+    default:
+      return state
+  }
+}
+
 /**
  * Replaces the previous bare mailto/tel contact block with context-specific
  * actions matching the actual next step in a buyer/renter's journey — each
@@ -39,53 +109,66 @@ export function PropertyCtaPanel({
   listingType,
 }: PropertyCtaPanelProps) {
   const router = useRouter()
-  const [mode, setMode] = useState<PanelMode>('closed')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
+  const [
+    {
+      mode,
+      isSubmitting,
+      error,
+      success,
+      question,
+      viewingDate,
+      viewingTime,
+      viewingNote,
+      offerPrice,
+      offerMessage,
+      monthlyIncome,
+      occupantsCount,
+      hasPets,
+      moveInDate,
+      applicationNotes,
+    },
+    dispatch,
+  ] = useReducer(ctaFormReducer, initialCtaFormState)
 
-  const [question, setQuestion] = useState('')
-  const [viewingDate, setViewingDate] = useState('')
-  const [viewingTime, setViewingTime] = useState('')
-  const [viewingNote, setViewingNote] = useState('')
-  const [offerPrice, setOfferPrice] = useState('')
-  const [offerMessage, setOfferMessage] = useState('')
-  const [monthlyIncome, setMonthlyIncome] = useState('')
-  const [occupantsCount, setOccupantsCount] = useState('')
-  const [hasPets, setHasPets] = useState(false)
-  const [moveInDate, setMoveInDate] = useState('')
-  const [applicationNotes, setApplicationNotes] = useState('')
+  const setField = <K extends keyof CtaFormState>(
+    name: K,
+    value: CtaFormState[K]
+  ) => dispatch({ type: 'fieldChanged', name, value } as CtaFormAction)
+
+  // Computed once per mount rather than inline in JSX: these panels only
+  // ever render after the user opens them (mode starts 'closed', so there's
+  // no server/first-client output to mismatch), but re-deriving "today" on
+  // every keystroke re-render is still wasted work and an unstable value.
+  const todayIsoDate = useMemo(() => new Date().toISOString().slice(0, 10), [])
 
   const openMode = (next: PanelMode) => {
-    setError(null)
-    setSuccess(null)
-    setMode((current) => (current === next ? 'closed' : next))
+    dispatch({ type: 'openMode', mode: next })
   }
 
   const submitInquiry = async () => {
-    setError(null)
-    setIsSubmitting(true)
+    setField('error', null)
+    setField('isSubmitting', true)
     try {
       const result = await sendInquiryAction(listingId, question)
       if ('error' in result) {
-        setError(result.error ?? 'Something went wrong')
+        setField('error', result.error ?? 'Something went wrong')
         return
       }
-      setSuccess('Your question was sent. The owner will reply here.')
-      setQuestion('')
-      setMode('closed')
+      setField('success', 'Your question was sent. The owner will reply here.')
+      setField('question', '')
+      setField('mode', 'closed')
     } finally {
-      setIsSubmitting(false)
+      setField('isSubmitting', false)
     }
   }
 
   const submitViewing = async () => {
-    setError(null)
+    setField('error', null)
     if (!viewingDate || !viewingTime) {
-      setError('Choose a preferred date and time')
+      setField('error', 'Choose a preferred date and time')
       return
     }
-    setIsSubmitting(true)
+    setField('isSubmitting', true)
     try {
       const start = new Date(`${viewingDate}T${viewingTime}`).toISOString()
       const result = await requestViewingAction({
@@ -94,29 +177,30 @@ export function PropertyCtaPanel({
         locationNote: viewingNote || undefined,
       })
       if ('error' in result) {
-        setError(result.error ?? 'Something went wrong')
+        setField('error', result.error ?? 'Something went wrong')
         return
       }
-      setSuccess(
+      setField(
+        'success',
         'Viewing requested. This is not confirmed yet — the owner needs to accept your proposed time.'
       )
-      setViewingDate('')
-      setViewingTime('')
-      setViewingNote('')
-      setMode('closed')
+      setField('viewingDate', '')
+      setField('viewingTime', '')
+      setField('viewingNote', '')
+      setField('mode', 'closed')
     } finally {
-      setIsSubmitting(false)
+      setField('isSubmitting', false)
     }
   }
 
   const submitOffer = async () => {
-    setError(null)
+    setField('error', null)
     const price = Number(offerPrice)
     if (!price || price <= 0) {
-      setError('Enter a valid offer amount')
+      setField('error', 'Enter a valid offer amount')
       return
     }
-    setIsSubmitting(true)
+    setField('isSubmitting', true)
     try {
       const result = await submitOfferAction({
         listingId,
@@ -124,18 +208,18 @@ export function PropertyCtaPanel({
         message: offerMessage || undefined,
       })
       if ('error' in result) {
-        setError(result.error ?? 'Something went wrong')
+        setField('error', result.error ?? 'Something went wrong')
         return
       }
       router.push('/dashboard/offers')
     } finally {
-      setIsSubmitting(false)
+      setField('isSubmitting', false)
     }
   }
 
   const submitApplication = async () => {
-    setError(null)
-    setIsSubmitting(true)
+    setField('error', null)
+    setField('isSubmitting', true)
     try {
       const result = await submitRentalApplicationAction({
         listingId,
@@ -146,12 +230,12 @@ export function PropertyCtaPanel({
         notes: applicationNotes || undefined,
       })
       if ('error' in result) {
-        setError(result.error ?? 'Something went wrong')
+        setField('error', result.error ?? 'Something went wrong')
         return
       }
       router.push('/dashboard/applications')
     } finally {
-      setIsSubmitting(false)
+      setField('isSubmitting', false)
     }
   }
 
@@ -217,7 +301,7 @@ export function PropertyCtaPanel({
           <Textarea
             placeholder="Ask about this property — availability, condition, neighborhood..."
             value={question}
-            onChange={(e) => setQuestion(e.target.value)}
+            onChange={(e) => setField('question', e.target.value)}
             rows={3}
           />
           <Button
@@ -237,19 +321,19 @@ export function PropertyCtaPanel({
             <Input
               type="date"
               value={viewingDate}
-              onChange={(e) => setViewingDate(e.target.value)}
-              min={new Date().toISOString().slice(0, 10)}
+              onChange={(e) => setField('viewingDate', e.target.value)}
+              min={todayIsoDate}
             />
             <Input
               type="time"
               value={viewingTime}
-              onChange={(e) => setViewingTime(e.target.value)}
+              onChange={(e) => setField('viewingTime', e.target.value)}
             />
           </div>
           <Textarea
             placeholder="Anything the owner should know (optional)"
             value={viewingNote}
-            onChange={(e) => setViewingNote(e.target.value)}
+            onChange={(e) => setField('viewingNote', e.target.value)}
             rows={2}
           />
           <p className="text-xs text-[#5f554d]">
@@ -273,13 +357,13 @@ export function PropertyCtaPanel({
             type="number"
             placeholder="Offer amount (USD)"
             value={offerPrice}
-            onChange={(e) => setOfferPrice(e.target.value)}
+            onChange={(e) => setField('offerPrice', e.target.value)}
             min={0}
           />
           <Textarea
             placeholder="Anything the seller should know (optional)"
             value={offerMessage}
-            onChange={(e) => setOfferMessage(e.target.value)}
+            onChange={(e) => setField('offerMessage', e.target.value)}
             rows={2}
           />
           <p className="text-xs text-[#5f554d]">
@@ -303,7 +387,7 @@ export function PropertyCtaPanel({
             type="number"
             placeholder="Monthly income (optional)"
             value={monthlyIncome}
-            onChange={(e) => setMonthlyIncome(e.target.value)}
+            onChange={(e) => setField('monthlyIncome', e.target.value)}
             min={0}
           />
           <div className="grid grid-cols-2 gap-2">
@@ -311,22 +395,22 @@ export function PropertyCtaPanel({
               type="number"
               placeholder="Occupants"
               value={occupantsCount}
-              onChange={(e) => setOccupantsCount(e.target.value)}
+              onChange={(e) => setField('occupantsCount', e.target.value)}
               min={1}
             />
             <Input
               type="date"
               placeholder="Move-in date"
               value={moveInDate}
-              onChange={(e) => setMoveInDate(e.target.value)}
-              min={new Date().toISOString().slice(0, 10)}
+              onChange={(e) => setField('moveInDate', e.target.value)}
+              min={todayIsoDate}
             />
           </div>
           <label className="flex items-center gap-2 text-sm text-[#5f554d]">
             <input
               type="checkbox"
               checked={hasPets}
-              onChange={(e) => setHasPets(e.target.checked)}
+              onChange={(e) => setField('hasPets', e.target.checked)}
               className="h-4 w-4 rounded border-[rgba(34,24,18,0.2)] text-[#a34702] focus:ring-[#fa6b05]/30"
             />
             I have pets
@@ -334,7 +418,7 @@ export function PropertyCtaPanel({
           <Textarea
             placeholder="Anything the landlord should know (optional)"
             value={applicationNotes}
-            onChange={(e) => setApplicationNotes(e.target.value)}
+            onChange={(e) => setField('applicationNotes', e.target.value)}
             rows={2}
           />
           <Button

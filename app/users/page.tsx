@@ -95,7 +95,11 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
             className="flex flex-col sm:flex-row gap-3 w-full sm:max-w-lg"
             method="GET"
           >
+            <label htmlFor="users-search" className="sr-only">
+              Search by name or email
+            </label>
             <input
+              id="users-search"
               name="search"
               defaultValue={resolvedParams.search ?? ''}
               placeholder="Search by name or email..."
@@ -103,6 +107,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
             />
             <select
               name="plan"
+              aria-label="Filter by plan"
               defaultValue={resolvedParams.plan ?? 'all'}
               className="h-10 px-3 rounded-lg bg-white border border-[rgba(34,24,18,0.14)] text-[#181411] text-sm focus:outline-none focus:ring-2 focus:ring-[#fa6b05]/30 focus:border-[#fa6b05] transition-colors"
             >

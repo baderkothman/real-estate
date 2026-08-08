@@ -55,7 +55,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={handleOpen}
-        className="relative p-2 rounded-xl text-[#5f554d] hover:text-[#181411] hover:bg-[#faf7eb] transition-all duration-200"
+        className="relative p-2 rounded-xl text-[#5f554d] hover:text-[#181411] hover:bg-[#faf7eb] transition-colors duration-200"
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
       >
         <IconBell className="h-5 w-5" stroke={1.75} />

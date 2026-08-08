@@ -7,6 +7,7 @@ import {
   IconUser,
   IconUsers,
 } from '@tabler/icons-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSupabase } from '@/components/providers/supabase-provider'
@@ -156,10 +157,11 @@ export function MobileNav() {
           aria-label={user ? 'My Profile' : 'Sign In'}
         >
           {user?.profileImage ? (
-            // biome-ignore lint/performance/noImgElement: user avatar, domain unknown
-            <img
+            <Image
               src={user.profileImage}
               alt={user.name}
+              width={24}
+              height={24}
               className={cn(
                 'h-6 w-6 rounded-full object-cover transition-all duration-200',
                 profileActive

@@ -29,7 +29,7 @@ import type { Property } from '@/types'
 
 function PropertyRow({ property }: { property: Property }) {
   return (
-    <div className="flex items-start gap-4 p-4 rounded-xl bg-white border border-[rgba(34,24,18,0.08)] hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_4px_12px_rgba(24,20,17,0.08)] transition-all duration-200">
+    <div className="flex items-start gap-4 p-4 rounded-xl bg-white border border-[rgba(34,24,18,0.08)] hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_4px_12px_rgba(24,20,17,0.08)] transition-[border-color,box-shadow] duration-200">
       <div className="relative h-16 w-24 rounded-lg overflow-hidden shrink-0">
         <Image
           src={
@@ -106,8 +106,10 @@ interface DashboardProfilePageProps {
 export default async function DashboardProfilePage({
   searchParams,
 }: DashboardProfilePageProps) {
-  const { tab } = await searchParams
-  const supabase = await createClient()
+  const [{ tab }, supabase] = await Promise.all([
+    searchParams,
+    createClient(),
+  ])
   const {
     data: { user: authUser },
   } = await supabase.auth.getUser()
@@ -185,7 +187,7 @@ export default async function DashboardProfilePage({
               </div>
               <div className="h-1.5 rounded-full bg-[#fef0e6] overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-[#fa6b05] transition-all"
+                  className="h-full rounded-full bg-[#fa6b05] transition-[width]"
                   style={{
                     width: `${Math.min(100, (activeCount / planLimit.maxProperties) * 100)}%`,
                   }}

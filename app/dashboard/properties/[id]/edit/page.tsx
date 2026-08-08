@@ -1,11 +1,19 @@
 ﻿'use client'
 
-import { IconCirclePlus, IconDeviceFloppy, IconX } from '@tabler/icons-react'
+import {
+  IconCirclePlus,
+  IconDeviceFloppy,
+  IconTag,
+  IconTrash,
+  IconX,
+} from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 import { use, useEffect, useState } from 'react'
 import { z } from 'zod'
 import {
+  deletePropertyAction,
   getPropertyAction,
+  toggleSoldPropertyAction,
   updatePropertyAction,
 } from '@/app/actions/properties'
 import { useSupabase } from '@/components/providers/supabase-provider'
@@ -57,10 +65,14 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
     areaSqM: '',
     description: '',
   })
-  const [imageUrls, setImageUrls] = useState<string[]>([''])
+  const [imageUrls, setImageUrls] = useState<
+    { id: string; url: string }[]
+  >(() => [{ id: crypto.randomUUID(), url: '' }])
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [serverError, setServerError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isTogglingSold, setIsTogglingSold] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     let isActive = true
@@ -87,7 +99,11 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
           areaSqM: data.areaSqM !== undefined ? String(data.areaSqM) : '',
           description: data.description,
         })
-        setImageUrls(data.images.length > 0 ? data.images : [''])
+        setImageUrls(
+          data.images.length > 0
+            ? data.images.map((url) => ({ id: crypto.randomUUID(), url }))
+            : [{ id: crypto.randomUUID(), url: '' }]
+        )
       })
       .catch(() => null)
       .finally(() => {
@@ -120,7 +136,9 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
       return
     }
 
-    const validImages = imageUrls.filter((u) => u.trim() !== '')
+    const validImages = imageUrls
+      .map((row) => row.url)
+      .filter((u) => u.trim() !== '')
     const parsed = propertySchema.safeParse({
       ...form,
       price: form.price ? Number(form.price) : undefined,
@@ -154,6 +172,38 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
       setServerError('An unexpected error occurred')
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  const handleToggleSold = async () => {
+    setServerError('')
+    setIsTogglingSold(true)
+    try {
+      const result = await toggleSoldPropertyAction(id)
+      if ('error' in result) {
+        setServerError(result.error ?? 'Failed to update sold status')
+        return
+      }
+      setProperty((prev) => (prev ? { ...prev, isSold: result.isSold } : prev))
+    } finally {
+      setIsTogglingSold(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!confirm('Delete this listing? This cannot be undone.')) return
+
+    setServerError('')
+    setIsDeleting(true)
+    try {
+      const result = await deletePropertyAction(id)
+      if ('error' in result) {
+        setServerError(result.error ?? 'Failed to delete listing')
+        return
+      }
+      router.push('/dashboard/profile')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -340,14 +390,14 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
             Photos
           </h3>
           <div className="space-y-2">
-            {imageUrls.map((url, idx) => (
-              <div key={url || String(idx)} className="flex gap-2">
+            {imageUrls.map((row, idx) => (
+              <div key={row.id} className="flex gap-2">
                 <Input
                   placeholder={`Image URL ${idx + 1}`}
-                  value={url}
+                  value={row.url}
                   onChange={(e) => {
                     const newUrls = [...imageUrls]
-                    newUrls[idx] = e.target.value
+                    newUrls[idx] = { ...row, url: e.target.value }
                     setImageUrls(newUrls)
                   }}
                   className="flex-1"
@@ -358,7 +408,7 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
                     variant="ghost"
                     size="icon-sm"
                     onClick={() =>
-                      setImageUrls((prev) => prev.filter((_, i) => i !== idx))
+                      setImageUrls((prev) => prev.filter((r) => r.id !== row.id))
                     }
                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
                     aria-label={`Remove image ${idx + 1}`}
@@ -374,7 +424,12 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
               type="button"
               variant="secondary"
               size="sm"
-              onClick={() => setImageUrls((prev) => [...prev, ''])}
+              onClick={() =>
+                setImageUrls((prev) => [
+                  ...prev,
+                  { id: crypto.randomUUID(), url: '' },
+                ])
+              }
               className="gap-2"
             >
               <IconCirclePlus className="h-4 w-4" />
@@ -412,6 +467,38 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
           </Button>
         </div>
       </form>
+
+      <div className="mt-8 rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
+        <h3 className="font-display text-lg font-semibold text-[#181411]">
+          Listing Actions
+        </h3>
+        <div className="flex flex-wrap gap-3">
+          <Button
+            type="button"
+            variant="secondary"
+            className="gap-2"
+            disabled={isTogglingSold}
+            onClick={() => void handleToggleSold()}
+          >
+            <IconTag className="h-4 w-4" />
+            {isTogglingSold
+              ? 'Updating...'
+              : property.isSold
+                ? 'Mark as Available'
+                : 'Mark as Sold'}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+            disabled={isDeleting}
+            onClick={() => void handleDelete()}
+          >
+            <IconTrash className="h-4 w-4" />
+            {isDeleting ? 'Deleting...' : 'Delete Listing'}
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

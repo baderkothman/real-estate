@@ -89,7 +89,11 @@ export default function AdminUsersPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6">
+        <label htmlFor="admin-user-search" className="sr-only">
+          Search by name or email
+        </label>
         <input
+          id="admin-user-search"
           type="text"
           placeholder="Search by name or email..."
           value={search}

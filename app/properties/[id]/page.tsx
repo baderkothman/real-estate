@@ -31,6 +31,7 @@ import {
   formatPrice,
   formatRelativeDate,
   getInitials,
+  safeJsonLdStringify,
 } from '@/lib/utils'
 import { getNotesForListing } from '@/services/discovery.service'
 import {
@@ -56,8 +57,7 @@ export async function generateMetadata({
 }
 
 export default async function PropertyPage({ params }: PropertyPageProps) {
-  const { id } = await params
-  const supabase = await createClient()
+  const [{ id }, supabase] = await Promise.all([params, createClient()])
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -65,8 +65,10 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
   const property = await getPropertyById(id, user?.id)
   if (!property) notFound()
 
-  const owner = await getUserById(property.userId)
-  const similar = await getSimilarProperties(id, property.city)
+  const [owner, similar] = await Promise.all([
+    getUserById(property.userId),
+    getSimilarProperties(id, property.city),
+  ])
   const notes = user ? await getNotesForListing(id, user.id) : []
 
   const isOwner = user?.id === property.userId
@@ -109,8 +111,8 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     <div className="min-h-screen bg-[#fcfaf7] pb-16">
       <script
         type="application/ld+json"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD built server-side from our own data, not user-supplied HTML
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD serialized with HTML-safe escaping below, not raw user-supplied HTML
+        dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(jsonLd) }}
       />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -282,7 +284,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                   href={`/users/${owner.id}`}
                   className="flex items-center gap-3 mb-4 group"
                 >
-                  <div className="relative h-12 w-12 rounded-full overflow-hidden ring-2 ring-[#fa6b05]/15 group-hover:ring-[#fa6b05]/40 transition-all shrink-0">
+                  <div className="relative h-12 w-12 rounded-full overflow-hidden ring-2 ring-[#fa6b05]/15 group-hover:ring-[#fa6b05]/40 transition-shadow shrink-0">
                     {owner.profileImage ? (
                       <Image
                         src={owner.profileImage}
