@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { createNeonAuth } from '@neondatabase/auth/next/server'
+import { requireServerEnv } from '@/lib/neon/env'
 
 export function hasNeonAuthEnv() {
   return Boolean(
@@ -9,11 +10,9 @@ export function hasNeonAuthEnv() {
 }
 
 export const auth = createNeonAuth({
-  baseUrl: process.env.NEON_AUTH_BASE_URL ?? 'https://missing-neon-auth.local',
+  baseUrl: requireServerEnv('NEON_AUTH_BASE_URL'),
   cookies: {
-    secret:
-      process.env.NEON_AUTH_COOKIE_SECRET ??
-      'missing-neon-auth-cookie-secret-for-builds',
+    secret: requireServerEnv('NEON_AUTH_COOKIE_SECRET'),
     sessionDataTtl: 300,
   },
   logLevel: process.env.NODE_ENV === 'production' ? 'warn' : 'info',
