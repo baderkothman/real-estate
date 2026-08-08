@@ -65,7 +65,9 @@ async function UsersList({ searchParams }: { searchParams: SearchParams }) {
       </div>
       {result.totalPages > 1 && (
         <div className="mt-12">
-          <Pagination page={result.page} totalPages={result.totalPages} />
+          <Suspense fallback={null}>
+            <Pagination page={result.page} totalPages={result.totalPages} />
+          </Suspense>
         </div>
       )}
     </div>

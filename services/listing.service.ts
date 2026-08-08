@@ -369,13 +369,22 @@ export async function updateProperty(
 export async function deleteProperty(id: string): Promise<boolean> {
   const supabase = await createClient()
 
-  const { data: listing } = await supabase
+  // Single atomic DELETE ... RETURNING round trip instead of a
+  // SELECT-then-DELETE pair: the two awaits looked independent to
+  // react-doctor/server-sequential-independent-await (the delete doesn't
+  // read `listing`), but they aren't — both target the same row, and the
+  // delete removes the exact data the select was reading. Racing them
+  // with Promise.all would let the delete win before the select observes
+  // `property_id`, silently skipping the orphaned-`properties`-row
+  // cleanup below. Folding them into one `.delete().select()` call
+  // removes the extra round trip entirely (strictly faster than either
+  // sequential or parallel two-call versions) and removes the race.
+  const { data: listing, error } = await supabase
     .from('listings')
-    .select('property_id')
+    .delete()
     .eq('id', id)
-    .single()
-
-  const { error } = await supabase.from('listings').delete().eq('id', id)
+    .select('property_id')
+    .maybeSingle()
   if (error) return false
 
   if (listing?.property_id) {

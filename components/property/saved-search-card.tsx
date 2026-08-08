@@ -3,7 +3,7 @@
 import { IconTrash } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useOptimistic, useState, useTransition } from 'react'
 import {
   deleteSavedSearchAction,
   setSearchAlertActiveAction,
@@ -35,26 +35,31 @@ function filtersSummary(filters: SavedSearch['filters']): string {
 
 export function SavedSearchCard({ search }: { search: SavedSearch }) {
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [alertActive, setAlertActive] = useState(search.alertActive)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isAlertPending, startAlertTransition] = useTransition()
+  // Tracks `search.alertActive` directly (instead of copying it into
+  // useState once) so a refreshed `search` prop is always reflected, with
+  // an optimistic overlay only while a toggle request is in flight.
+  const [alertActive, setOptimisticAlertActive] = useOptimistic(
+    search.alertActive
+  )
 
-  const toggleAlert = async () => {
-    setIsSubmitting(true)
-    try {
-      await setSearchAlertActiveAction(search.id, !alertActive)
-      setAlertActive((v) => !v)
-    } finally {
-      setIsSubmitting(false)
-    }
+  const toggleAlert = () => {
+    const next = !alertActive
+    startAlertTransition(async () => {
+      setOptimisticAlertActive(next)
+      await setSearchAlertActiveAction(search.id, next)
+      router.refresh()
+    })
   }
 
   const remove = async () => {
-    setIsSubmitting(true)
+    setIsDeleting(true)
     try {
       await deleteSavedSearchAction(search.id)
       router.refresh()
     } finally {
-      setIsSubmitting(false)
+      setIsDeleting(false)
     }
   }
 
@@ -75,7 +80,7 @@ export function SavedSearchCard({ search }: { search: SavedSearch }) {
         <Button
           size="icon-sm"
           variant="ghost"
-          disabled={isSubmitting}
+          disabled={isDeleting}
           onClick={remove}
           aria-label={`Delete saved search "${search.name}"`}
         >
@@ -86,7 +91,7 @@ export function SavedSearchCard({ search }: { search: SavedSearch }) {
         <input
           type="checkbox"
           checked={alertActive}
-          disabled={isSubmitting}
+          disabled={isAlertPending}
           onChange={toggleAlert}
           className="h-4 w-4 rounded border-[rgba(34,24,18,0.2)] text-[#a34702] focus:ring-[#fa6b05]/30"
         />

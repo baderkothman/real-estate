@@ -120,7 +120,9 @@ async function PropertiesList({
 
           {result.totalPages > 1 && (
             <div className="mt-14">
-              <Pagination page={result.page} totalPages={result.totalPages} />
+              <Suspense fallback={null}>
+                <Pagination page={result.page} totalPages={result.totalPages} />
+              </Suspense>
             </div>
           )}
         </>

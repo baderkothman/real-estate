@@ -5,7 +5,7 @@ import {
   IconSearch,
   IconX,
 } from '@tabler/icons-react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useReducer } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -67,7 +67,6 @@ function filterFormReducer(
 
 export function PropertyFilters() {
   const router = useRouter()
-  const pathname = usePathname()
   const searchParams = useSearchParams()
 
   // Lazy init (the 3-arg useReducer form): reading each query param only
@@ -106,12 +105,13 @@ export function PropertyFilters() {
 
   const handleSearch = () => {
     const query = buildQuery()
+    const pathname = window.location.pathname
     router.push(`${pathname}${query ? `?${query}` : ''}`)
   }
 
   const handleReset = () => {
     dispatch({ type: 'reset' })
-    router.push(pathname)
+    router.push(window.location.pathname)
   }
 
   const hasFilters =
