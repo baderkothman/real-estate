@@ -19,8 +19,10 @@ Copy `.env.example` to `.env.local`, then set:
 - `NEON_AUTH_BASE_URL`
 - `NEON_AUTH_COOKIE_SECRET`
 - `NEON_DATA_API_URL`
-- `NEON_DATA_API_ADMIN_TOKEN`
-- `DATABASE_URL`
+- `DATABASE_URL` — used both for manual migrations and, at runtime, by
+  `lib/neon/admin.ts`'s admin client (the `neondb_owner` connection carries
+  BYPASSRLS, so trusted server paths don't need a separate Data API admin
+  token)
 - Stripe variables
 
 Generate a cookie secret with:

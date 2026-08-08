@@ -71,9 +71,14 @@ npm run test:e2e    # Playwright + axe-core accessibility suite
 NEON_AUTH_BASE_URL=https://your-neon-auth-url/YOUR_DB/auth
 NEON_AUTH_COOKIE_SECRET=generate-with-openssl-rand-base64-32
 NEON_DATA_API_URL=https://your-neon-data-api-url/rest/v1
-NEON_DATA_API_ADMIN_TOKEN=server-only-admin-data-api-jwt
 DATABASE_URL=postgresql://USER:PASSWORD@HOST/DB?sslmode=require
 ```
+
+`DATABASE_URL` (the `neondb_owner` connection) is used both for manual
+migrations and, at runtime, by `lib/neon/admin.ts` — its BYPASSRLS privilege
+is what gives trusted server paths (audit log, admin user management,
+payment webhooks, analytics) privileged access, rather than a Data API admin
+bearer token.
 
 ### Stripe
 

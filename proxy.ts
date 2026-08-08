@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { auth, hasNeonAuthEnv } from '@/lib/auth/server'
 import { createAdminClient } from '@/lib/neon/admin'
-import { hasNeonDataEnv } from '@/lib/neon/env'
 
 function loginRedirect(request: NextRequest) {
   const loginUrl = new URL('/auth/login', request.url)
@@ -31,8 +30,8 @@ export default async function proxy(request: NextRequest) {
   }
 
   if (pathname.startsWith('/admin')) {
-    if (!hasNeonDataEnv() || !process.env.NEON_DATA_API_ADMIN_TOKEN) {
-      console.error('Neon admin data access is not configured for /admin')
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL is not configured for /admin')
       return NextResponse.redirect(new URL('/', request.url))
     }
 

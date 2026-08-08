@@ -1,27 +1,15 @@
 import 'server-only'
 
-import { NeonPostgrestClient } from '@neondatabase/postgrest-js'
 import { auth } from '@/lib/auth/server'
-import { requireServerEnv } from '@/lib/neon/env'
+import { createPgAdminClient } from '@/lib/neon/pg-admin-client'
 
-function adminFetch(input: RequestInfo | URL, init?: RequestInit) {
-  const headers = new Headers(init?.headers)
-  headers.set(
-    'Authorization',
-    `Bearer ${requireServerEnv('NEON_DATA_API_ADMIN_TOKEN')}`
-  )
-  return fetch(input, { ...init, headers })
-}
-
+// The Data API's bearer-token route to admin/RLS-bypassing access requires a
+// custom JWT provider (a hosted JWKS endpoint) — infra this project doesn't
+// have. `createPgAdminClient()` instead talks directly to Postgres over
+// `DATABASE_URL`, which already carries BYPASSRLS. See the comment atop
+// lib/neon/pg-admin-client.ts for the full rationale.
 export function createAdminClient() {
-  const client = new NeonPostgrestClient({
-    dataApiUrl: requireServerEnv('NEON_DATA_API_URL'),
-    options: {
-      global: {
-        fetch: adminFetch,
-      },
-    },
-  })
+  const client = createPgAdminClient()
 
   return Object.assign(client, {
     auth: {

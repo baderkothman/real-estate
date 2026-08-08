@@ -37,7 +37,12 @@ with migrated Neon data.
 
 - `lib/auth/server.ts`: Neon Auth server singleton.
 - `lib/neon/server.ts`: request-scoped Data API client with Neon Auth token injection.
-- `lib/neon/admin.ts`: trusted server Data API client for privileged operations.
+- `lib/neon/admin.ts`: trusted server client for privileged operations.
+  Backed by `lib/neon/pg-admin-client.ts` — a small PostgREST-alike query
+  builder that talks directly to Postgres over `DATABASE_URL` (BYPASSRLS),
+  not the Data API. It only supports the `.from()/.rpc()` chains and
+  embedded-select relationships services/*.ts actually use; see the file's
+  header comment before adding a new embed or filter op.
 
 Use server client for user-scoped actions and admin client only on trusted server paths.
 
@@ -109,8 +114,10 @@ Required for core app behavior:
 - `NEON_AUTH_BASE_URL`
 - `NEON_AUTH_COOKIE_SECRET`
 - `NEON_DATA_API_URL`
-- `NEON_DATA_API_ADMIN_TOKEN`
-- `DATABASE_URL` for manual migrations
+- `DATABASE_URL` — manual migrations, and (at runtime) `lib/neon/admin.ts`'s
+  admin client, which talks directly to Postgres over this connection
+  (`neondb_owner` carries BYPASSRLS) instead of through a Data API admin
+  bearer token
 
 Used for Stripe checkout:
 
