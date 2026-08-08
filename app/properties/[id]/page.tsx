@@ -7,9 +7,7 @@
   IconClock,
   IconExternalLink,
   IconHeart,
-  IconMail,
   IconMapPin,
-  IconPhone,
   IconSquare,
 } from '@tabler/icons-react'
 import type { Metadata } from 'next'
@@ -18,7 +16,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PlanBadge } from '@/components/common/plan-badge'
 import { PropertyCard } from '@/components/property/property-card'
+import {
+  PropertyCtaPanel,
+  PropertyCtaSignInPrompt,
+} from '@/components/property/property-cta-panel'
 import { PropertyGallery } from '@/components/property/property-gallery'
+import { PropertyNotes } from '@/components/property/property-notes'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/server'
@@ -29,6 +32,7 @@ import {
   formatRelativeDate,
   getInitials,
 } from '@/lib/utils'
+import { getNotesForListing } from '@/services/discovery.service'
 import {
   getPropertyById,
   getSimilarProperties,
@@ -63,12 +67,51 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
   const owner = await getUserById(property.userId)
   const similar = await getSimilarProperties(id, property.city)
+  const notes = user ? await getNotesForListing(id, user.id) : []
 
   const isOwner = user?.id === property.userId
   const isApproved = property.status === 'approved'
+  const canRequestContact = isApproved && !property.isSold && !isOwner
+  const loginUrl = `/auth/login?callbackUrl=${encodeURIComponent(`/properties/${property.id}`)}`
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ??
+    'http://localhost:3000'
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateListing',
+    name: property.title,
+    description: property.description,
+    url: `${siteUrl}/properties/${property.id}`,
+    image: property.images,
+    datePosted: property.createdAt.toISOString(),
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: property.address,
+      addressLocality: property.city,
+      addressCountry: 'LB',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: property.price,
+      priceCurrency: 'USD',
+      availability: property.isSold
+        ? 'https://schema.org/SoldOut'
+        : 'https://schema.org/InStock',
+      businessFunction:
+        property.listingType === 'rent'
+          ? 'https://schema.org/LeaseOut'
+          : 'https://schema.org/Sell',
+    },
+  }
 
   return (
     <div className="min-h-screen bg-[#fcfaf7] pb-16">
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD built server-side from our own data, not user-supplied HTML
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Main content */}
@@ -129,7 +172,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
               {/* Location */}
               <div className="flex items-center gap-1.5 text-[#5f554d] mb-4">
-                <IconMapPin className="h-4 w-4 text-[#fa6b05]" />
+                <IconMapPin className="h-4 w-4 text-[#a34702]" />
                 <span>
                   {property.address ? `${property.address}, ` : ''}
                   {property.city}
@@ -138,11 +181,11 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
               {/* Price */}
               <div className="mb-6">
-                <span className="font-mono text-4xl font-bold text-[#fa6b05]">
+                <span className="font-mono text-4xl font-bold text-[#a34702]">
                   {formatPrice(property.price)}
                 </span>
                 {property.listingType === 'rent' && (
-                  <span className="text-[#8b8178] text-base ml-2">/month</span>
+                  <span className="text-[#5f554d] text-base ml-2">/month</span>
                 )}
               </div>
 
@@ -153,7 +196,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                 <div className="flex flex-wrap gap-6 mb-8 p-4 rounded-xl bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_2px_8px_rgba(24,20,17,0.04)]">
                   {property.bedrooms !== undefined && property.bedrooms > 0 && (
                     <div className="flex items-center gap-2 text-[#5f554d]">
-                      <IconBed className="h-5 w-5 text-[#fa6b05]" />
+                      <IconBed className="h-5 w-5 text-[#a34702]" />
                       <span>
                         <span className="font-semibold text-[#181411]">
                           {property.bedrooms}
@@ -165,7 +208,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                   {property.bathrooms !== undefined &&
                     property.bathrooms > 0 && (
                       <div className="flex items-center gap-2 text-[#5f554d]">
-                        <IconBath className="h-5 w-5 text-[#fa6b05]" />
+                        <IconBath className="h-5 w-5 text-[#a34702]" />
                         <span>
                           <span className="font-semibold text-[#181411]">
                             {property.bathrooms}
@@ -176,7 +219,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                     )}
                   {property.areaSqM && (
                     <div className="flex items-center gap-2 text-[#5f554d]">
-                      <IconSquare className="h-5 w-5 text-[#fa6b05]" />
+                      <IconSquare className="h-5 w-5 text-[#a34702]" />
                       <span>
                         <span className="font-semibold text-[#181411]">
                           {property.areaSqM}
@@ -199,7 +242,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
               </div>
 
               {/* Dates */}
-              <div className="flex items-center gap-2 text-sm text-[#8b8178]">
+              <div className="flex items-center gap-2 text-sm text-[#5f554d]">
                 <IconCalendar className="h-4 w-4" />
                 <span>
                   Listed {formatRelativeDate(property.createdAt)} &middot;{' '}
@@ -249,13 +292,13 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                         sizes="48px"
                       />
                     ) : (
-                      <div className="h-full w-full bg-[#fef0e6] flex items-center justify-center text-[#fa6b05] font-bold font-display">
+                      <div className="h-full w-full bg-[#fef0e6] flex items-center justify-center text-[#a34702] font-bold font-display">
                         {getInitials(owner.name)}
                       </div>
                     )}
                   </div>
                   <div>
-                    <p className="font-medium text-[#181411] group-hover:text-[#fa6b05] transition-colors">
+                    <p className="font-medium text-[#181411] group-hover:text-[#a34702] transition-colors">
                       {owner.name}
                     </p>
                     <PlanBadge plan={owner.plan} size="sm" className="mt-1" />
@@ -263,55 +306,16 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                 </Link>
 
                 {owner.bio && (
-                  <p className="text-xs text-[#8b8178] leading-relaxed mb-4 line-clamp-2">
+                  <p className="text-xs text-[#5f554d] leading-relaxed mb-4 line-clamp-2">
                     {owner.bio}
                   </p>
-                )}
-
-                {/* Contact â€” only for approved properties */}
-                {isApproved && (
-                  <div className="space-y-2 border-t border-[rgba(34,24,18,0.08)] pt-4">
-                    {user ? (
-                      <>
-                        <a
-                          href={`mailto:${owner.email}`}
-                          className="flex items-center gap-2 text-sm text-[#5f554d] hover:text-[#fa6b05] transition-colors"
-                        >
-                          <IconMail className="h-4 w-4 shrink-0" />
-                          <span className="truncate">{owner.email}</span>
-                        </a>
-                        {owner.phone && (
-                          <a
-                            href={`tel:${owner.phone}`}
-                            className="flex items-center gap-2 text-sm text-[#5f554d] hover:text-[#fa6b05] transition-colors"
-                          >
-                            <IconPhone className="h-4 w-4 shrink-0" />
-                            {owner.phone}
-                          </a>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-center py-2">
-                        <p className="text-xs text-[#8b8178] mb-3">
-                          Sign in to see contact details
-                        </p>
-                        <Button asChild size="sm" className="w-full">
-                          <Link
-                            href={`/auth/login?callbackUrl=/properties/${property.id}`}
-                          >
-                            Sign In to Contact
-                          </Link>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
                 )}
 
                 <Button
                   asChild
                   variant="secondary"
                   size="sm"
-                  className="w-full mt-4"
+                  className="w-full mt-2"
                 >
                   <Link href={`/users/${owner.id}`} className="gap-2">
                     <IconExternalLink className="h-3.5 w-3.5" />
@@ -321,16 +325,47 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
               </div>
             )}
 
+            {/* Context-specific CTAs replace the old bare mailto/tel
+                contact block — "Ask a Question" and "Request a Viewing"
+                are explicit next steps, not a generic "Contact" action. */}
+            {isOwner ? (
+              <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 text-center">
+                <p className="text-sm text-[#5f554d] mb-4">
+                  Manage questions and viewing requests for your listings from
+                  your dashboard.
+                </p>
+                <div className="flex flex-col gap-2">
+                  <Button asChild variant="secondary" size="sm">
+                    <Link href="/dashboard/messages">View Messages</Link>
+                  </Button>
+                  <Button asChild variant="secondary" size="sm">
+                    <Link href="/dashboard/viewings">
+                      View Viewing Requests
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            ) : canRequestContact ? (
+              user ? (
+                <PropertyCtaPanel
+                  listingId={property.id}
+                  listingType={property.listingType}
+                />
+              ) : (
+                <PropertyCtaSignInPrompt loginUrl={loginUrl} />
+              )
+            ) : null}
+
             {/* Save card */}
             <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-5 text-center">
-              <IconHeart className="h-6 w-6 text-[#fa6b05] mx-auto mb-3" />
+              <IconHeart className="h-6 w-6 text-[#a34702] mx-auto mb-3" />
               <p className="text-sm text-[#5f554d] mb-4">
                 {user
                   ? 'Save this property to revisit it later.'
                   : 'Sign in to save this property to your list.'}
               </p>
               {user ? (
-                <p className="text-xs text-[#8b8178]">
+                <p className="text-xs text-[#5f554d]">
                   Use the heart icon on the listing card to save.
                 </p>
               ) : (
@@ -339,6 +374,8 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                 </Button>
               )}
             </div>
+
+            {user && <PropertyNotes listingId={property.id} notes={notes} />}
           </div>
         </div>
 
@@ -359,4 +396,3 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     </div>
   )
 }
-

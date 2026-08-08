@@ -75,15 +75,15 @@ export function MobileNav() {
               className={cn(
                 'h-6 w-6 transition-all duration-200',
                 isActive(href, exact)
-                  ? 'text-[#fa6b05] scale-110'
-                  : 'text-[#8b8178] group-hover:text-[#5f554d] group-hover:scale-105'
+                  ? 'text-[#a34702] scale-110'
+                  : 'text-[#5f554d] group-hover:text-[#5f554d] group-hover:scale-105'
               )}
               stroke={isActive(href, exact) ? 2 : 1.75}
             />
             <span
               className={cn(
                 'text-[9px] font-semibold tracking-wide transition-colors duration-200',
-                isActive(href, exact) ? 'text-[#fa6b05]' : 'text-[#8b8178]'
+                isActive(href, exact) ? 'text-[#a34702]' : 'text-[#5f554d]'
               )}
             >
               {label}
@@ -113,7 +113,7 @@ export function MobileNav() {
           >
             <IconCirclePlus className="h-6 w-6 text-white" stroke={2} />
           </div>
-          <span className="text-[9px] font-semibold tracking-wide text-[#8b8178] mt-1">
+          <span className="text-[9px] font-semibold tracking-wide text-[#5f554d] mt-1">
             List
           </span>
         </Link>
@@ -130,15 +130,15 @@ export function MobileNav() {
               className={cn(
                 'h-6 w-6 transition-all duration-200',
                 isActive(href, exact)
-                  ? 'text-[#fa6b05] scale-110'
-                  : 'text-[#8b8178] group-hover:text-[#5f554d] group-hover:scale-105'
+                  ? 'text-[#a34702] scale-110'
+                  : 'text-[#5f554d] group-hover:text-[#5f554d] group-hover:scale-105'
               )}
               stroke={isActive(href, exact) ? 2 : 1.75}
             />
             <span
               className={cn(
                 'text-[9px] font-semibold tracking-wide transition-colors duration-200',
-                isActive(href, exact) ? 'text-[#fa6b05]' : 'text-[#8b8178]'
+                isActive(href, exact) ? 'text-[#a34702]' : 'text-[#5f554d]'
               )}
             >
               {label}
@@ -172,19 +172,19 @@ export function MobileNav() {
               className={cn(
                 'h-6 w-6 rounded-full transition-all duration-200 flex items-center justify-center',
                 profileActive
-                  ? 'bg-[#fa6b05] text-white scale-110'
+                  ? 'bg-[#a34702] text-white scale-110'
                   : 'bg-[#faf7eb] group-hover:scale-105'
               )}
             >
               {user ? (
-                <span className="text-[9px] font-bold text-[#fa6b05]">
+                <span className="text-[9px] font-bold text-[#a34702]">
                   {user.name[0]?.toUpperCase()}
                 </span>
               ) : (
                 <IconUser
                   className={cn(
                     'h-4 w-4',
-                    profileActive ? 'text-white' : 'text-[#8b8178]'
+                    profileActive ? 'text-white' : 'text-[#5f554d]'
                   )}
                   stroke={1.75}
                 />
@@ -194,7 +194,7 @@ export function MobileNav() {
           <span
             className={cn(
               'text-[9px] font-semibold tracking-wide transition-colors duration-200',
-              profileActive ? 'text-[#fa6b05]' : 'text-[#8b8178]'
+              profileActive ? 'text-[#a34702]' : 'text-[#5f554d]'
             )}
           >
             {user ? 'Me' : 'Sign In'}

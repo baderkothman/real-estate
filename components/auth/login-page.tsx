@@ -94,7 +94,7 @@ export function LoginPage({
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <Link href="/">
-            <span className="font-display text-3xl font-semibold text-[#fa6b05] tracking-wide">
+            <span className="font-display text-3xl font-semibold text-[#a34702] tracking-wide">
               Othman
             </span>
             <span className="font-display text-3xl font-light text-[#5f554d] tracking-wide ml-2">
@@ -167,7 +167,7 @@ export function LoginPage({
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8b8178] hover:text-[#5f554d] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5f554d] hover:text-[#5f554d] transition-colors"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
@@ -185,13 +185,13 @@ export function LoginPage({
                   type="checkbox"
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
-                  className="h-4 w-4 rounded border-[rgba(34,24,18,0.20)] bg-white text-[#fa6b05] focus:ring-[#fa6b05]/40"
+                  className="h-4 w-4 rounded border-[rgba(34,24,18,0.20)] bg-white text-[#a34702] focus:ring-[#fa6b05]/40"
                 />
                 <span className="text-sm text-[#5f554d]">Remember me</span>
               </label>
               <Link
                 href="/auth/forgot-password"
-                className="text-sm text-[#fa6b05] hover:text-[#c85604] transition-colors"
+                className="text-sm text-[#a34702] hover:text-[#c85604] transition-colors"
               >
                 Forgot password?
               </Link>
@@ -217,11 +217,11 @@ export function LoginPage({
             </Button>
           </form>
 
-          <p className="text-center text-sm text-[#8b8178] mt-6">
+          <p className="text-center text-sm text-[#5f554d] mt-6">
             Don&apos;t have an account?{' '}
             <Link
               href="/auth/register"
-              className="text-[#fa6b05] hover:text-[#c85604] transition-colors font-medium"
+              className="text-[#a34702] hover:text-[#c85604] transition-colors font-medium"
             >
               Create one free
             </Link>

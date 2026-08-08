@@ -16,9 +16,10 @@ import { PropertyCard } from '@/components/property/property-card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { PLAN_LIMITS } from '@/lib/constants'
+import { PARTY_ROLE_LABELS, PLAN_LIMITS } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import { cn, formatPrice, getInitials } from '@/lib/utils'
+import { getPartyRoleSummaryForProfile } from '@/services/party.service'
 import {
   getSavedProperties,
   getUserProperties,
@@ -45,13 +46,13 @@ function PropertyRow({ property }: { property: Property }) {
       <div className="flex-1 min-w-0">
         <Link
           href={`/properties/${property.id}`}
-          className="font-display text-base font-medium text-[#181411] hover:text-[#fa6b05] transition-colors line-clamp-1"
+          className="font-display text-base font-medium text-[#181411] hover:text-[#a34702] transition-colors line-clamp-1"
         >
           {property.title}
         </Link>
         <div className="flex flex-wrap items-center gap-2 mt-1">
-          <span className="text-xs text-[#8b8178]">{property.city}</span>
-          <span className="text-xs font-mono text-[#fa6b05]">
+          <span className="text-xs text-[#5f554d]">{property.city}</span>
+          <span className="text-xs font-mono text-[#a34702]">
             {formatPrice(property.price)}
           </span>
           <span
@@ -87,7 +88,10 @@ function PropertyRow({ property }: { property: Property }) {
         </div>
       </div>
       <Button variant="ghost" size="icon-sm" asChild>
-        <Link href={`/dashboard/properties/${property.id}/edit`}>
+        <Link
+          href={`/dashboard/properties/${property.id}/edit`}
+          aria-label={`Edit ${property.title}`}
+        >
           <IconEdit className="h-3.5 w-3.5" />
         </Link>
       </Button>
@@ -112,9 +116,10 @@ export default async function DashboardProfilePage({
   const user = await getUserById(authUser.id)
   if (!user) redirect('/auth/login')
 
-  const [allProperties, savedProperties] = await Promise.all([
+  const [allProperties, savedProperties, roleSummary] = await Promise.all([
     getUserProperties(user.id, true),
     getSavedProperties(user.id),
+    getPartyRoleSummaryForProfile(user.id),
   ])
 
   const activeListings = allProperties.filter(
@@ -140,7 +145,7 @@ export default async function DashboardProfilePage({
               sizes="64px"
             />
           ) : (
-            <div className="h-full w-full bg-[#fef0e6] flex items-center justify-center text-[#fa6b05] font-bold font-display text-xl">
+            <div className="h-full w-full bg-[#fef0e6] flex items-center justify-center text-[#a34702] font-bold font-display text-xl">
               {getInitials(user.name)}
             </div>
           )}
@@ -152,13 +157,29 @@ export default async function DashboardProfilePage({
             </h2>
             <PlanBadge plan={user.plan} size="sm" />
           </div>
-          <p className="text-sm text-[#8b8178] mb-3">{user.email}</p>
+          <p className="text-sm text-[#5f554d] mb-3">{user.email}</p>
+          {/* Roles are scoped per-listing, not a single account-wide label —
+              this reflects whatever the account actually holds today (e.g.
+              seller on some listings, landlord on others). */}
+          {roleSummary.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              {roleSummary.map(({ role, count }) => (
+                <span
+                  key={role}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(34,24,18,0.1)] bg-[#faf7eb] px-2.5 py-1 text-xs font-medium text-[#5f554d]"
+                >
+                  {PARTY_ROLE_LABELS[role]}
+                  <span className="text-[#a34702] font-semibold">{count}</span>
+                </span>
+              ))}
+            </div>
+          )}
           {/* Plan usage */}
           <div className="flex items-center gap-3">
             <div className="flex-1 max-w-xs">
               <div className="flex justify-between text-xs mb-1">
                 <span className="text-[#5f554d]">Active listings</span>
-                <span className="text-[#fa6b05] font-medium">
+                <span className="text-[#a34702] font-medium">
                   {activeCount} / {planLimit.maxProperties}
                 </span>
               </div>

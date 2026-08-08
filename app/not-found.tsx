@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4">
       <div className="text-center max-w-md">
-        <div className="font-display text-[120px] font-bold leading-none text-[#fa6b05]/15 select-none">
+        <div className="font-display text-[120px] font-bold leading-none text-[#a34702]/15 select-none">
           404
         </div>
         <h1 className="font-display text-3xl font-semibold text-[#181411] -mt-4 mb-4">
@@ -32,7 +32,7 @@ export default function NotFound() {
         </div>
 
         {/* Decorative */}
-        <div className="mt-16 text-[#8b8178] text-sm font-display italic">
+        <div className="mt-16 text-[#5f554d] text-sm font-display italic">
           &ldquo;Every door unlocked is a new beginning.&rdquo;
         </div>
       </div>

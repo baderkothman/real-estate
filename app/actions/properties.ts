@@ -3,6 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { PLAN_LIMITS } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
+import { logAudit } from '@/services/audit.service'
+import { createNotification } from '@/services/notification.service'
 import {
   createProperty,
   deleteProperty,
@@ -69,6 +71,21 @@ async function getAdminProfile() {
 
 function errorMessage(err: unknown, fallback: string) {
   return err instanceof Error ? err.message : fallback
+}
+
+// Lightweight, JSON-safe snapshot for audit_log.before_data/after_data —
+// not the full Property object (which carries Date instances and joined
+// owner fields that aren't relevant to "what changed").
+function auditSnapshot(property: Property | null) {
+  if (!property) return null
+  return {
+    status: property.status,
+    isFeatured: property.isFeatured,
+    featuredUntil: property.featuredUntil?.toISOString() ?? null,
+    isSold: property.isSold,
+    price: property.price,
+    title: property.title,
+  }
 }
 
 function sanitizePropertyInput(
@@ -270,38 +287,107 @@ export async function adminPropertyAction(
   const admin = await getAdminProfile()
   if (!admin) return { error: 'Forbidden' }
 
+  // Every branch below records an audit_log entry (actor, before/after
+  // snapshot) — the admin panel previously had no audit trail at all.
+  // Transition validity (e.g. approve on an already-approved listing) is
+  // now enforced in the database itself (migration 008); a rejected
+  // transition surfaces here as a thrown error, caught below.
+  const before = await getPropertyById(id).catch(() => null)
+  if (!before) return { error: 'Property not found' }
+
   try {
     switch (input.action) {
-      case 'approve':
+      case 'approve': {
         await updateProperty(id, { status: 'approved' })
+        const after = await getPropertyById(id)
+        await logAudit({
+          actorId: admin.id,
+          entityType: 'listing',
+          entityId: id,
+          action: 'approve',
+          beforeData: auditSnapshot(before),
+          afterData: auditSnapshot(after),
+        })
+        await createNotification({
+          profileId: before.userId,
+          type: 'listing_approved',
+          title: `Your listing "${before.title}" was approved`,
+          linkHref: `/properties/${id}`,
+        })
         revalidatePropertyPaths(id)
         return { success: true, action: 'approved' }
+      }
 
-      case 'reject':
+      case 'reject': {
         await updateProperty(id, { status: 'rejected', isFeatured: false })
+        const after = await getPropertyById(id)
+        await logAudit({
+          actorId: admin.id,
+          entityType: 'listing',
+          entityId: id,
+          action: 'reject',
+          beforeData: auditSnapshot(before),
+          afterData: auditSnapshot(after),
+        })
+        await createNotification({
+          profileId: before.userId,
+          type: 'listing_rejected',
+          title: `Your listing "${before.title}" was not approved`,
+          linkHref: `/dashboard/properties/${id}/edit`,
+        })
         revalidatePropertyPaths(id)
         return { success: true, action: 'rejected' }
+      }
 
-      case 'feature':
+      case 'feature': {
         await featureProperty(id, input.days ?? 30)
+        const after = await getPropertyById(id)
+        await logAudit({
+          actorId: admin.id,
+          entityType: 'listing',
+          entityId: id,
+          action: 'feature',
+          beforeData: auditSnapshot(before),
+          afterData: auditSnapshot(after),
+        })
         revalidatePropertyPaths(id)
         return { success: true, action: 'featured' }
+      }
 
-      case 'unfeature':
+      case 'unfeature': {
         await updateProperty(id, {
           isFeatured: false,
           featuredUntil: undefined,
         })
+        const after = await getPropertyById(id)
+        await logAudit({
+          actorId: admin.id,
+          entityType: 'listing',
+          entityId: id,
+          action: 'unfeature',
+          beforeData: auditSnapshot(before),
+          afterData: auditSnapshot(after),
+        })
         revalidatePropertyPaths(id)
         return { success: true, action: 'unfeatured' }
+      }
 
-      case 'delete':
+      case 'delete': {
         await deleteProperty(id)
+        await logAudit({
+          actorId: admin.id,
+          entityType: 'listing',
+          entityId: id,
+          action: 'delete',
+          beforeData: auditSnapshot(before),
+          afterData: null,
+        })
         revalidatePropertyPaths(id)
         return { success: true, action: 'deleted' }
+      }
     }
   } catch (err) {
     console.error('Admin property action error:', err)
-    return { error: 'Action failed' }
+    return { error: errorMessage(err, 'Action failed') }
   }
 }

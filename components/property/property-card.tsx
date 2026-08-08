@@ -5,14 +5,20 @@ import {
   IconBed,
   IconCircleCheck,
   IconClock,
+  IconEyeOff,
   IconHeart,
   IconMapPin,
   IconPhoto,
+  IconScale,
   IconSquare,
   IconStar,
 } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { hideListingAction } from '@/app/actions/discovery'
+import { useCompare } from '@/hooks/use-compare'
 import { useSaveProperty } from '@/hooks/use-save-property'
 import { cn, formatPrice, getInitials } from '@/lib/utils'
 import type { Property } from '@/types'
@@ -20,18 +26,34 @@ import type { Property } from '@/types'
 interface PropertyCardProps {
   property: Property
   showStatus?: boolean
+  showHide?: boolean
   className?: string
 }
 
 export function PropertyCard({
   property,
   showStatus = false,
+  showHide = false,
   className,
 }: PropertyCardProps) {
+  const router = useRouter()
   const { isSaved, isLoading, toggle } = useSaveProperty(
     property.id,
     property.savedByCurrentUser ?? false
   )
+  const { ids: compareIds, toggle: toggleCompare, isFull } = useCompare()
+  const isComparing = compareIds.includes(property.id)
+  const [isHiding, setIsHiding] = useState(false)
+
+  const hide = async () => {
+    setIsHiding(true)
+    try {
+      await hideListingAction(property.id)
+      router.refresh()
+    } finally {
+      setIsHiding(false)
+    }
+  }
 
   const coverUrl =
     property.coverImage ||
@@ -71,7 +93,7 @@ export function PropertyCard({
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
           {property.isFeatured && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#fa6b05] px-2.5 py-1 text-[10px] font-semibold text-white shadow-[0_2px_8px_rgba(250,107,5,0.35)]">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#a34702] px-2.5 py-1 text-[10px] font-semibold text-white shadow-[0_2px_8px_rgba(250,107,5,0.35)]">
               <IconStar className="h-2.5 w-2.5 fill-current" />
               Featured
             </span>
@@ -100,24 +122,63 @@ export function PropertyCard({
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault()
-            void toggle()
-          }}
-          disabled={isLoading}
-          className={cn(
-            'absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all duration-200',
-            'shadow-[0_2px_8px_rgba(0,0,0,0.4)]',
-            isSaved
-              ? 'bg-[#fa6b05] text-white scale-110'
-              : 'bg-white/80 text-[#8b8178] hover:bg-[#fa6b05] hover:text-white hover:scale-110'
+        <div className="absolute top-3 right-3 flex items-center gap-1.5">
+          {showHide && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                void hide()
+              }}
+              disabled={isHiding}
+              className="p-2 rounded-full backdrop-blur-md transition-all duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.4)] bg-white/80 text-[#5f554d] hover:bg-[#181411] hover:text-white hover:scale-110"
+              aria-label="Hide this listing"
+            >
+              <IconEyeOff className="h-3.5 w-3.5" />
+            </button>
           )}
-          aria-label={isSaved ? 'Remove from saved' : 'Save property'}
-        >
-          <IconHeart className={cn('h-3.5 w-3.5', isSaved && 'fill-current')} />
-        </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              if (!isComparing && isFull) return
+              toggleCompare(property.id)
+            }}
+            disabled={!isComparing && isFull}
+            className={cn(
+              'p-2 rounded-full backdrop-blur-md transition-all duration-200',
+              'shadow-[0_2px_8px_rgba(0,0,0,0.4)] disabled:opacity-40 disabled:cursor-not-allowed',
+              isComparing
+                ? 'bg-[#181411] text-white scale-110'
+                : 'bg-white/80 text-[#5f554d] hover:bg-[#181411] hover:text-white hover:scale-110'
+            )}
+            aria-label={
+              isComparing ? 'Remove from comparison' : 'Add to comparison'
+            }
+          >
+            <IconScale className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              void toggle()
+            }}
+            disabled={isLoading}
+            className={cn(
+              'p-2 rounded-full backdrop-blur-md transition-all duration-200',
+              'shadow-[0_2px_8px_rgba(0,0,0,0.4)]',
+              isSaved
+                ? 'bg-[#a34702] text-white scale-110'
+                : 'bg-white/80 text-[#5f554d] hover:bg-[#a34702] hover:text-white hover:scale-110'
+            )}
+            aria-label={isSaved ? 'Remove from saved' : 'Save property'}
+          >
+            <IconHeart
+              className={cn('h-3.5 w-3.5', isSaved && 'fill-current')}
+            />
+          </button>
+        </div>
 
         <div className="absolute bottom-3 inset-x-3 flex items-end justify-between">
           {property.images.length > 1 && (
@@ -140,28 +201,30 @@ export function PropertyCard({
       </Link>
 
       <div className="flex flex-col flex-1 p-4 pt-3.5">
-        <div className="flex items-center gap-1 text-[#8b8178] mb-1.5">
+        <div className="flex items-center gap-1 text-[#5f554d] mb-1.5">
           <IconMapPin className="h-3 w-3 shrink-0" />
-          <span className="text-xs tracking-wide truncate">{property.city}</span>
+          <span className="text-xs tracking-wide truncate">
+            {property.city}
+          </span>
         </div>
 
         <Link href={`/properties/${property.id}`}>
-          <h3 className="font-display text-[#181411] font-medium text-[1.05rem] leading-snug line-clamp-2 hover:text-[#fa6b05] transition-colors duration-200 mb-2.5">
+          <h3 className="font-display text-[#181411] font-medium text-[1.05rem] leading-snug line-clamp-2 hover:text-[#a34702] transition-colors duration-200 mb-2.5">
             {property.title}
           </h3>
         </Link>
 
         <div className="flex items-baseline gap-1.5 mb-3">
-          <span className="font-mono text-[1.3rem] font-semibold text-[#fa6b05] leading-none">
+          <span className="font-mono text-[1.3rem] font-semibold text-[#a34702] leading-none">
             {formatPrice(property.price)}
           </span>
           {property.listingType === 'rent' && (
-            <span className="text-xs text-[#8b8178]">/mo</span>
+            <span className="text-xs text-[#5f554d]">/mo</span>
           )}
         </div>
 
         {(property.bedrooms || property.bathrooms || property.areaSqM) && (
-          <div className="flex items-center gap-3 text-[#8b8178] text-xs pb-3.5 mb-3 border-b border-[rgba(34,24,18,0.08)]">
+          <div className="flex items-center gap-3 text-[#5f554d] text-xs pb-3.5 mb-3 border-b border-[rgba(34,24,18,0.08)]">
             {property.bedrooms !== undefined && property.bedrooms > 0 && (
               <span className="flex items-center gap-1">
                 <IconBed className="h-3.5 w-3.5" />
@@ -195,12 +258,12 @@ export function PropertyCard({
                   className="object-cover h-full w-full"
                 />
               ) : (
-                <div className="h-full w-full flex items-center justify-center text-[8px] text-[#fa6b05] font-bold">
+                <div className="h-full w-full flex items-center justify-center text-[8px] text-[#a34702] font-bold">
                   {getInitials(property.ownerName)}
                 </div>
               )}
             </div>
-            <span className="text-xs text-[#8b8178] truncate flex-1">
+            <span className="text-xs text-[#5f554d] truncate flex-1">
               {property.ownerName}
             </span>
             {property.ownerPlan && property.ownerPlan !== 'free' && (

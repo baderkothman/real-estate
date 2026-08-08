@@ -38,7 +38,7 @@ export function SectionHeader({
           )}
         >
           <span className="h-px w-6 bg-gradient-to-r from-transparent to-[#fa6b05]/70" />
-          <span className="text-[10px] font-semibold text-[#fa6b05] uppercase tracking-[0.2em]">
+          <span className="text-[10px] font-semibold text-[#a34702] uppercase tracking-[0.2em]">
             {eyebrow}
           </span>
           <span className="h-px w-6 bg-gradient-to-l from-transparent to-[#fa6b05]/70" />
@@ -57,7 +57,7 @@ export function SectionHeader({
       {viewAllHref && !centered && (
         <Link
           href={viewAllHref}
-          className="group flex items-center gap-1.5 text-sm text-[#5f554d] hover:text-[#fa6b05] font-medium transition-all duration-200 shrink-0 px-4 py-2 rounded-lg border border-transparent hover:border-[#fa6b05]/20 hover:bg-[#fef0e6]"
+          className="group flex items-center gap-1.5 text-sm text-[#5f554d] hover:text-[#a34702] font-medium transition-all duration-200 shrink-0 px-4 py-2 rounded-lg border border-transparent hover:border-[#fa6b05]/20 hover:bg-[#fef0e6]"
         >
           {viewAllLabel}
           <IconArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -67,7 +67,7 @@ export function SectionHeader({
       {viewAllHref && centered && (
         <Link
           href={viewAllHref}
-          className="group flex items-center gap-1.5 text-sm text-[#fa6b05] hover:text-[#c85604] font-medium transition-colors mt-2"
+          className="group flex items-center gap-1.5 text-sm text-[#a34702] hover:text-[#c85604] font-medium transition-colors mt-2"
         >
           {viewAllLabel}
           <IconArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />

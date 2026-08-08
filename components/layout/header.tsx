@@ -12,6 +12,7 @@ import {
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { NotificationBell } from '@/components/layout/notification-bell'
 import { useSupabase } from '@/components/providers/supabase-provider'
 import { Button } from '@/components/ui/button'
 import { cn, getInitials } from '@/lib/utils'
@@ -82,7 +83,7 @@ export function Header() {
               </svg>
             </div>
             <div className="flex items-baseline gap-1.5">
-              <span className="font-display text-[1.05rem] font-semibold text-[#fa6b05] tracking-wide">
+              <span className="font-display text-[1.05rem] font-semibold text-[#a34702] tracking-wide">
                 Othman
               </span>
               <span className="hidden sm:block font-display text-[1.05rem] font-light text-[#5f554d] tracking-wide">
@@ -100,7 +101,7 @@ export function Header() {
                 className={cn(
                   'relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                   pathname === link.href
-                    ? 'text-[#fa6b05]'
+                    ? 'text-[#a34702]'
                     : 'text-[#5f554d] hover:text-[#181411] hover:bg-[#faf7eb]'
                 )}
               >
@@ -125,106 +126,111 @@ export function Header() {
 
             {/* Desktop auth controls */}
             {user ? (
-              <div className="relative hidden md:block">
-                <button
-                  type="button"
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2.5 rounded-xl px-3 py-1.5 text-sm text-[#181411] hover:bg-[#faf7eb] transition-all duration-200 border border-transparent hover:border-[rgba(34,24,18,0.12)]"
-                >
-                  <div className="h-7 w-7 rounded-full bg-[#fa6b05] flex items-center justify-center text-white font-bold text-xs overflow-hidden ring-2 ring-[#fa6b05]/20">
-                    {user.profileImage ? (
-                      // biome-ignore lint/performance/noImgElement: user-supplied URL, domain unknown
-                      <img
-                        src={user.profileImage}
-                        alt={user.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      getInitials(user.name)
-                    )}
-                  </div>
-                  <span className="max-w-[100px] truncate font-medium text-[#181411]">
-                    {user.name}
-                  </span>
-                  <IconChevronDown
-                    className={cn(
-                      'h-3.5 w-3.5 text-[#8b8178] transition-transform duration-200',
-                      profileOpen && 'rotate-180'
-                    )}
-                    stroke={2}
-                  />
-                </button>
-
-                {profileOpen && (
-                  <>
-                    <div
-                      role="presentation"
-                      aria-hidden="true"
-                      className="fixed inset-0 z-10"
-                      onClick={() => setProfileOpen(false)}
-                    />
-                    <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-[rgba(34,24,18,0.10)] bg-white/98 backdrop-blur-xl shadow-[0_14px_40px_rgba(24,20,17,0.12)] z-20 overflow-hidden animate-scale-in">
-                      <div className="px-4 py-3.5 border-b border-[rgba(34,24,18,0.08)] bg-[#faf7eb]">
-                        <p className="text-sm font-semibold text-[#181411] truncate">
-                          {user.name}
-                        </p>
-                        <p className="text-xs text-[#8b8178] truncate mt-0.5">
-                          {user.email}
-                        </p>
-                      </div>
-                      <div className="py-1.5">
-                        {user.role === 'admin' && (
-                          <Link
-                            href="/admin"
-                            onClick={() => setProfileOpen(false)}
-                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#fa6b05] hover:bg-[#fef0e6] transition-colors duration-150"
-                          >
-                            <IconShield className="h-4 w-4" stroke={1.75} />
-                            Admin Dashboard
-                          </Link>
-                        )}
-                        <Link
-                          href="/dashboard/profile"
-                          onClick={() => setProfileOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#5f554d] hover:text-[#181411] hover:bg-[#faf7eb] transition-colors duration-150"
-                        >
-                          <IconLayoutDashboard
-                            className="h-4 w-4"
-                            stroke={1.75}
-                          />
-                          My Dashboard
-                        </Link>
-                        <Link
-                          href="/dashboard/properties/create"
-                          onClick={() => setProfileOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#5f554d] hover:text-[#181411] hover:bg-[#faf7eb] transition-colors duration-150"
-                        >
-                          <IconCirclePlus className="h-4 w-4" stroke={1.75} />
-                          Create Listing
-                        </Link>
-                        <Link
-                          href="/dashboard/profile/edit"
-                          onClick={() => setProfileOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#5f554d] hover:text-[#181411] hover:bg-[#faf7eb] transition-colors duration-150"
-                        >
-                          <IconSettings className="h-4 w-4" stroke={1.75} />
-                          Settings
-                        </Link>
-                      </div>
-                      <div className="border-t border-[rgba(34,24,18,0.08)] py-1.5">
-                        <button
-                          type="button"
-                          onClick={() => void handleSignOut()}
-                          className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
-                        >
-                          <IconLogout className="h-4 w-4" stroke={1.75} />
-                          Sign Out
-                        </button>
-                      </div>
+              <>
+                <div className="hidden md:block">
+                  <NotificationBell />
+                </div>
+                <div className="relative hidden md:block">
+                  <button
+                    type="button"
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    className="flex items-center gap-2.5 rounded-xl px-3 py-1.5 text-sm text-[#181411] hover:bg-[#faf7eb] transition-all duration-200 border border-transparent hover:border-[rgba(34,24,18,0.12)]"
+                  >
+                    <div className="h-7 w-7 rounded-full bg-[#a34702] flex items-center justify-center text-white font-bold text-xs overflow-hidden ring-2 ring-[#fa6b05]/20">
+                      {user.profileImage ? (
+                        // biome-ignore lint/performance/noImgElement: user-supplied URL, domain unknown
+                        <img
+                          src={user.profileImage}
+                          alt={user.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        getInitials(user.name)
+                      )}
                     </div>
-                  </>
-                )}
-              </div>
+                    <span className="max-w-[100px] truncate font-medium text-[#181411]">
+                      {user.name}
+                    </span>
+                    <IconChevronDown
+                      className={cn(
+                        'h-3.5 w-3.5 text-[#5f554d] transition-transform duration-200',
+                        profileOpen && 'rotate-180'
+                      )}
+                      stroke={2}
+                    />
+                  </button>
+
+                  {profileOpen && (
+                    <>
+                      <div
+                        role="presentation"
+                        aria-hidden="true"
+                        className="fixed inset-0 z-10"
+                        onClick={() => setProfileOpen(false)}
+                      />
+                      <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-[rgba(34,24,18,0.10)] bg-white/98 backdrop-blur-xl shadow-[0_14px_40px_rgba(24,20,17,0.12)] z-20 overflow-hidden animate-scale-in">
+                        <div className="px-4 py-3.5 border-b border-[rgba(34,24,18,0.08)] bg-[#faf7eb]">
+                          <p className="text-sm font-semibold text-[#181411] truncate">
+                            {user.name}
+                          </p>
+                          <p className="text-xs text-[#5f554d] truncate mt-0.5">
+                            {user.email}
+                          </p>
+                        </div>
+                        <div className="py-1.5">
+                          {user.role === 'admin' && (
+                            <Link
+                              href="/admin"
+                              onClick={() => setProfileOpen(false)}
+                              className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#a34702] hover:bg-[#fef0e6] transition-colors duration-150"
+                            >
+                              <IconShield className="h-4 w-4" stroke={1.75} />
+                              Admin Dashboard
+                            </Link>
+                          )}
+                          <Link
+                            href="/dashboard/profile"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#5f554d] hover:text-[#181411] hover:bg-[#faf7eb] transition-colors duration-150"
+                          >
+                            <IconLayoutDashboard
+                              className="h-4 w-4"
+                              stroke={1.75}
+                            />
+                            My Dashboard
+                          </Link>
+                          <Link
+                            href="/dashboard/properties/create"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#5f554d] hover:text-[#181411] hover:bg-[#faf7eb] transition-colors duration-150"
+                          >
+                            <IconCirclePlus className="h-4 w-4" stroke={1.75} />
+                            Create Listing
+                          </Link>
+                          <Link
+                            href="/dashboard/profile/edit"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#5f554d] hover:text-[#181411] hover:bg-[#faf7eb] transition-colors duration-150"
+                          >
+                            <IconSettings className="h-4 w-4" stroke={1.75} />
+                            Settings
+                          </Link>
+                        </div>
+                        <div className="border-t border-[rgba(34,24,18,0.08)] py-1.5">
+                          <button
+                            type="button"
+                            onClick={() => void handleSignOut()}
+                            className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
+                          >
+                            <IconLogout className="h-4 w-4" stroke={1.75} />
+                            Sign Out
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </>
             ) : (
               <div className="hidden md:flex items-center gap-2">
                 <Button variant="ghost" size="sm" asChild>

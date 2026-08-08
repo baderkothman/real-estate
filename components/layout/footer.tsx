@@ -62,7 +62,7 @@ export function Footer() {
                 </svg>
               </div>
               <div>
-                <span className="font-display text-2xl font-semibold text-[#fa6b05] tracking-wide">
+                <span className="font-display text-2xl font-semibold text-[#a34702] tracking-wide">
                   Othman
                 </span>
                 <span className="font-display text-2xl font-light text-[#5f554d] tracking-wide ml-2">
@@ -71,7 +71,7 @@ export function Footer() {
               </div>
             </div>
 
-            <p className="text-[#8b8178] text-sm leading-relaxed max-w-sm">
+            <p className="text-[#5f554d] text-sm leading-relaxed max-w-sm">
               Lebanon&apos;s premier real estate marketplace. Connecting buyers,
               sellers, and renters with exceptional properties - from the cedar
               mountains to the Mediterranean coast.
@@ -86,9 +86,9 @@ export function Footer() {
               ].map(({ Icon, text }) => (
                 <div
                   key={text}
-                  className="flex items-center gap-2.5 text-xs text-[#8b8178]"
+                  className="flex items-center gap-2.5 text-xs text-[#5f554d]"
                 >
-                  <Icon className="h-3.5 w-3.5 text-[#fa6b05]/50 shrink-0" />
+                  <Icon className="h-3.5 w-3.5 text-[#a34702]/50 shrink-0" />
                   <span>{text}</span>
                 </div>
               ))}
@@ -124,7 +124,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="p-2.5 rounded-xl bg-white border border-[rgba(34,24,18,0.10)] text-[#8b8178] hover:text-[#fa6b05] hover:border-[#fa6b05]/25 hover:bg-[#fef0e6] transition-all duration-200"
+                  className="p-2.5 rounded-xl bg-white border border-[rgba(34,24,18,0.10)] text-[#5f554d] hover:text-[#a34702] hover:border-[#fa6b05]/25 hover:bg-[#fef0e6] transition-all duration-200"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -148,7 +148,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="group flex items-center gap-2 text-sm text-[#8b8178] hover:text-[#fa6b05] transition-colors duration-200"
+                    className="group flex items-center gap-2 text-sm text-[#5f554d] hover:text-[#a34702] transition-colors duration-200"
                   >
                     <span className="h-px w-0 bg-[#fa6b05]/50 transition-all duration-300 group-hover:w-3 shrink-0" />
                     {link.label}
@@ -177,7 +177,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="group flex items-center gap-2 text-sm text-[#8b8178] hover:text-[#fa6b05] transition-colors duration-200"
+                    className="group flex items-center gap-2 text-sm text-[#5f554d] hover:text-[#a34702] transition-colors duration-200"
                   >
                     <span className="h-px w-0 bg-[#fa6b05]/50 transition-all duration-300 group-hover:w-3 shrink-0" />
                     {link.label}
@@ -190,21 +190,21 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-14 pt-8 border-t border-[rgba(34,24,18,0.08)] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-[#8b8178]">
+          <p className="text-xs text-[#5f554d]">
             &copy; {new Date().getFullYear()} Othman Real Estate. All rights
             reserved.
           </p>
           <div className="flex items-center gap-5">
             <Link
               href="/privacy"
-              className="text-xs text-[#8b8178] hover:text-[#5f554d] transition-colors duration-200"
+              className="text-xs text-[#5f554d] hover:text-[#a34702] transition-colors duration-200"
             >
               Privacy Policy
             </Link>
             <span className="text-[rgba(34,24,18,0.20)] text-xs">&middot;</span>
             <Link
               href="/terms"
-              className="text-xs text-[#8b8178] hover:text-[#5f554d] transition-colors duration-200"
+              className="text-xs text-[#5f554d] hover:text-[#a34702] transition-colors duration-200"
             >
               Terms of Service
             </Link>
@@ -214,5 +214,3 @@ export function Footer() {
     </footer>
   )
 }
-
-

@@ -3,7 +3,8 @@ import { LoginPage } from '@/components/auth/login-page'
 
 export const metadata: Metadata = {
   title: 'Sign In',
-  description: 'Sign in to manage listings, saved properties, and your account.',
+  description:
+    'Sign in to manage listings, saved properties, and your account.',
 }
 
 interface LoginRouteProps {

@@ -36,7 +36,7 @@ export default async function AdminDashboardPage() {
       label: 'Total Properties',
       value: summary.totalProperties,
       icon: IconBuilding,
-      color: 'text-[#fa6b05]',
+      color: 'text-[#a34702]',
     },
     {
       label: 'Pending Review',
@@ -48,7 +48,7 @@ export default async function AdminDashboardPage() {
       label: 'Featured',
       value: summary.featuredProperties,
       icon: IconStar,
-      color: 'text-[#fa6b05]',
+      color: 'text-[#a34702]',
     },
     {
       label: 'Approved',
@@ -81,7 +81,7 @@ export default async function AdminDashboardPage() {
             <div className="font-display text-2xl font-bold text-[#181411]">
               {value}
             </div>
-            <div className="text-[10px] text-[#8b8178] mt-0.5">{label}</div>
+            <div className="text-[10px] text-[#5f554d] mt-0.5">{label}</div>
           </div>
         ))}
       </div>
@@ -99,7 +99,7 @@ export default async function AdminDashboardPage() {
           </div>
 
           {pendingResult.data.length === 0 ? (
-            <div className="p-8 text-center text-[#8b8178] text-sm">
+            <div className="p-8 text-center text-[#5f554d] text-sm">
               No pending properties
             </div>
           ) : (
@@ -131,14 +131,14 @@ export default async function AdminDashboardPage() {
                       sizes="32px"
                     />
                   ) : (
-                    <div className="h-full w-full flex items-center justify-center text-[#fa6b05] text-xs font-bold">
+                    <div className="h-full w-full flex items-center justify-center text-[#a34702] text-xs font-bold">
                       {user.name[0]}
                     </div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-[#181411] truncate">{user.name}</p>
-                  <p className="text-xs text-[#8b8178] truncate">
+                  <p className="text-xs text-[#5f554d] truncate">
                     {user.email}
                   </p>
                 </div>
@@ -150,7 +150,7 @@ export default async function AdminDashboardPage() {
                     user.plan === 'pro' &&
                       'bg-[#fef0e6] border-[#fa6b05]/25 text-[#964003]',
                     user.plan === 'free' &&
-                      'bg-[#faf7eb] border-[rgba(34,24,18,0.12)] text-[#8b8178]'
+                      'bg-[#faf7eb] border-[rgba(34,24,18,0.12)] text-[#5f554d]'
                   )}
                 >
                   {user.plan}

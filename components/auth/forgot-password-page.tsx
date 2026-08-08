@@ -60,7 +60,7 @@ export function ForgotPasswordPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <Link href="/">
-            <span className="font-display text-3xl font-semibold text-[#fa6b05] tracking-wide">
+            <span className="font-display text-3xl font-semibold text-[#a34702] tracking-wide">
               Othman
             </span>
             <span className="font-display text-3xl font-light text-[#5f554d] tracking-wide ml-2">
@@ -124,11 +124,11 @@ export function ForgotPasswordPage() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-[#8b8178] mt-6">
+          <p className="text-center text-sm text-[#5f554d] mt-6">
             Remembered your password?{' '}
             <Link
               href="/auth/login"
-              className="text-[#fa6b05] hover:text-[#c85604] transition-colors font-medium"
+              className="text-[#a34702] hover:text-[#c85604] transition-colors font-medium"
             >
               Back to sign in
             </Link>

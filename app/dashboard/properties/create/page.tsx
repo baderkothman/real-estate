@@ -153,12 +153,15 @@ export default function CreatePropertyPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>City *</Label>
+              <Label htmlFor="create-city">City *</Label>
               <Select
                 value={form.city}
                 onValueChange={(v) => setField('city', v)}
               >
-                <SelectTrigger className={errors.city ? 'border-red-400' : ''}>
+                <SelectTrigger
+                  id="create-city"
+                  className={errors.city ? 'border-red-400' : ''}
+                >
                   <SelectValue placeholder="Select city" />
                 </SelectTrigger>
                 <SelectContent>
@@ -175,14 +178,14 @@ export default function CreatePropertyPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label>Listing Type *</Label>
+              <Label htmlFor="create-listing-type">Listing Type *</Label>
               <Select
                 value={form.listingType}
                 onValueChange={(v: 'sale' | 'rent') =>
                   setField('listingType', v)
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger id="create-listing-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -275,7 +278,7 @@ export default function CreatePropertyPage() {
               placeholder="Describe the property in detail - location, features, nearby amenities..."
               value={form.description}
               onChange={(e) => setField('description', e.target.value)}
-              className={`flex w-full rounded-lg border bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-[#8b8178] focus:outline-none focus:ring-2 transition-colors resize-none ${
+              className={`flex w-full rounded-lg border bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-[#5f554d] focus:outline-none focus:ring-2 transition-colors resize-none ${
                 errors.description
                   ? 'border-red-400 focus:ring-red-400/30 focus:border-red-400'
                   : 'border-[rgba(34,24,18,0.14)] focus:ring-[#fa6b05]/30 focus:border-[#fa6b05]'
@@ -293,7 +296,7 @@ export default function CreatePropertyPage() {
             <h3 className="font-display text-lg font-semibold text-[#181411]">
               Photos
             </h3>
-            <span className="text-xs text-[#8b8178]">
+            <span className="text-xs text-[#5f554d]">
               {imageUrls.filter((u) => u.trim()).length} / {planLimit.maxImages}{' '}
               max
             </span>
@@ -319,6 +322,7 @@ export default function CreatePropertyPage() {
                     size="icon-sm"
                     onClick={() => removeImageField(idx)}
                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    aria-label={`Remove image ${idx + 1}`}
                   >
                     <IconX className="h-4 w-4" />
                   </Button>

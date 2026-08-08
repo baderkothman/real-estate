@@ -14,6 +14,8 @@ interface ProfileRow {
   role: 'user' | 'admin'
   is_banned: boolean
   created_at: string
+  stripe_customer_id?: string | null
+  stripe_subscription_id?: string | null
 }
 
 // ─── Mapper ───────────────────────────────────────────────────────────────────
@@ -164,6 +166,45 @@ export async function banUser(id: string, banned: boolean): Promise<boolean> {
 export async function changeUserPlan(id: string, plan: Plan): Promise<boolean> {
   const admin = createAdminClient()
   const { error } = await admin.from('profiles').update({ plan }).eq('id', id)
+  return !error
+}
+
+export async function getUserByStripeCustomerId(
+  customerId: string
+): Promise<User | null> {
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('profiles')
+    .select('*')
+    .eq('stripe_customer_id', customerId)
+    .maybeSingle()
+  if (error || !data) return null
+  return dbRowToUser(data as ProfileRow)
+}
+
+/**
+ * Applies a Stripe subscription lifecycle event to a profile. Called only
+ * from the Stripe webhook handler (app/api/webhooks/stripe/route.ts) — this
+ * is the single place `profiles.plan` is derived from billing state, closing
+ * the loop where a successful checkout previously never persisted anything.
+ */
+export async function syncBillingFromStripe(
+  id: string,
+  data: {
+    plan: Plan
+    stripeCustomerId?: string
+    stripeSubscriptionId?: string | null
+  }
+): Promise<boolean> {
+  const admin = createAdminClient()
+  const dbUpdate: Record<string, unknown> = { plan: data.plan }
+  if (data.stripeCustomerId !== undefined) {
+    dbUpdate.stripe_customer_id = data.stripeCustomerId
+  }
+  if (data.stripeSubscriptionId !== undefined) {
+    dbUpdate.stripe_subscription_id = data.stripeSubscriptionId
+  }
+  const { error } = await admin.from('profiles').update(dbUpdate).eq('id', id)
   return !error
 }
 

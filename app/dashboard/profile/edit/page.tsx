@@ -151,7 +151,7 @@ export default function EditProfilePage() {
                   sizes="64px"
                 />
               ) : (
-                <div className="h-full w-full bg-[#fef0e6] flex items-center justify-center text-[#fa6b05] font-bold font-display text-xl">
+                <div className="h-full w-full bg-[#fef0e6] flex items-center justify-center text-[#a34702] font-bold font-display text-xl">
                   {getInitials(profile.name || 'U')}
                 </div>
               )}
@@ -213,7 +213,7 @@ export default function EditProfilePage() {
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, bio: e.target.value }))
                 }
-                className="flex w-full rounded-lg border border-[rgba(34,24,18,0.14)] bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-[#8b8178] focus:outline-none focus:ring-2 focus:ring-[#fa6b05]/30 focus:border-[#fa6b05] transition-colors resize-none"
+                className="flex w-full rounded-lg border border-[rgba(34,24,18,0.14)] bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-[#5f554d] focus:outline-none focus:ring-2 focus:ring-[#fa6b05]/30 focus:border-[#fa6b05] transition-colors resize-none"
               />
             </div>
           </div>
@@ -254,7 +254,7 @@ export default function EditProfilePage() {
                 <button
                   type="button"
                   onClick={() => setShowNewPw(!showNewPw)}
-                  className="absolute right-3 top-3 text-[#8b8178] hover:text-[#5f554d]"
+                  className="absolute right-3 top-3 text-[#5f554d] hover:text-[#5f554d]"
                 >
                   {showNewPw ? (
                     <IconEyeOff className="h-4 w-4" />

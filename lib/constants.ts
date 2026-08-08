@@ -1,4 +1,4 @@
-import type { Plan, PlanLimits, PlanPricing } from '@/types'
+import type { PartyRoleType, Plan, PlanLimits, PlanPricing } from '@/types'
 
 export const APP_NAME = 'Othman Real Estate'
 export const APP_DESCRIPTION =
@@ -56,6 +56,16 @@ export const CITIES_LEBANON = [
   'Akkar',
   'Hermel',
 ] as const
+
+export const PARTY_ROLE_LABELS: Record<PartyRoleType, string> = {
+  buyer: 'Buyer',
+  seller: 'Seller',
+  landlord: 'Landlord',
+  tenant: 'Tenant',
+  listing_agent: 'Listing Agent',
+  buyer_agent: "Buyer's Agent",
+  other: 'Other',
+}
 
 export const PLAN_FEATURES: Record<Plan, string[]> = {
   free: [

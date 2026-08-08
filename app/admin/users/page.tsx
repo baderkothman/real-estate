@@ -97,7 +97,7 @@ export default function AdminUsersPage() {
             setSearch(e.target.value)
             setPage(1)
           }}
-          className="flex-1 min-w-[200px] h-10 px-3 rounded-lg bg-white border border-[rgba(34,24,18,0.14)] text-[#181411] placeholder:text-[#8b8178] text-sm focus:outline-none focus:ring-2 focus:ring-[#fa6b05]/30 focus:border-[#fa6b05] transition-colors"
+          className="flex-1 min-w-[200px] h-10 px-3 rounded-lg bg-white border border-[rgba(34,24,18,0.14)] text-[#181411] placeholder:text-[#5f554d] text-sm focus:outline-none focus:ring-2 focus:ring-[#fa6b05]/30 focus:border-[#fa6b05] transition-colors"
         />
         <Select
           value={planFilter}
@@ -106,7 +106,7 @@ export default function AdminUsersPage() {
             setPage(1)
           }}
         >
-          <SelectTrigger className="w-36">
+          <SelectTrigger className="w-36" aria-label="Filter by plan">
             <SelectValue placeholder="All Plans" />
           </SelectTrigger>
           <SelectContent>
@@ -117,7 +117,7 @@ export default function AdminUsersPage() {
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-36">
+          <SelectTrigger className="w-36" aria-label="Filter by status">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
@@ -143,7 +143,7 @@ export default function AdminUsersPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(34,24,18,0.08)] bg-[#faf7eb] text-xs text-[#8b8178]">
+                  <tr className="border-b border-[rgba(34,24,18,0.08)] bg-[#faf7eb] text-xs text-[#5f554d]">
                     <th className="text-left p-4 font-normal">User</th>
                     <th className="text-left p-4 font-normal hidden sm:table-cell">
                       Plan
@@ -178,7 +178,7 @@ export default function AdminUsersPage() {
                                 sizes="32px"
                               />
                             ) : (
-                              <div className="h-full w-full flex items-center justify-center text-[#fa6b05] text-xs font-bold">
+                              <div className="h-full w-full flex items-center justify-center text-[#a34702] text-xs font-bold">
                                 {user.name[0]}
                               </div>
                             )}
@@ -187,7 +187,7 @@ export default function AdminUsersPage() {
                             <p className="text-[#181411] text-sm">
                               {user.name}
                             </p>
-                            <p className="text-[#8b8178] text-xs truncate max-w-[160px]">
+                            <p className="text-[#5f554d] text-xs truncate max-w-[160px]">
                               {user.email}
                             </p>
                           </div>
@@ -202,7 +202,7 @@ export default function AdminUsersPage() {
                             user.plan === 'pro' &&
                               'bg-[#fef0e6] border-[#fa6b05]/25 text-[#964003]',
                             user.plan === 'free' &&
-                              'bg-[#faf7eb] border-[rgba(34,24,18,0.12)] text-[#8b8178]'
+                              'bg-[#faf7eb] border-[rgba(34,24,18,0.12)] text-[#5f554d]'
                           )}
                         >
                           {user.plan}
@@ -214,14 +214,14 @@ export default function AdminUsersPage() {
                             'text-xs',
                             user.role === 'admin'
                               ? 'text-violet-600'
-                              : 'text-[#8b8178]'
+                              : 'text-[#5f554d]'
                           )}
                         >
                           {user.role}
                         </span>
                       </td>
                       <td className="p-4 hidden lg:table-cell">
-                        <span className="text-xs text-[#8b8178]">
+                        <span className="text-xs text-[#5f554d]">
                           {formatDate(user.createdAt)}
                         </span>
                       </td>
@@ -247,7 +247,10 @@ export default function AdminUsersPage() {
                               })
                             }
                           >
-                            <SelectTrigger className="h-7 w-24 text-xs">
+                            <SelectTrigger
+                              className="h-7 w-24 text-xs"
+                              aria-label={`Change plan for ${user.name}`}
+                            >
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -278,6 +281,11 @@ export default function AdminUsersPage() {
                                   : 'bg-red-50 text-red-600 hover:bg-red-100'
                               )}
                               title={user.isBanned ? 'Unban user' : 'Ban user'}
+                              aria-label={
+                                user.isBanned
+                                  ? `Unban ${user.name}`
+                                  : `Ban ${user.name}`
+                              }
                             >
                               {user.isBanned ? (
                                 <IconCircleCheck className="h-3.5 w-3.5" />
@@ -302,10 +310,11 @@ export default function AdminUsersPage() {
                 size="sm"
                 onClick={() => setPage((p) => p - 1)}
                 disabled={page <= 1}
+                aria-label="Previous page"
               >
                 <IconChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm text-[#8b8178]">
+              <span className="text-sm text-[#5f554d]">
                 Page {page} of {result.totalPages}
               </span>
               <Button
@@ -313,6 +322,7 @@ export default function AdminUsersPage() {
                 size="sm"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= result.totalPages}
+                aria-label="Next page"
               >
                 <IconChevronRight className="h-4 w-4" />
               </Button>

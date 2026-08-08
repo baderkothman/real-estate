@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { logAudit } from '@/services/audit.service'
 import {
   banUser,
   changeUserPlan,
@@ -140,29 +141,76 @@ export async function getAdminUsersAction(input: {
   }
 }
 
+function auditSnapshot(user: User | null) {
+  if (!user) return null
+  return {
+    email: user.email,
+    plan: user.plan,
+    isBanned: user.isBanned,
+  }
+}
+
 export async function adminUserAction(id: string, input: AdminUserActionInput) {
   const admin = await getAdminProfile()
   if (!admin) return { error: 'Forbidden' }
 
+  // Every branch logs an audit_log entry with a before/after snapshot —
+  // this was the one admin-action surface (ban/unban/plan changes) that
+  // never wrote to audit_log, unlike the property moderation actions in
+  // app/actions/properties.ts. Fixed as part of Milestone 11's audit-log
+  // viewer, since a searchable log that's silently missing a whole class
+  // of admin action would be misleading.
+  const before = await getUserById(id).catch(() => null)
+  if (!before) return { error: 'User not found' }
+
   try {
     switch (input.action) {
-      case 'ban':
+      case 'ban': {
         await banUser(id, true)
+        const after = await getUserById(id)
+        await logAudit({
+          actorId: admin.id,
+          entityType: 'user',
+          entityId: id,
+          action: 'ban',
+          beforeData: auditSnapshot(before),
+          afterData: auditSnapshot(after),
+        })
         revalidatePath('/admin/users')
         revalidatePath(`/users/${id}`)
         return { success: true, action: 'banned' }
+      }
 
-      case 'unban':
+      case 'unban': {
         await banUser(id, false)
+        const after = await getUserById(id)
+        await logAudit({
+          actorId: admin.id,
+          entityType: 'user',
+          entityId: id,
+          action: 'unban',
+          beforeData: auditSnapshot(before),
+          afterData: auditSnapshot(after),
+        })
         revalidatePath('/admin/users')
         revalidatePath(`/users/${id}`)
         return { success: true, action: 'unbanned' }
+      }
 
-      case 'change_plan':
+      case 'change_plan': {
         if (!input.plan || !VALID_PLANS.includes(input.plan)) {
           return { error: 'Plan is required' }
         }
         await changeUserPlan(id, input.plan)
+        const after = await getUserById(id)
+        await logAudit({
+          actorId: admin.id,
+          entityType: 'user',
+          entityId: id,
+          action: 'change_plan',
+          beforeData: auditSnapshot(before),
+          afterData: auditSnapshot(after),
+        })
         revalidatePath('/admin/users')
         revalidatePath(`/users/${id}`)
         revalidatePath('/dashboard/profile')
@@ -171,6 +219,7 @@ export async function adminUserAction(id: string, input: AdminUserActionInput) {
           action: 'plan_changed',
           plan: input.plan,
         }
+      }
     }
   } catch {
     return { error: 'Action failed' }

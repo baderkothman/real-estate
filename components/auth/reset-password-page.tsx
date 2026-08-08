@@ -7,8 +7,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { createClient } from '@/lib/supabase/client'
 import { getPasswordPolicyErrorMessage } from '@/lib/supabase/auth-errors'
+import { createClient } from '@/lib/supabase/client'
 
 export function ResetPasswordPage() {
   const router = useRouter()
@@ -95,7 +95,7 @@ export function ResetPasswordPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <Link href="/">
-            <span className="font-display text-3xl font-semibold text-[#fa6b05] tracking-wide">
+            <span className="font-display text-3xl font-semibold text-[#a34702] tracking-wide">
               Othman
             </span>
             <span className="font-display text-3xl font-light text-[#5f554d] tracking-wide ml-2">
@@ -112,7 +112,7 @@ export function ResetPasswordPage() {
 
         <div className="rounded-[20px] border border-[rgba(34,24,18,0.08)] bg-white shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-8">
           {checkingSession ? (
-            <div className="flex items-center justify-center py-6 text-sm text-[#8b8178]">
+            <div className="flex items-center justify-center py-6 text-sm text-[#5f554d]">
               Checking reset session...
             </div>
           ) : !hasSession ? (
@@ -128,7 +128,10 @@ export function ResetPasswordPage() {
                 </div>
               )}
 
-              <form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
+              <form
+                onSubmit={(e) => void handleSubmit(e)}
+                className="space-y-5"
+              >
                 <div className="space-y-1.5">
                   <Label htmlFor="password">New Password</Label>
                   <Input
@@ -177,11 +180,11 @@ export function ResetPasswordPage() {
             </>
           )}
 
-          <p className="text-center text-sm text-[#8b8178] mt-6">
+          <p className="text-center text-sm text-[#5f554d] mt-6">
             Need to sign in instead?{' '}
             <Link
               href="/auth/login"
-              className="text-[#fa6b05] hover:text-[#c85604] transition-colors font-medium"
+              className="text-[#a34702] hover:text-[#c85604] transition-colors font-medium"
             >
               Back to sign in
             </Link>

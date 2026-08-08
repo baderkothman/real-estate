@@ -9,15 +9,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-[#fa6b05] text-white font-semibold hover:bg-[#c85604] active:bg-[#964003] shadow-[0_2px_12px_rgba(250,107,5,0.20)] hover:shadow-[0_4px_20px_rgba(250,107,5,0.30)]',
+          'bg-[#a34702] text-white font-semibold hover:bg-[#8a3c02] active:bg-[#702f01] shadow-[0_2px_12px_rgba(250,107,5,0.20)] hover:shadow-[0_4px_20px_rgba(250,107,5,0.30)]',
         secondary:
           'bg-white text-[#181411] border border-[rgba(34,24,18,0.12)] hover:bg-[#faf7eb] hover:border-[rgba(34,24,18,0.20)]',
         outline:
-          'border border-[#fa6b05]/30 text-[#fa6b05] bg-transparent hover:bg-[#fef0e6] hover:border-[#fa6b05]/60',
+          'border border-[#fa6b05]/30 text-[#a34702] bg-transparent hover:bg-[#fef0e6] hover:border-[#fa6b05]/60',
         ghost:
           'text-[#5f554d] bg-transparent hover:bg-[#faf7eb] hover:text-[#181411]',
         destructive: 'bg-red-600 text-white hover:bg-red-700 shadow-sm',
-        link: 'text-[#fa6b05] underline-offset-4 hover:underline bg-transparent p-0 h-auto',
+        link: 'text-[#a34702] underline-offset-4 hover:underline bg-transparent p-0 h-auto',
       },
       size: {
         sm: 'h-8 px-3 text-xs rounded-lg',

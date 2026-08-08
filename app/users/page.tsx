@@ -54,7 +54,7 @@ async function UsersList({ searchParams }: { searchParams: SearchParams }) {
 
   return (
     <div>
-      <p className="text-sm text-[#8b8178] mb-6">
+      <p className="text-sm text-[#5f554d] mb-6">
         <span className="text-[#181411] font-medium">{result.total}</span> agent
         {result.total !== 1 ? 's' : ''} found
       </p>
@@ -99,7 +99,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
               name="search"
               defaultValue={resolvedParams.search ?? ''}
               placeholder="Search by name or email..."
-              className="flex-1 h-10 px-3 rounded-lg bg-white border border-[rgba(34,24,18,0.14)] text-[#181411] placeholder:text-[#8b8178] text-sm focus:outline-none focus:ring-2 focus:ring-[#fa6b05]/30 focus:border-[#fa6b05] transition-colors"
+              className="flex-1 h-10 px-3 rounded-lg bg-white border border-[rgba(34,24,18,0.14)] text-[#181411] placeholder:text-[#5f554d] text-sm focus:outline-none focus:ring-2 focus:ring-[#fa6b05]/30 focus:border-[#fa6b05] transition-colors"
             />
             <select
               name="plan"
@@ -113,7 +113,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
             </select>
             <button
               type="submit"
-              className="h-10 px-4 rounded-lg bg-[#fa6b05] text-white text-sm font-semibold hover:bg-[#c85604] transition-colors shadow-[0_2px_8px_rgba(250,107,5,0.20)]"
+              className="h-10 px-4 rounded-lg bg-[#a34702] text-white text-sm font-semibold hover:bg-[#c85604] transition-colors shadow-[0_2px_8px_rgba(250,107,5,0.20)]"
             >
               Search
             </button>

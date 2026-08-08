@@ -3,9 +3,12 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { EmptyState } from '@/components/common/empty-state'
 import { Pagination } from '@/components/common/pagination'
+import { ActiveFilterChips } from '@/components/property/active-filter-chips'
 import { PropertyCard } from '@/components/property/property-card'
 import { PropertyFilters } from '@/components/property/property-filters'
+import { SaveSearchButton } from '@/components/property/save-search-button'
 import { ITEMS_PER_PAGE } from '@/lib/constants'
+import { createClient } from '@/lib/supabase/server'
 import { getProperties } from '@/services/property.service'
 import type { PropertyFilters as Filters, ListingType } from '@/types'
 
@@ -16,10 +19,13 @@ export const metadata: Metadata = {
 }
 
 interface SearchParams {
+  search?: string
   city?: string
   listingType?: string
   minPrice?: string
   maxPrice?: string
+  minBeds?: string
+  minBaths?: string
   page?: string
 }
 
@@ -54,26 +60,39 @@ async function PropertiesList({
   const page = parseInt(searchParams.page ?? '1', 10)
 
   const filters: Filters = {
+    search: searchParams.search,
     city: searchParams.city,
     listingType: (searchParams.listingType as ListingType) || undefined,
     minPrice: searchParams.minPrice ? Number(searchParams.minPrice) : undefined,
     maxPrice: searchParams.maxPrice ? Number(searchParams.maxPrice) : undefined,
+    minBeds: searchParams.minBeds ? Number(searchParams.minBeds) : undefined,
+    minBaths: searchParams.minBaths ? Number(searchParams.minBaths) : undefined,
   }
 
-  const result = await getProperties(filters, page, ITEMS_PER_PAGE)
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const result = await getProperties(filters, page, ITEMS_PER_PAGE, user?.id)
   const hasActiveFilters = Object.values(filters).some(Boolean)
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-[#8b8178]">
+      <div className="flex items-center justify-between mb-4 gap-3">
+        <p className="text-sm text-[#5f554d]">
           <span className="text-[#181411] font-semibold">
             {result.total.toLocaleString()}
           </span>{' '}
           {result.total !== 1 ? 'properties' : 'property'}
-          {hasActiveFilters && <span className="text-[#fa6b05]"> found</span>}
+          {hasActiveFilters && <span className="text-[#a34702]"> found</span>}
         </p>
+        {hasActiveFilters && user && <SaveSearchButton filters={filters} />}
       </div>
+
+      <Suspense fallback={null}>
+        <ActiveFilterChips />
+      </Suspense>
 
       {result.data.length === 0 ? (
         <EmptyState
@@ -91,7 +110,11 @@ async function PropertiesList({
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
             {result.data.map((property) => (
-              <PropertyCard key={property.id} property={property} />
+              <PropertyCard
+                key={property.id}
+                property={property}
+                showHide={!!user}
+              />
             ))}
           </div>
 
@@ -119,7 +142,7 @@ export default async function PropertiesPage({
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14">
           <div className="flex items-center gap-2 mb-3">
             <span className="h-px w-6 bg-[#fa6b05]/60" />
-            <span className="text-[10px] font-semibold text-[#fa6b05] uppercase tracking-[0.2em]">
+            <span className="text-[10px] font-semibold text-[#a34702] uppercase tracking-[0.2em]">
               Lebanon
             </span>
           </div>

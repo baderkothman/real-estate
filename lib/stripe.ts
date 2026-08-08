@@ -32,3 +32,16 @@ export const PLAN_PRICE_IDS: Record<string, string> = {
 export function getPriceId(plan: string, billing: string): string | undefined {
   return PLAN_PRICE_IDS[`${plan}_${billing}`]
 }
+
+/**
+ * Reverse-lookup: given a Stripe price id, return the plan it maps to.
+ * Used by the webhook handler to sync `profiles.plan` from subscription
+ * events where only the price id is available (not our own plan/billing
+ * strings).
+ */
+export function getPlanFromPriceId(priceId: string): 'pro' | 'agency' | null {
+  const entry = Object.entries(PLAN_PRICE_IDS).find(([, id]) => id === priceId)
+  if (!entry) return null
+  const [key] = entry
+  return key.startsWith('pro_') ? 'pro' : 'agency'
+}

@@ -51,7 +51,7 @@ export default async function UserPage({ params }: UserPageProps) {
                   sizes="80px"
                 />
               ) : (
-                <div className="h-full w-full bg-[#fef0e6] flex items-center justify-center text-[#fa6b05] font-bold font-display text-2xl">
+                <div className="h-full w-full bg-[#fef0e6] flex items-center justify-center text-[#a34702] font-bold font-display text-2xl">
                   {getInitials(user.name)}
                 </div>
               )}
@@ -76,7 +76,7 @@ export default async function UserPage({ params }: UserPageProps) {
                 </p>
               )}
 
-              <div className="flex flex-wrap gap-4 text-sm text-[#8b8178]">
+              <div className="flex flex-wrap gap-4 text-sm text-[#5f554d]">
                 <span className="flex items-center gap-1.5">
                   <IconMail className="h-4 w-4" />
                   {user.email}

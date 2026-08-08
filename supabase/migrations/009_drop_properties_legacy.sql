@@ -1,0 +1,21 @@
+-- DO NOT RUN THIS AUTOMATICALLY AS PART OF A ROUTINE "apply all migrations"
+-- PASS. `properties_legacy` is the rollback fence left by migration 005 —
+-- dropping it is irreversible. Application code has zero references to it
+-- (verified via repo-wide grep as of Milestone 3), which satisfies the
+-- code-side half of the safety check, but that is not sufficient on its
+-- own. Before running this migration against a real database, confirm:
+--
+--   1. Migrations 001-008 have been applied to that database and the app
+--      has been running against the new `properties`/`listings` tables for
+--      at least one full release cycle with no reported data issues.
+--   2. `select count(*) from properties_legacy` matches the row count you
+--      expect from before the split, and spot-checking a handful of rows
+--      against their corresponding `properties`/`listings` rows (same id on
+--      `listings`) shows the backfill carried every field over correctly.
+--   3. You have a database backup/snapshot taken before running this, in
+--      addition to whatever the legacy table itself would have provided as
+--      a fallback.
+--
+-- Only once all three are true should this be applied.
+
+drop table if exists public.properties_legacy;

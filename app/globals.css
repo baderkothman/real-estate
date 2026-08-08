@@ -187,7 +187,7 @@
 
   /* Brand badge */
   .badge-brand {
-    @apply bg-[#fa6b05] text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full;
+    @apply bg-[#a34702] text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full;
   }
 }
 

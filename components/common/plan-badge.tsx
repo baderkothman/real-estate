@@ -10,7 +10,7 @@ interface PlanBadgeProps {
 const planConfig = {
   free: {
     label: 'Free',
-    className: 'bg-[#faf7eb] border-[rgba(34,24,18,0.12)] text-[#8b8178]',
+    className: 'bg-[#faf7eb] border-[rgba(34,24,18,0.12)] text-[#5f554d]',
   },
   pro: {
     label: 'Pro',

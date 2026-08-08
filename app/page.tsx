@@ -74,7 +74,7 @@ export default async function HomePage() {
                   <Link
                     key={city}
                     href={`/properties?city=${city}`}
-                    className="px-3 py-1 rounded-full bg-white border border-[rgba(34,24,18,0.10)] text-xs text-[#8b8178] hover:border-[#fa6b05]/30 hover:text-[#fa6b05] transition-colors shadow-[0_1px_4px_rgba(24,20,17,0.06)]"
+                    className="px-3 py-1 rounded-full bg-white border border-[rgba(34,24,18,0.10)] text-xs text-[#5f554d] hover:border-[#fa6b05]/30 hover:text-[#a34702] transition-colors shadow-[0_1px_4px_rgba(24,20,17,0.06)]"
                   >
                     {city}
                   </Link>
@@ -94,10 +94,10 @@ export default async function HomePage() {
                 { value: '15+', label: 'Lebanese Cities' },
               ].map((stat) => (
                 <div key={stat.label} className="text-center sm:text-left">
-                  <div className="font-display text-2xl sm:text-3xl font-bold text-[#fa6b05]">
+                  <div className="font-display text-2xl sm:text-3xl font-bold text-[#a34702]">
                     {stat.value}
                   </div>
-                  <div className="text-xs text-[#8b8178] mt-0.5">
+                  <div className="text-xs text-[#5f554d] mt-0.5">
                     {stat.label}
                   </div>
                 </div>
@@ -189,11 +189,11 @@ export default async function HomePage() {
                 className="relative rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] p-8 hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.08)] transition-all duration-300"
               >
                 {/* Step number */}
-                <div className="font-display text-5xl font-bold text-[#fa6b05]/8 absolute top-4 right-5 select-none">
+                <div className="font-display text-5xl font-bold text-[#a34702]/8 absolute top-4 right-5 select-none">
                   {step}
                 </div>
                 <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#fef0e6] border border-[#fa6b05]/15">
-                  <Icon className="h-6 w-6 text-[#fa6b05]" />
+                  <Icon className="h-6 w-6 text-[#a34702]" />
                 </div>
                 <h3 className="font-display text-xl font-semibold text-[#181411] mb-3">
                   {title}
@@ -227,7 +227,7 @@ export default async function HomePage() {
                   {Array.from({ length: 5 }).map((_, i) => (
                     <IconStar
                       key={i}
-                      className={`h-4 w-4 ${i < t.rating ? 'text-[#fa6b05] fill-[#fa6b05]' : 'text-[rgba(34,24,18,0.12)]'}`}
+                      className={`h-4 w-4 ${i < t.rating ? 'text-[#a34702] fill-[#fa6b05]' : 'text-[rgba(34,24,18,0.12)]'}`}
                     />
                   ))}
                 </div>
@@ -252,7 +252,7 @@ export default async function HomePage() {
                     <div className="text-sm font-medium text-[#181411]">
                       {t.name}
                     </div>
-                    <div className="text-xs text-[#8b8178]">{t.role}</div>
+                    <div className="text-xs text-[#5f554d]">{t.role}</div>
                   </div>
                 </div>
               </div>
@@ -294,4 +294,3 @@ export default async function HomePage() {
     </div>
   )
 }
-

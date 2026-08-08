@@ -38,7 +38,7 @@ export function AdminPendingActions({ properties }: AdminPendingActionsProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm text-[#181411] truncate">{property.title}</p>
-            <p className="text-xs text-[#8b8178]">
+            <p className="text-xs text-[#5f554d]">
               {property.city} &middot; {formatRelativeDate(property.createdAt)}
             </p>
           </div>
@@ -47,6 +47,7 @@ export function AdminPendingActions({ properties }: AdminPendingActionsProps) {
               type="button"
               className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
               title="Approve"
+              aria-label={`Approve "${property.title}"`}
               onClick={() => void doAction(property.id, 'approve')}
             >
               <IconCircleCheck className="h-4 w-4" />
@@ -55,6 +56,7 @@ export function AdminPendingActions({ properties }: AdminPendingActionsProps) {
               type="button"
               className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
               title="Reject"
+              aria-label={`Reject "${property.title}"`}
               onClick={() => void doAction(property.id, 'reject')}
             >
               <IconCircleX className="h-4 w-4" />

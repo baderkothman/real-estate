@@ -34,7 +34,7 @@ export function EmptyState({
       <div className="relative mb-6">
         <div className="absolute inset-0 rounded-full bg-[#fa6b05]/5 scale-[2] blur-2xl" />
         <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-[#fef0e6] border border-[#fa6b05]/15">
-          <Icon className="h-9 w-9 text-[#fa6b05]/50" />
+          <Icon className="h-9 w-9 text-[#a34702]/50" />
         </div>
       </div>
       <h3 className="font-display text-2xl font-semibold text-[#181411] mb-2.5">

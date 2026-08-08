@@ -191,7 +191,11 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
       </p>
 
       {serverError && (
-        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+        >
           {serverError}
         </div>
       )}
@@ -202,8 +206,9 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
             Basic Information
           </h3>
           <div className="space-y-1.5">
-            <Label>Title *</Label>
+            <Label htmlFor="edit-title">Title *</Label>
             <Input
+              id="edit-title"
               value={form.title}
               onChange={(e) => setField('title', e.target.value)}
               error={errors.title}
@@ -211,12 +216,12 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>City *</Label>
+              <Label htmlFor="edit-city">City *</Label>
               <Select
                 value={form.city}
                 onValueChange={(v) => setField('city', v)}
               >
-                <SelectTrigger>
+                <SelectTrigger id="edit-city">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -229,14 +234,14 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Type *</Label>
+              <Label htmlFor="edit-listing-type">Type *</Label>
               <Select
                 value={form.listingType}
                 onValueChange={(v: 'sale' | 'rent') =>
                   setField('listingType', v)
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger id="edit-listing-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -247,8 +252,9 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>Address</Label>
+            <Label htmlFor="edit-address">Address</Label>
             <Input
+              id="edit-address"
               value={form.address}
               onChange={(e) => setField('address', e.target.value)}
             />
@@ -260,8 +266,9 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
             Pricing & Specs
           </h3>
           <div className="space-y-1.5">
-            <Label>Price (USD) *</Label>
+            <Label htmlFor="edit-price">Price (USD) *</Label>
             <Input
+              id="edit-price"
               type="number"
               value={form.price}
               onChange={(e) => setField('price', e.target.value)}
@@ -270,8 +277,9 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <Label>Bedrooms</Label>
+              <Label htmlFor="edit-bedrooms">Bedrooms</Label>
               <Input
+                id="edit-bedrooms"
                 type="number"
                 value={form.bedrooms}
                 onChange={(e) => setField('bedrooms', e.target.value)}
@@ -279,8 +287,9 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Bathrooms</Label>
+              <Label htmlFor="edit-bathrooms">Bathrooms</Label>
               <Input
+                id="edit-bathrooms"
                 type="number"
                 value={form.bathrooms}
                 onChange={(e) => setField('bathrooms', e.target.value)}
@@ -288,8 +297,9 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Area (sq m)</Label>
+              <Label htmlFor="edit-area">Area (sq m)</Label>
               <Input
+                id="edit-area"
                 type="number"
                 value={form.areaSqM}
                 onChange={(e) => setField('areaSqM', e.target.value)}
@@ -300,17 +310,28 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
         </div>
 
         <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 space-y-4">
-          <h3 className="font-display text-lg font-semibold text-[#181411]">
+          <h3
+            id="edit-description-label"
+            className="font-display text-lg font-semibold text-[#181411]"
+          >
             Description *
           </h3>
           <textarea
+            id="edit-description"
             rows={6}
             value={form.description}
             onChange={(e) => setField('description', e.target.value)}
-            className="flex w-full rounded-lg border border-[rgba(34,24,18,0.14)] bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-[#8b8178] focus:outline-none focus:ring-2 focus:ring-[#fa6b05]/30 focus:border-[#fa6b05] transition-colors resize-none"
+            aria-labelledby="edit-description-label"
+            aria-invalid={!!errors.description}
+            aria-describedby={
+              errors.description ? 'edit-description-error' : undefined
+            }
+            className="flex w-full rounded-lg border border-[rgba(34,24,18,0.14)] bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-[#5f554d] focus:outline-none focus:ring-2 focus:ring-[#fa6b05]/30 focus:border-[#fa6b05] transition-colors resize-none"
           />
           {errors.description && (
-            <p className="text-xs text-red-600">{errors.description}</p>
+            <p id="edit-description-error" className="text-xs text-red-600">
+              {errors.description}
+            </p>
           )}
         </div>
 
@@ -340,6 +361,7 @@ export default function EditPropertyPage({ params }: EditPropertyPageProps) {
                       setImageUrls((prev) => prev.filter((_, i) => i !== idx))
                     }
                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    aria-label={`Remove image ${idx + 1}`}
                   >
                     <IconX className="h-4 w-4" />
                   </Button>

@@ -7,7 +7,13 @@ import { getUserById } from '@/services/user.service'
 const navItems = [
   { href: '/dashboard/profile', label: 'My Dashboard' },
   { href: '/dashboard/properties/create', label: 'Create Listing' },
+  { href: '/dashboard/messages', label: 'Messages' },
+  { href: '/dashboard/notifications', label: 'Notifications' },
+  { href: '/dashboard/viewings', label: 'Viewings' },
+  { href: '/dashboard/offers', label: 'Offers' },
+  { href: '/dashboard/applications', label: 'Applications' },
   { href: '/dashboard/saved', label: 'Saved Properties' },
+  { href: '/dashboard/saved-searches', label: 'Saved Searches' },
   { href: '/dashboard/profile/edit', label: 'Edit Profile' },
 ]
 
@@ -33,14 +39,14 @@ export default async function DashboardLayout({
       <div className="border-b border-[rgba(34,24,18,0.08)] bg-[#faf7eb] py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-[#fa6b05] flex items-center justify-center text-white font-bold shadow-[0_2px_8px_rgba(250,107,5,0.25)]">
+            <div className="h-10 w-10 rounded-full bg-[#a34702] flex items-center justify-center text-white font-bold shadow-[0_2px_8px_rgba(250,107,5,0.25)]">
               <IconUser className="h-5 w-5" />
             </div>
             <div>
               <h1 className="font-display text-2xl font-semibold text-[#181411] tracking-wide">
                 Dashboard
               </h1>
-              <p className="text-[#8b8178] text-sm">
+              <p className="text-[#5f554d] text-sm">
                 Welcome back, {profile.name}
               </p>
             </div>

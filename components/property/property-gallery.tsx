@@ -62,7 +62,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
 
         {/* Counter */}
         <div className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm text-xs text-[#181411] shadow-[0_2px_8px_rgba(24,20,17,0.10)]">
-          <IconPhoto className="h-3.5 w-3.5 text-[#fa6b05]" />
+          <IconPhoto className="h-3.5 w-3.5 text-[#a34702]" />
           {activeIndex + 1} / {validImages.length}
         </div>
       </div>

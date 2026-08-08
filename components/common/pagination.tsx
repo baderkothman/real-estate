@@ -42,7 +42,7 @@ export function Pagination({ page, totalPages, className }: PaginationProps) {
 
   const navBtn = cn(
     'h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200',
-    'border border-[rgba(34,24,18,0.12)] text-[#8b8178]',
+    'border border-[rgba(34,24,18,0.12)] text-[#5f554d]',
     'hover:bg-white hover:text-[#181411] hover:border-[rgba(34,24,18,0.20)] hover:shadow-[0_2px_8px_rgba(24,20,17,0.06)]',
     'disabled:opacity-30 disabled:cursor-not-allowed'
   )
@@ -67,7 +67,7 @@ export function Pagination({ page, totalPages, className }: PaginationProps) {
           num === 'ellipsis' ? (
             <span
               key={`e-${idx}`}
-              className="h-9 w-9 flex items-center justify-center text-[#8b8178]"
+              className="h-9 w-9 flex items-center justify-center text-[#5f554d]"
             >
               <IconDots className="h-4 w-4" />
             </span>
@@ -80,7 +80,7 @@ export function Pagination({ page, totalPages, className }: PaginationProps) {
               className={cn(
                 'h-9 w-9 rounded-xl text-sm font-medium transition-all duration-200',
                 num === page
-                  ? 'bg-[#fa6b05] text-white font-semibold shadow-[0_2px_8px_rgba(250,107,5,0.25)]'
+                  ? 'bg-[#a34702] text-white font-semibold shadow-[0_2px_8px_rgba(250,107,5,0.25)]'
                   : 'text-[#5f554d] hover:bg-white hover:text-[#181411] border border-transparent hover:border-[rgba(34,24,18,0.12)] hover:shadow-[0_2px_8px_rgba(24,20,17,0.06)]'
               )}
             >
@@ -100,7 +100,7 @@ export function Pagination({ page, totalPages, className }: PaginationProps) {
         <IconChevronRight className="h-4 w-4" />
       </button>
 
-      <span className="hidden sm:block text-xs text-[#8b8178] ml-2">
+      <span className="hidden sm:block text-xs text-[#5f554d] ml-2">
         {page} / {totalPages}
       </span>
     </nav>

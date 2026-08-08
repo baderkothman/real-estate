@@ -30,8 +30,7 @@ export default function TermsPage() {
               terms shown during checkout.
             </p>
             <p>
-              Questions about these terms can be sent to
-              support@othmanre.com.
+              Questions about these terms can be sent to support@othmanre.com.
             </p>
           </div>
         </div>

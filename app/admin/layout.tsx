@@ -1,6 +1,7 @@
 import {
   IconBuilding,
   IconChartBar,
+  IconHistory,
   IconLayoutDashboard,
   IconShield,
   IconUsers,
@@ -15,6 +16,7 @@ const adminNavItems = [
   { href: '/admin/properties', label: 'Properties', icon: IconBuilding },
   { href: '/admin/users', label: 'Users', icon: IconUsers },
   { href: '/admin/analytics', label: 'Analytics', icon: IconChartBar },
+  { href: '/admin/audit-log', label: 'Audit Log', icon: IconHistory },
 ]
 
 export default async function AdminLayout({
@@ -46,7 +48,7 @@ export default async function AdminLayout({
                 Admin Panel
               </span>
             </div>
-            <span className="text-xs text-[#8b8178]">
+            <span className="text-xs text-[#5f554d]">
               Signed in as {profile.name}
             </span>
           </div>

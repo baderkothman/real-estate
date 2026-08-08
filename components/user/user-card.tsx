@@ -11,7 +11,7 @@ interface UserCardProps {
 }
 
 const planStyles = {
-  free: 'bg-[#faf7eb] border-[rgba(34,24,18,0.12)] text-[#8b8178]',
+  free: 'bg-[#faf7eb] border-[rgba(34,24,18,0.12)] text-[#5f554d]',
   pro: 'bg-[#fef0e6] border-[#fa6b05]/25 text-[#964003]',
   agency: 'bg-[#ecf8f5] border-[#379579]/25 text-[#1c4a3c]',
 }
@@ -38,14 +38,14 @@ export function UserCard({ user, propertyCount, className }: UserCardProps) {
               sizes="56px"
             />
           ) : (
-            <div className="h-full w-full flex items-center justify-center text-[#fa6b05] font-bold font-display text-lg">
+            <div className="h-full w-full flex items-center justify-center text-[#a34702] font-bold font-display text-lg">
               {getInitials(user.name)}
             </div>
           )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-display text-base font-semibold text-[#181411] truncate group-hover:text-[#fa6b05] transition-colors">
+          <h3 className="font-display text-base font-semibold text-[#181411] truncate group-hover:text-[#a34702] transition-colors">
             {user.name}
           </h3>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -75,12 +75,12 @@ export function UserCard({ user, propertyCount, className }: UserCardProps) {
 
       {/* Footer */}
       <div className="mt-auto space-y-2 pt-3 border-t border-[rgba(34,24,18,0.08)]">
-        <div className="flex items-center gap-2 text-xs text-[#8b8178]">
+        <div className="flex items-center gap-2 text-xs text-[#5f554d]">
           <IconMail className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">{user.email}</span>
         </div>
         {propertyCount !== undefined && (
-          <div className="flex items-center gap-2 text-xs text-[#8b8178]">
+          <div className="flex items-center gap-2 text-xs text-[#5f554d]">
             <IconBuilding className="h-3.5 w-3.5 shrink-0" />
             <span>
               {propertyCount} propert{propertyCount !== 1 ? 'ies' : 'y'} listed

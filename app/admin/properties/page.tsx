@@ -106,7 +106,7 @@ export default function AdminPropertiesPage() {
             className={cn(
               'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               status === tab.value
-                ? 'bg-[#fa6b05] text-white shadow-[0_2px_8px_rgba(250,107,5,0.25)]'
+                ? 'bg-[#a34702] text-white shadow-[0_2px_8px_rgba(250,107,5,0.25)]'
                 : 'text-[#5f554d] hover:text-[#181411] hover:bg-white hover:shadow-[0_2px_8px_rgba(24,20,17,0.06)]'
             )}
           >
@@ -131,7 +131,7 @@ export default function AdminPropertiesPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(34,24,18,0.08)] bg-[#faf7eb] text-xs text-[#8b8178]">
+                  <tr className="border-b border-[rgba(34,24,18,0.08)] bg-[#faf7eb] text-xs text-[#5f554d]">
                     <th className="text-left p-4 font-normal">Property</th>
                     <th className="text-left p-4 font-normal hidden md:table-cell">
                       Owner
@@ -171,11 +171,11 @@ export default function AdminPropertiesPage() {
                           <div>
                             <Link
                               href={`/properties/${property.id}`}
-                              className="text-[#181411] hover:text-[#fa6b05] transition-colors line-clamp-1 text-sm"
+                              className="text-[#181411] hover:text-[#a34702] transition-colors line-clamp-1 text-sm"
                             >
                               {property.title}
                             </Link>
-                            <p className="text-xs text-[#8b8178]">
+                            <p className="text-xs text-[#5f554d]">
                               {property.city}
                             </p>
                           </div>
@@ -203,12 +203,12 @@ export default function AdminPropertiesPage() {
                         </span>
                       </td>
                       <td className="p-4 hidden lg:table-cell">
-                        <span className="font-mono text-xs text-[#fa6b05]">
+                        <span className="font-mono text-xs text-[#a34702]">
                           {formatPrice(property.price)}
                         </span>
                       </td>
                       <td className="p-4 hidden xl:table-cell">
-                        <span className="text-xs text-[#8b8178]">
+                        <span className="text-xs text-[#5f554d]">
                           {formatRelativeDate(property.createdAt)}
                         </span>
                       </td>
@@ -226,6 +226,7 @@ export default function AdminPropertiesPage() {
                                 }
                                 className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 disabled:opacity-50 transition-colors"
                                 title="Approve"
+                                aria-label={`Approve "${property.title}"`}
                               >
                                 <IconCircleCheck className="h-3.5 w-3.5" />
                               </button>
@@ -239,6 +240,7 @@ export default function AdminPropertiesPage() {
                                 }
                                 className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 transition-colors"
                                 title="Reject"
+                                aria-label={`Reject "${property.title}"`}
                               >
                                 <IconCircleX className="h-3.5 w-3.5" />
                               </button>
@@ -260,6 +262,7 @@ export default function AdminPropertiesPage() {
                                   className="w-14 h-7 rounded-md bg-white border border-[rgba(34,24,18,0.14)] text-[#181411] text-xs px-2 focus:outline-none focus:border-[#fa6b05]"
                                   min={1}
                                   max={365}
+                                  aria-label={`Days to feature "${property.title}"`}
                                 />
                                 <button
                                   type="button"
@@ -271,8 +274,9 @@ export default function AdminPropertiesPage() {
                                       ),
                                     })
                                   }
-                                  className="p-1.5 rounded-lg bg-[#fef0e6] text-[#fa6b05] hover:bg-[#fa6b05]/15 transition-colors"
+                                  className="p-1.5 rounded-lg bg-[#fef0e6] text-[#a34702] hover:bg-[#fa6b05]/15 transition-colors"
                                   title="Feature"
+                                  aria-label={`Feature "${property.title}"`}
                                 >
                                   <IconStar className="h-3.5 w-3.5" />
                                 </button>
@@ -284,8 +288,9 @@ export default function AdminPropertiesPage() {
                               onClick={() =>
                                 void adminAction(property.id, 'unfeature')
                               }
-                              className="p-1.5 rounded-lg bg-[#faf7eb] text-[#8b8178] hover:bg-[rgba(34,24,18,0.08)] transition-colors"
+                              className="p-1.5 rounded-lg bg-[#faf7eb] text-[#5f554d] hover:bg-[rgba(34,24,18,0.08)] transition-colors"
                               title="Unfeature"
+                              aria-label={`Unfeature "${property.title}"`}
                             >
                               <IconStarOff className="h-3.5 w-3.5" />
                             </button>
@@ -299,6 +304,7 @@ export default function AdminPropertiesPage() {
                             }}
                             className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
                             title="Delete"
+                            aria-label={`Delete "${property.title}"`}
                           >
                             <IconTrash className="h-3.5 w-3.5" />
                           </button>
@@ -319,10 +325,11 @@ export default function AdminPropertiesPage() {
                 size="sm"
                 onClick={() => setPage((p) => p - 1)}
                 disabled={page <= 1}
+                aria-label="Previous page"
               >
                 <IconChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm text-[#8b8178]">
+              <span className="text-sm text-[#5f554d]">
                 Page {page} of {result.totalPages}
               </span>
               <Button
@@ -330,6 +337,7 @@ export default function AdminPropertiesPage() {
                 size="sm"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page >= result.totalPages}
+                aria-label="Next page"
               >
                 <IconChevronRight className="h-4 w-4" />
               </Button>

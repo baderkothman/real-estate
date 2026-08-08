@@ -68,7 +68,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_#fef3e7_0%,_#fcfaf7_70%)]" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#fa6b05]/20 bg-[#fef0e6] px-4 py-1.5 mb-8">
-            <IconMapPin className="h-3.5 w-3.5 text-[#fa6b05]" />
+            <IconMapPin className="h-3.5 w-3.5 text-[#a34702]" />
             <span className="text-xs font-medium text-[#964003] tracking-widest uppercase">
               Est. 2022 - Beirut, Lebanon
             </span>
@@ -127,11 +127,11 @@ export default function AboutPage() {
                   key={stat.label}
                   className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 text-center hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.10)] transition-all duration-300"
                 >
-                  <stat.icon className="h-6 w-6 text-[#fa6b05] mx-auto mb-3" />
-                  <div className="font-display text-3xl font-bold text-[#fa6b05] mb-1">
+                  <stat.icon className="h-6 w-6 text-[#a34702] mx-auto mb-3" />
+                  <div className="font-display text-3xl font-bold text-[#a34702] mb-1">
                     {stat.value}
                   </div>
-                  <div className="text-xs text-[#8b8178]">{stat.label}</div>
+                  <div className="text-xs text-[#5f554d]">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -155,7 +155,7 @@ export default function AboutPage() {
                 className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-8 hover:border-[rgba(34,24,18,0.14)] hover:shadow-[0_14px_40px_rgba(24,20,17,0.10)] transition-all duration-300"
               >
                 <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#fef0e6] border border-[#fa6b05]/20">
-                  <Icon className="h-6 w-6 text-[#fa6b05]" />
+                  <Icon className="h-6 w-6 text-[#a34702]" />
                 </div>
                 <h3 className="font-display text-xl font-semibold text-[#181411] mb-3">
                   {title}
@@ -201,7 +201,7 @@ export default function AboutPage() {
                 <h3 className="font-display text-xl font-semibold text-[#181411] mb-1">
                   {member.name}
                 </h3>
-                <p className="text-sm text-[#fa6b05] mb-4">{member.title}</p>
+                <p className="text-sm text-[#a34702] mb-4">{member.title}</p>
                 <p className="text-sm text-[#5f554d] leading-relaxed">
                   {member.bio}
                 </p>
@@ -213,4 +213,3 @@ export default function AboutPage() {
     </div>
   )
 }
-

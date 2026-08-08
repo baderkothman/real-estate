@@ -108,7 +108,7 @@ export function PricingPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="h-px w-6 bg-gradient-to-r from-transparent to-[#fa6b05]/70" />
-            <span className="text-[10px] font-semibold text-[#fa6b05] uppercase tracking-[0.2em]">
+            <span className="text-[10px] font-semibold text-[#a34702] uppercase tracking-[0.2em]">
               Plans
             </span>
             <span className="h-px w-6 bg-gradient-to-l from-transparent to-[#fa6b05]/70" />
@@ -130,8 +130,8 @@ export function PricingPage() {
                 className={cn(
                   'relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                   billing === value
-                    ? 'bg-[#fa6b05] text-white font-semibold shadow-[0_2px_8px_rgba(250,107,5,0.25)]'
-                    : 'text-[#8b8178] hover:text-[#181411]'
+                    ? 'bg-[#a34702] text-white font-semibold shadow-[0_2px_8px_rgba(250,107,5,0.25)]'
+                    : 'text-[#5f554d] hover:text-[#181411]'
                 )}
               >
                 {billingLabels[value]}
@@ -141,7 +141,7 @@ export function PricingPage() {
                       'absolute -top-2 -right-1 text-[9px] font-bold px-1 py-0.5 rounded-full',
                       billing === value
                         ? 'bg-[#964003] text-white'
-                        : 'bg-[#fef0e6] text-[#fa6b05]'
+                        : 'bg-[#fef0e6] text-[#a34702]'
                     )}
                   >
                     {billingDiscount[value]}
@@ -172,7 +172,7 @@ export function PricingPage() {
                 >
                   {plan.highlighted && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="bg-[#fa6b05] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-[0_2px_8px_rgba(250,107,5,0.30)]">
+                      <span className="bg-[#a34702] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-[0_2px_8px_rgba(250,107,5,0.30)]">
                         Most Popular
                       </span>
                     </div>
@@ -191,8 +191,8 @@ export function PricingPage() {
                       className={cn(
                         'h-10 w-10 rounded-xl flex items-center justify-center',
                         plan.highlighted
-                          ? 'bg-[#fa6b05] text-white shadow-[0_2px_8px_rgba(250,107,5,0.25)]'
-                          : 'bg-[#fef0e6] text-[#fa6b05]'
+                          ? 'bg-[#a34702] text-white shadow-[0_2px_8px_rgba(250,107,5,0.25)]'
+                          : 'bg-[#fef0e6] text-[#a34702]'
                       )}
                     >
                       <Icon className="h-5 w-5" />
@@ -209,10 +209,10 @@ export function PricingPage() {
                       </div>
                     ) : (
                       <div className="flex items-baseline gap-1">
-                        <span className="font-mono text-4xl font-bold text-[#fa6b05]">
+                        <span className="font-mono text-4xl font-bold text-[#a34702]">
                           ${plan.price}
                         </span>
-                        <span className="text-[#8b8178] text-sm">
+                        <span className="text-[#5f554d] text-sm">
                           /
                           {billing === 'month'
                             ? 'mo'
@@ -238,7 +238,7 @@ export function PricingPage() {
                           className={cn(
                             'h-4 w-4 shrink-0 mt-0.5',
                             plan.highlighted
-                              ? 'text-[#fa6b05]'
+                              ? 'text-[#a34702]'
                               : 'text-[#379579]'
                           )}
                         />
@@ -287,7 +287,7 @@ export function PricingPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[rgba(34,24,18,0.08)] bg-[#faf7eb]">
-                  <th className="text-left p-4 text-sm text-[#8b8178] font-normal">
+                  <th className="text-left p-4 text-sm text-[#5f554d] font-normal">
                     Feature
                   </th>
                   {['Free', 'Pro', 'Agency'].map((plan) => (
@@ -317,9 +317,9 @@ export function PricingPage() {
                         {value === 'Yes' ? (
                           <IconCheck className="h-4 w-4 text-[#379579] mx-auto" />
                         ) : value === '-' ? (
-                          <span className="text-[#8b8178]">-</span>
+                          <span className="text-[#5f554d]">-</span>
                         ) : (
-                          <span className="text-[#fa6b05] font-medium">
+                          <span className="text-[#a34702] font-medium">
                             {value}
                           </span>
                         )}

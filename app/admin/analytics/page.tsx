@@ -1,3 +1,4 @@
+import { IconArrowRight } from '@tabler/icons-react'
 import type { Metadata } from 'next'
 import { cn } from '@/lib/utils'
 import {
@@ -5,6 +6,7 @@ import {
   getPropertiesByStatus,
   getPropertiesByType,
   getTopCities,
+  getTransactionFunnel,
   getUsersByPlan,
 } from '@/services/analytics.service'
 
@@ -43,14 +45,54 @@ function BarChartRow({
   )
 }
 
+function FunnelStage({
+  label,
+  count,
+  pctOfFirst,
+  isLast,
+}: {
+  label: string
+  count: number
+  pctOfFirst: number
+  isLast: boolean
+}) {
+  return (
+    <div className="flex flex-col items-center flex-1 min-w-[100px]">
+      <div className="w-full flex items-center gap-2">
+        <div className="flex-1 h-16 rounded-xl bg-[#fef0e6] border border-[#fa6b05]/20 flex flex-col items-center justify-center">
+          <span className="font-display text-xl font-bold text-[#a34702]">
+            {count}
+          </span>
+          <span className="text-[10px] text-[#5f554d]">{pctOfFirst}%</span>
+        </div>
+        {!isLast && (
+          <IconArrowRight className="h-4 w-4 text-[#8b8178] shrink-0" />
+        )}
+      </div>
+      <span className="text-xs text-[#5f554d] mt-2 text-center">{label}</span>
+    </div>
+  )
+}
+
 export default async function AdminAnalyticsPage() {
-  const [summary, byStatus, byType, topCities, byPlan] = await Promise.all([
-    getAnalyticsSummary(),
-    getPropertiesByStatus(),
-    getPropertiesByType(),
-    getTopCities(10),
-    getUsersByPlan(),
-  ])
+  const [summary, byStatus, byType, topCities, byPlan, funnel] =
+    await Promise.all([
+      getAnalyticsSummary(),
+      getPropertiesByStatus(),
+      getPropertiesByType(),
+      getTopCities(10),
+      getUsersByPlan(),
+      getTransactionFunnel(),
+    ])
+
+  const funnelStages = [
+    { label: 'Live Listings', count: funnel.listingsCount },
+    { label: 'Viewings', count: funnel.viewingsCount },
+    { label: 'Offers', count: funnel.offersCount },
+    { label: 'Transactions', count: funnel.transactionsCount },
+    { label: 'Closed', count: funnel.closedTransactionsCount },
+  ]
+  const funnelBase = funnelStages[0]?.count ?? 0
 
   const maxCityCount = topCities.reduce((m, c) => Math.max(m, c.count), 0)
   const maxStatusCount = byStatus.reduce((m, s) => Math.max(m, s.count), 0)
@@ -88,12 +130,38 @@ export default async function AdminAnalyticsPage() {
             key={label}
             className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-4 text-center"
           >
-            <div className="font-display text-3xl font-bold text-[#fa6b05]">
+            <div className="font-display text-3xl font-bold text-[#a34702]">
               {value}
             </div>
-            <div className="text-[11px] text-[#8b8178] mt-1">{label}</div>
+            <div className="text-[11px] text-[#5f554d] mt-1">{label}</div>
           </div>
         ))}
+      </div>
+
+      {/* Transaction funnel */}
+      <div className="rounded-[20px] bg-white border border-[rgba(34,24,18,0.08)] shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-6 mb-8">
+        <h3 className="font-display text-lg font-semibold text-[#181411] mb-1">
+          Transaction Funnel
+        </h3>
+        <p className="text-xs text-[#5f554d] mb-5">
+          Live listings through to closed transactions. Percentages are of stage
+          one (live listings).
+        </p>
+        <div className="flex items-stretch gap-1 sm:gap-3 overflow-x-auto pb-1">
+          {funnelStages.map((stage, idx) => (
+            <FunnelStage
+              key={stage.label}
+              label={stage.label}
+              count={stage.count}
+              pctOfFirst={
+                funnelBase > 0
+                  ? Math.round((stage.count / funnelBase) * 100)
+                  : 0
+              }
+              isLast={idx === funnelStages.length - 1}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -144,7 +212,7 @@ export default async function AdminAnalyticsPage() {
                 <span className="text-xs text-[#5f554d] capitalize">
                   {plan}
                 </span>
-                <span className="text-xs text-[#8b8178]">
+                <span className="text-xs text-[#5f554d]">
                   (
                   {summary.totalUsers > 0
                     ? Math.round((count / summary.totalUsers) * 100)
@@ -172,7 +240,7 @@ export default async function AdminAnalyticsPage() {
               <div key={type} className="flex-1">
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-[#5f554d]">{type}</span>
-                  <span className="text-[#fa6b05] font-mono">{count}</span>
+                  <span className="text-[#a34702] font-mono">{count}</span>
                 </div>
                 <div className="h-3 bg-[#faf7eb] rounded-full overflow-hidden">
                   <div
@@ -183,7 +251,7 @@ export default async function AdminAnalyticsPage() {
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <p className="text-xs text-[#8b8178] mt-1">{pct}% of total</p>
+                <p className="text-xs text-[#5f554d] mt-1">{pct}% of total</p>
               </div>
             )
           })}
@@ -198,7 +266,7 @@ export default async function AdminAnalyticsPage() {
         <div className="space-y-3">
           {topCities.map(({ city, count }, idx) => (
             <div key={city} className="flex items-center gap-3">
-              <span className="w-5 text-xs text-[#8b8178] text-right shrink-0">
+              <span className="w-5 text-xs text-[#5f554d] text-right shrink-0">
                 {idx + 1}
               </span>
               <BarChartRow

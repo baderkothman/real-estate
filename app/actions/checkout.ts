@@ -3,6 +3,7 @@
 import { headers } from 'next/headers'
 import { getPriceId } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
+import { getUserById } from '@/services/user.service'
 
 type CheckoutInput = {
   plan: 'pro' | 'agency'
@@ -34,16 +35,32 @@ export async function createCheckoutSessionAction(input: CheckoutInput) {
     const headerList = await headers()
     const baseUrl = headerList.get('origin') ?? 'http://localhost:3000'
 
+    // Reuse the existing Stripe customer if this profile already has one, so
+    // repeat upgrades/downgrades don't fragment into multiple customers.
+    const profile = await getUserById(user.id)
+
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${baseUrl}/dashboard/profile?upgraded=1`,
       cancel_url: `${baseUrl}/pricing`,
+      client_reference_id: user.id,
+      customer_email: profile?.email,
       metadata: {
         userId: user.id,
         plan: input.plan,
         billing: input.billing,
+      },
+      // Stamped on the subscription itself, not just this checkout session,
+      // so later subscription.updated/deleted webhook events (which don't
+      // carry checkout session metadata) can still resolve back to a user
+      // without relying solely on the stored Stripe customer id.
+      subscription_data: {
+        metadata: {
+          userId: user.id,
+          plan: input.plan,
+        },
       },
     })
 
