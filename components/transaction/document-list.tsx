@@ -21,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import type { DocType, TransactionDocument } from '@/services/document.service'
 
@@ -216,22 +215,30 @@ export function DocumentList({
     setError(null)
     setIsUploading(true)
     try {
-      const uploadUrl = await getDocumentUploadUrlAction(
-        transactionId,
-        file.name
-      )
-      if ('error' in uploadUrl) {
-        setError(uploadUrl.error)
+      const upload = await getDocumentUploadUrlAction(transactionId, file.name)
+      if (!('signedUrl' in upload)) {
+        setError(upload.error ?? 'Failed to prepare upload')
         return
       }
 
-      const supabase = createClient()
-      const { error: uploadError } = await supabase.storage
-        .from('documents')
-        .uploadToSignedUrl(uploadUrl.path, uploadUrl.token, file)
-
-      if (uploadError) {
-        setError(uploadError.message)
+      const uploadBody = new FormData()
+      uploadBody.set('cacheControl', '3600')
+      uploadBody.set('', file)
+      const uploadResponse = await fetch(upload.signedUrl, {
+        method: 'PUT',
+        headers: upload.headers,
+        body: uploadBody,
+      })
+      if (!uploadResponse.ok) {
+        const uploadError = (await uploadResponse.json().catch(() => null)) as {
+          message?: string
+          error?: string
+        } | null
+        setError(
+          uploadError?.message ??
+            uploadError?.error ??
+            'Failed to upload document'
+        )
         return
       }
 
@@ -239,7 +246,7 @@ export function DocumentList({
         transactionId,
         title: title.trim(),
         docType,
-        storagePath: uploadUrl.path,
+        storagePath: upload.path,
       })
       if ('error' in result) {
         setError(result.error ?? 'Failed to save document')

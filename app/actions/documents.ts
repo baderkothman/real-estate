@@ -44,7 +44,17 @@ export async function getDocumentUploadUrlAction(
 
   try {
     const upload = await createDocumentUploadUrl(path)
-    return upload
+    const publicKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (!publicKey) return { error: 'Storage is not configured' }
+
+    return {
+      ...upload,
+      headers: {
+        apikey: publicKey,
+        Authorization: `Bearer ${publicKey}`,
+        'x-upsert': 'false',
+      },
+    }
   } catch (err) {
     console.error('Create upload URL error:', err)
     return { error: errorMessage(err, 'Failed to prepare upload') }

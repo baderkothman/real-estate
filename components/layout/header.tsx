@@ -13,6 +13,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { signOutAction } from '@/app/actions/auth'
 import { NotificationBell } from '@/components/layout/notification-bell'
 import { useSupabase } from '@/components/providers/supabase-provider'
 import { Button } from '@/components/ui/button'
@@ -27,7 +28,7 @@ const navLinks = [
 ]
 
 export function Header() {
-  const { user, supabase } = useSupabase()
+  const { user } = useSupabase()
   const pathname = usePathname()
   const router = useRouter()
   const [profileOpen, setProfileOpen] = useState(false)
@@ -41,7 +42,7 @@ export function Header() {
 
   const handleSignOut = async () => {
     setProfileOpen(false)
-    await supabase.auth.signOut()
+    await signOutAction()
     router.push('/')
     router.refresh()
   }

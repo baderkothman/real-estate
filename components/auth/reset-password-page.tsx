@@ -3,57 +3,19 @@
 import { IconAlertCircle, IconKey } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
+import { updatePasswordAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { getPasswordPolicyErrorMessage } from '@/lib/supabase/auth-errors'
-import { createClient } from '@/lib/supabase/client'
 
-export function ResetPasswordPage() {
+export function ResetPasswordPage({ hasSession }: { hasSession: boolean }) {
   const router = useRouter()
-  const supabase = useMemo(() => createClient(), [])
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [checkingSession, setCheckingSession] = useState(true)
-  const [hasSession, setHasSession] = useState(false)
-
-  useEffect(() => {
-    let isActive = true
-
-    const loadSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-
-      if (!isActive) {
-        return
-      }
-
-      setHasSession(Boolean(session))
-      setCheckingSession(false)
-    }
-
-    void loadSession()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!isActive) {
-        return
-      }
-
-      setHasSession(Boolean(session))
-      setCheckingSession(false)
-    })
-
-    return () => {
-      isActive = false
-      subscription.unsubscribe()
-    }
-  }, [supabase])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -71,16 +33,13 @@ export function ResetPasswordPage() {
 
     setIsLoading(true)
     try {
-      const { error: updateError } = await supabase.auth.updateUser({
-        password,
-      })
+      const result = await updatePasswordAction(password)
 
-      if (updateError) {
-        setError(getPasswordPolicyErrorMessage(updateError.message))
+      if (result.error) {
+        setError(getPasswordPolicyErrorMessage(result.error))
         return
       }
 
-      await supabase.auth.signOut()
       router.push('/auth/login?reset=1')
       router.refresh()
     } catch {
@@ -111,11 +70,7 @@ export function ResetPasswordPage() {
         </div>
 
         <div className="rounded-[20px] border border-[rgba(34,24,18,0.08)] bg-white shadow-[0_6px_20px_rgba(24,20,17,0.06)] p-8">
-          {checkingSession ? (
-            <div className="flex items-center justify-center py-6 text-sm text-[#5f554d]">
-              Checking reset session...
-            </div>
-          ) : !hasSession ? (
+          {!hasSession ? (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
               Open this page from the password reset link sent to your email.
             </div>

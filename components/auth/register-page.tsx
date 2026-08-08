@@ -10,11 +10,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { z } from 'zod'
+import { signUpAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { getRegisterErrorMessage } from '@/lib/supabase/auth-errors'
-import { createClient } from '@/lib/supabase/client'
 
 const registerSchema = z
   .object({
@@ -77,21 +77,19 @@ export function RegisterPage() {
 
     setIsLoading(true)
     try {
-      const supabase = createClient()
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      const result = await signUpAction({
         email: form.email,
         password: form.password,
-        options: {
-          data: { name: form.name, phone: form.phone },
-        },
+        name: form.name,
+        phone: form.phone,
       })
 
-      if (signUpError) {
-        setServerError(getRegisterErrorMessage(signUpError.message))
+      if (result.error) {
+        setServerError(getRegisterErrorMessage(result.error))
         return
       }
 
-      if (data.session) {
+      if (result.hasSession) {
         router.push('/dashboard/profile')
         router.refresh()
         return

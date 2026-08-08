@@ -1,6 +1,5 @@
 'use client'
 
-import type { SupabaseClient } from '@supabase/supabase-js'
 import {
   createContext,
   useCallback,
@@ -10,7 +9,6 @@ import {
   useState,
 } from 'react'
 import { getCurrentUserProfileAction } from '@/app/actions/users'
-import { createClient } from '@/lib/supabase/client'
 import type { Plan, UserRole } from '@/types'
 
 export interface UserProfile {
@@ -26,7 +24,6 @@ export interface UserProfile {
 }
 
 interface SupabaseContextType {
-  supabase: SupabaseClient
   user: UserProfile | null
   loading: boolean
   refreshUser: () => Promise<void>
@@ -37,11 +34,11 @@ const SupabaseContext = createContext<SupabaseContextType | undefined>(
 )
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  const supabase = useMemo(() => createClient(), [])
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
 
   const fetchProfile = useCallback(async () => {
+    setLoading(true)
     try {
       const result = await getCurrentUserProfileAction()
       if (result.profile) {
@@ -57,50 +54,12 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    let isActive = true
-
-    const initializeUser = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
-
-        if (session) {
-          await fetchProfile()
-          return
-        }
-      } catch {
-        // Fall back to the anonymous state if session lookup fails.
-      }
-
-      if (isActive) {
-        setUser(null)
-        setLoading(false)
-      }
-    }
-
-    void initializeUser()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        void fetchProfile()
-      } else {
-        setUser(null)
-        setLoading(false)
-      }
-    })
-
-    return () => {
-      isActive = false
-      subscription.unsubscribe()
-    }
-  }, [supabase, fetchProfile])
+    void fetchProfile()
+  }, [fetchProfile])
 
   const value = useMemo(
-    () => ({ supabase, user, loading, refreshUser: fetchProfile }),
-    [supabase, user, loading, fetchProfile]
+    () => ({ user, loading, refreshUser: fetchProfile }),
+    [user, loading, fetchProfile]
   )
 
   return (

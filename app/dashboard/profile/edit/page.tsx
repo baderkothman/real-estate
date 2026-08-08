@@ -9,6 +9,7 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { changePasswordAction } from '@/app/actions/auth'
 import { updateUserProfileAction } from '@/app/actions/users'
 import { PlanBadge } from '@/components/common/plan-badge'
 import { useSupabase } from '@/components/providers/supabase-provider'
@@ -27,7 +28,7 @@ interface ProfileData {
 }
 
 export default function EditProfilePage() {
-  const { user, supabase, refreshUser } = useSupabase()
+  const { user, refreshUser } = useSupabase()
 
   const [profile, setProfile] = useState<ProfileData>({
     name: '',
@@ -69,7 +70,7 @@ export default function EditProfilePage() {
         bio: profile.bio,
         profileImage: profile.profileImage,
       })
-      if ('error' in result) throw new Error(result.error)
+      if (result.error) throw new Error(result.error)
       setSuccessMsg('Profile updated successfully!')
       await refreshUser()
     } catch {
@@ -92,10 +93,8 @@ export default function EditProfilePage() {
     setIsSavingPw(true)
     setErrorMsg('')
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-      })
-      if (error) throw error
+      const result = await changePasswordAction(newPassword)
+      if ('error' in result) throw new Error(result.error)
       setSuccessMsg('Password changed successfully!')
       setNewPassword('')
       setConfirmPassword('')

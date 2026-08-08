@@ -10,10 +10,10 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
+import { signInAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { createClient } from '@/lib/supabase/client'
 
 const DEFAULT_CALLBACK_URL = '/dashboard/profile'
 
@@ -70,14 +70,10 @@ export function LoginPage({
     setIsLoading(true)
 
     try {
-      const supabase = createClient()
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const result = await signInAction({ email, password })
 
-      if (signInError) {
-        setError(getLoginErrorMessage(signInError.message))
+      if (result.error) {
+        setError(getLoginErrorMessage(result.error))
       } else {
         router.push(safeCallbackUrl)
         router.refresh()
