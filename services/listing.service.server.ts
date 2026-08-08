@@ -1,7 +1,9 @@
+import 'server-only'
+
 import { ITEMS_PER_PAGE } from '@/lib/constants'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
-import { ensureOwnerPartyRole } from '@/services/party.service'
+import { ensureOwnerPartyRole } from '@/services/party.service.server'
 import type {
   CreatePropertyInput,
   ListingLifecycleStatus,
@@ -11,6 +13,8 @@ import type {
   PropertyFilters,
   PropertyStatus,
 } from '@/types'
+
+// Server-only data access: callers authenticate before these RLS-protected writes.
 
 // ─── DB row types ──────────────────────────────────────────────────────────────
 //

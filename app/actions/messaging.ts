@@ -7,8 +7,8 @@ import {
   replyToInquiry,
   sendInquiry,
   sendMessage,
-} from '@/services/messaging.service'
-import { createNotification } from '@/services/notification.service'
+} from '@/services/messaging.service.server'
+import { createNotification } from '@/services/notification.service.server'
 import { getPropertyById } from '@/services/property.service'
 
 async function getAuthenticatedUserId() {

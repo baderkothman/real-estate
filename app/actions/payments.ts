@@ -4,7 +4,7 @@ import { createDepositCheckoutSession } from '@/lib/payments/stripe-provider'
 import { createClient } from '@/lib/supabase/server'
 import { createPendingDepositIntent } from '@/services/payment.service'
 import { getRegionalRule } from '@/services/regional-rules.service'
-import { getTransactionById } from '@/services/transaction.service'
+import { getTransactionById } from '@/services/transaction.service.server'
 import { getUserById } from '@/services/user.service'
 
 async function getAuthenticatedUserId() {

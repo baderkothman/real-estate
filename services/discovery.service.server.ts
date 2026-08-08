@@ -1,6 +1,10 @@
+import 'server-only'
+
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import type { PropertyFilters } from '@/types'
+
+// Server-only data access: callers authenticate before these RLS-protected writes.
 
 // ─── Saved searches & alerts ─────────────────────────────────────────────────
 //

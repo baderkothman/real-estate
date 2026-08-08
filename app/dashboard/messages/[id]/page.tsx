@@ -9,7 +9,7 @@ import {
   getConversationById,
   getMessagesForConversation,
   markConversationRead,
-} from '@/services/messaging.service'
+} from '@/services/messaging.service.server'
 
 export const metadata: Metadata = { title: 'Conversation' }
 

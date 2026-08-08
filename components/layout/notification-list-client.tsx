@@ -8,7 +8,7 @@ import {
 } from '@/app/actions/notifications'
 import { Button } from '@/components/ui/button'
 import { cn, formatRelativeDate } from '@/lib/utils'
-import type { Notification } from '@/services/notification.service'
+import type { Notification } from '@/services/notification.service.server'
 
 function NotificationBody({ n }: { n: Notification }) {
   return (

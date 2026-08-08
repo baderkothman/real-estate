@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { createNotification } from '@/services/notification.service'
+import { createNotification } from '@/services/notification.service.server'
 import {
   acceptOffer,
   counterOffer,

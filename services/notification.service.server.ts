@@ -1,5 +1,9 @@
+import 'server-only'
+
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+
+// Server-only data access: callers authenticate before these RLS-protected writes.
 
 export interface Notification {
   id: string

@@ -16,7 +16,7 @@ import {
   getTransactionById,
   getTransactionParticipants,
   getTransactionTasks,
-} from '@/services/transaction.service'
+} from '@/services/transaction.service.server'
 
 export const metadata: Metadata = { title: 'Transaction' }
 

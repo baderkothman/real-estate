@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server'
 import {
   getActiveSearchAlerts,
   markAlertRun,
-} from '@/services/discovery.service'
-import { getNewMatchingListings } from '@/services/listing.service'
-import { createNotification } from '@/services/notification.service'
+} from '@/services/discovery.service.server'
+import { getNewMatchingListings } from '@/services/listing.service.server'
+import { createNotification } from '@/services/notification.service.server'
 
 // Not wired into any scheduler by this change — deploying this requires
 // configuring a cron trigger (Vercel Cron, Supabase scheduled function, or

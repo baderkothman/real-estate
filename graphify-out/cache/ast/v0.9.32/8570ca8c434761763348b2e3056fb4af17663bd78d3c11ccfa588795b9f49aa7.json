@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_supabase_migrations_009_drop_properties_legacy_sql", "label": "009_drop_properties_legacy.sql", "file_type": "code", "source_file": "supabase/migrations/009_drop_properties_legacy.sql", "source_location": null}], "edges": []}

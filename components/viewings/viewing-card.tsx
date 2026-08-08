@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import type { Viewing } from '@/services/viewing.service'
+import type { Viewing } from '@/services/viewing.service.server'
 
 const STATUS_STYLES: Record<Viewing['status'], string> = {
   requested: 'bg-amber-50 border-amber-200 text-amber-700',

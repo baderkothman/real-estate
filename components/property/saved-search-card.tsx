@@ -9,7 +9,7 @@ import {
   setSearchAlertActiveAction,
 } from '@/app/actions/discovery'
 import { Button } from '@/components/ui/button'
-import type { SavedSearch } from '@/services/discovery.service'
+import type { SavedSearch } from '@/services/discovery.service.server'
 
 function filtersToQuery(filters: SavedSearch['filters']): string {
   const params = new URLSearchParams()

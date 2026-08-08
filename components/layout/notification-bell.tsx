@@ -9,7 +9,7 @@ import {
   markNotificationReadAction,
 } from '@/app/actions/notifications'
 import { formatRelativeDate } from '@/lib/utils'
-import type { Notification } from '@/services/notification.service'
+import type { Notification } from '@/services/notification.service.server'
 
 export function NotificationBell() {
   const router = useRouter()

@@ -11,7 +11,7 @@ import {
   getRevisionsForOffer,
   type Offer,
 } from '@/services/offer.service'
-import { getTransactionBySource } from '@/services/transaction.service'
+import { getTransactionBySource } from '@/services/transaction.service.server'
 
 export const metadata: Metadata = { title: 'Offers' }
 

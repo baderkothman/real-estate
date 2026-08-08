@@ -1,5 +1,9 @@
+import 'server-only'
+
 import { createClient } from '@/lib/supabase/server'
 import type { ListingType } from '@/types'
+
+// Server-only data access: callers authenticate before these RLS-protected writes.
 
 export type ViewingStatus =
   | 'requested'

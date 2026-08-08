@@ -13,7 +13,7 @@ import {
   signDocument,
   voidDocument,
 } from '@/services/document.service'
-import { getTransactionById } from '@/services/transaction.service'
+import { getTransactionById } from '@/services/transaction.service.server'
 
 async function getAuthenticatedUserId() {
   const supabase = await createClient()

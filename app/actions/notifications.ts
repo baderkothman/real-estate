@@ -7,7 +7,7 @@ import {
   getUnreadNotificationCount,
   markAllNotificationsRead,
   markNotificationRead,
-} from '@/services/notification.service'
+} from '@/services/notification.service.server'
 
 async function getAuthenticatedUserId() {
   const supabase = await createClient()

@@ -10,7 +10,7 @@ import {
   saveSearch,
   setSearchAlertActive,
   unhideListing,
-} from '@/services/discovery.service'
+} from '@/services/discovery.service.server'
 import type { PropertyFilters } from '@/types'
 
 async function getAuthenticatedUserId() {

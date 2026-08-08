@@ -10,8 +10,8 @@ import {
   rejectRentalApplication,
   submitRentalApplication,
   withdrawRentalApplication,
-} from '@/services/application.service'
-import { createNotification } from '@/services/notification.service'
+} from '@/services/application.service.server'
+import { createNotification } from '@/services/notification.service.server'
 import { getPropertyById } from '@/services/property.service'
 
 async function getAuthenticatedUserId() {

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { unhideListingAction } from '@/app/actions/discovery'
 import { Button } from '@/components/ui/button'
-import type { HiddenListing } from '@/services/discovery.service'
+import type { HiddenListing } from '@/services/discovery.service.server'
 
 export function HiddenListingsList({
   listings,

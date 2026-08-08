@@ -8,7 +8,7 @@ import {
   type TransactionStatus,
   transitionTransactionStatus,
   updateTaskStatus,
-} from '@/services/transaction.service'
+} from '@/services/transaction.service.server'
 
 async function getAuthenticatedUserId() {
   const supabase = await createClient()

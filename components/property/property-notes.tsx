@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { formatRelativeDate } from '@/lib/utils'
-import type { PropertyNote } from '@/services/discovery.service'
+import type { PropertyNote } from '@/services/discovery.service.server'
 
 export function PropertyNotes({
   listingId,

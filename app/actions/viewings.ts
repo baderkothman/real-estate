@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { createNotification } from '@/services/notification.service'
+import { createNotification } from '@/services/notification.service.server'
 import { getPropertyById } from '@/services/property.service'
 import {
   cancelViewing,
@@ -12,7 +12,7 @@ import {
   proposeReschedule,
   requestViewing,
   type ViewingSlot,
-} from '@/services/viewing.service'
+} from '@/services/viewing.service.server'
 
 async function getAuthenticatedUserId() {
   const supabase = await createClient()

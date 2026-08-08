@@ -4,4 +4,4 @@
 // shim keeps every existing `import ... from '@/services/property.service'`
 // working unchanged — new code should import from `@/services/listing.service`
 // directly.
-export * from './listing.service'
+export * from './listing.service.server'

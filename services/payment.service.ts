@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { applyCommissionToTransaction } from '@/services/commission.service'
-import { createNotification } from '@/services/notification.service'
+import { createNotification } from '@/services/notification.service.server'
 
 export type PaymentIntentStatus =
   | 'requires_payment_method'

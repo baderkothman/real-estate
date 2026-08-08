@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/server'
 import {
   getViewingsForHost,
   getViewingsForRequester,
-} from '@/services/viewing.service'
+} from '@/services/viewing.service.server'
 
 export const metadata: Metadata = { title: 'Viewings' }
 

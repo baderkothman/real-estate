@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { EmptyState } from '@/components/common/empty-state'
 import { NotificationListClient } from '@/components/layout/notification-list-client'
 import { createClient } from '@/lib/supabase/server'
-import { getNotificationsForUser } from '@/services/notification.service'
+import { getNotificationsForUser } from '@/services/notification.service.server'
 
 export const metadata: Metadata = { title: 'Notifications' }
 

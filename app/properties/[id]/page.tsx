@@ -33,7 +33,7 @@ import {
   getInitials,
   safeJsonLdStringify,
 } from '@/lib/utils'
-import { getNotesForListing } from '@/services/discovery.service'
+import { getNotesForListing } from '@/services/discovery.service.server'
 import {
   getPropertyById,
   getSimilarProperties,

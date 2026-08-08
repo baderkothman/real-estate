@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { transitionTransactionStatusAction } from '@/app/actions/transactions'
 import { Button } from '@/components/ui/button'
-import type { TransactionStatus } from '@/services/transaction.service'
+import type { TransactionStatus } from '@/services/transaction.service.server'
 
 const NEXT_STATUSES: Record<
   TransactionStatus,

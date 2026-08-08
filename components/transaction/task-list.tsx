@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils'
 import type {
   TaskStatus,
   TransactionTask,
-} from '@/services/transaction.service'
+} from '@/services/transaction.service.server'
 
 const STATUS_ICON: Record<TaskStatus, typeof IconCheck> = {
   open: IconCircle,

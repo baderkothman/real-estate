@@ -19,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PARTY_ROLE_LABELS, PLAN_LIMITS } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import { cn, formatPrice, getInitials } from '@/lib/utils'
-import { getPartyRoleSummaryForProfile } from '@/services/party.service'
+import { getPartyRoleSummaryForProfile } from '@/services/party.service.server'
 import {
   getSavedProperties,
   getUserProperties,

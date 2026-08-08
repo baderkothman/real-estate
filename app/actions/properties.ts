@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { PLAN_LIMITS } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import { logAudit } from '@/services/audit.service'
-import { createNotification } from '@/services/notification.service'
+import { createNotification } from '@/services/notification.service.server'
 import {
   createProperty,
   deleteProperty,

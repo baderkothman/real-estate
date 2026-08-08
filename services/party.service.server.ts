@@ -1,6 +1,10 @@
+import 'server-only'
+
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import type { ListingType, PartyRoleSummary, PartyRoleType } from '@/types'
+
+// Server-only data access: privileged writes stay behind trusted server callers.
 
 // `party_roles` has no INSERT/UPDATE/DELETE policy for authenticated/anon —
 // see supabase/migrations/006_party_roles_audit_events.sql — so every write

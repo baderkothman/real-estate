@@ -13,7 +13,7 @@ import {
 } from '@/app/actions/applications'
 import { Button } from '@/components/ui/button'
 import { cn, formatPrice } from '@/lib/utils'
-import type { RentalApplication } from '@/services/application.service'
+import type { RentalApplication } from '@/services/application.service.server'
 
 const STATUS_STYLES: Record<RentalApplication['status'], string> = {
   submitted: 'bg-amber-50 border-amber-200 text-amber-700',

@@ -1,4 +1,8 @@
+import 'server-only'
+
 import { createClient } from '@/lib/supabase/server'
+
+// Server-only data access: callers authenticate before these RLS-protected writes.
 
 export type InquiryStatus = 'new' | 'replied' | 'closed'
 

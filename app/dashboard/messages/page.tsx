@@ -10,7 +10,7 @@ import {
   getConversationsForUser,
   getInquiriesForOwner,
   getInquiriesSentByUser,
-} from '@/services/messaging.service'
+} from '@/services/messaging.service.server'
 
 export const metadata: Metadata = { title: 'Messages' }
 

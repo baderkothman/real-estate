@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/server'
 import {
   getHiddenListings,
   getSavedSearches,
-} from '@/services/discovery.service'
+} from '@/services/discovery.service.server'
 
 export const metadata: Metadata = { title: 'Saved Searches' }
 

@@ -9,8 +9,8 @@ import {
   getApplicationsForOwner,
   getApplicationsSubmitted,
   type RentalApplication,
-} from '@/services/application.service'
-import { getTransactionBySource } from '@/services/transaction.service'
+} from '@/services/application.service.server'
+import { getTransactionBySource } from '@/services/transaction.service.server'
 
 export const metadata: Metadata = { title: 'Rental Applications' }
 
