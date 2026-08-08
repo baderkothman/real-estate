@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { PLAN_LIMITS } from '@/lib/constants'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import { logAudit } from '@/services/audit.service'
 import { createNotification } from '@/services/notification.service.server'
 import {
@@ -53,10 +53,10 @@ const VALID_STATUSES: PropertyStatus[] = ['pending', 'approved', 'rejected']
 const VALID_LISTING_TYPES: ListingType[] = ['sale', 'rent']
 
 async function getAuthenticatedUserId() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
 
   return user?.id ?? null
 }
@@ -136,10 +136,10 @@ function revalidatePropertyPaths(propertyId?: string, ownerId?: string) {
 }
 
 export async function getPropertyAction(id: string) {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
 
   try {
     const property = await getPropertyById(id, user?.id)

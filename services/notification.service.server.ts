@@ -1,7 +1,7 @@
 import 'server-only'
 
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/neon/admin'
+import { createClient } from '@/lib/neon/server'
 
 // Server-only data access: callers authenticate before these RLS-protected writes.
 
@@ -67,8 +67,8 @@ export async function createNotification(input: {
 export async function getNotificationsForUser(
   userId: string
 ): Promise<Notification[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('notifications')
     .select('*')
     .eq('profile_id', userId)
@@ -82,8 +82,8 @@ export async function getNotificationsForUser(
 export async function getUnreadNotificationCount(
   userId: string
 ): Promise<number> {
-  const supabase = await createClient()
-  const { count } = await supabase
+  const dbClient = await createClient()
+  const { count } = await dbClient
     .from('notifications')
     .select('*', { count: 'exact', head: true })
     .eq('profile_id', userId)
@@ -96,8 +96,8 @@ export async function markNotificationRead(
   id: string,
   userId: string
 ): Promise<void> {
-  const supabase = await createClient()
-  await supabase
+  const dbClient = await createClient()
+  await dbClient
     .from('notifications')
     .update({ read_at: new Date().toISOString() })
     .eq('id', id)
@@ -105,8 +105,8 @@ export async function markNotificationRead(
 }
 
 export async function markAllNotificationsRead(userId: string): Promise<void> {
-  const supabase = await createClient()
-  await supabase
+  const dbClient = await createClient()
+  await dbClient
     .from('notifications')
     .update({ read_at: new Date().toISOString() })
     .eq('profile_id', userId)

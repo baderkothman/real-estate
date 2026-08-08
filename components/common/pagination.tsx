@@ -42,7 +42,8 @@ export function Pagination({ page, totalPages, className }: PaginationProps) {
     const start = Math.max(2, page - 1)
     const end = Math.min(totalPages - 1, page + 1)
     for (let i = start; i <= end; i++) items.push({ key: `page-${i}`, num: i })
-    if (page < totalPages - 2) items.push({ key: 'ellipsis-end', num: 'ellipsis' })
+    if (page < totalPages - 2)
+      items.push({ key: 'ellipsis-end', num: 'ellipsis' })
     items.push({ key: `page-${totalPages}`, num: totalPages })
     return items
   }

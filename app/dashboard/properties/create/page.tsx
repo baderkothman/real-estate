@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { z } from 'zod'
 import { createPropertyAction } from '@/app/actions/properties'
-import { useSupabase } from '@/components/providers/supabase-provider'
+import { useNeon } from '@/components/providers/neon-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -309,7 +309,7 @@ function CreatePhotosField({
 }
 
 export default function CreatePropertyPage() {
-  const { user } = useSupabase()
+  const { user } = useNeon()
   const router = useRouter()
 
   const [form, setForm] = useState({

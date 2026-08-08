@@ -8,7 +8,7 @@ import { updatePasswordAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { getPasswordPolicyErrorMessage } from '@/lib/supabase/auth-errors'
+import { getPasswordPolicyErrorMessage } from '@/lib/auth/errors'
 
 export function ResetPasswordPage({ hasSession }: { hasSession: boolean }) {
   const router = useRouter()

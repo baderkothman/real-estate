@@ -3,16 +3,16 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { EmptyState } from '@/components/common/empty-state'
 import { NotificationListClient } from '@/components/layout/notification-list-client'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import { getNotificationsForUser } from '@/services/notification.service.server'
 
 export const metadata: Metadata = { title: 'Notifications' }
 
 export default async function NotificationsPage() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   if (!user) redirect('/auth/login')
 
   const notifications = await getNotificationsForUser(user.id)

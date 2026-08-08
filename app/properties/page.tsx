@@ -8,7 +8,7 @@ import { PropertyCard } from '@/components/property/property-card'
 import { PropertyFilters } from '@/components/property/property-filters'
 import { SaveSearchButton } from '@/components/property/save-search-button'
 import { ITEMS_PER_PAGE } from '@/lib/constants'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import { getProperties } from '@/services/property.service'
 import type { PropertyFilters as Filters, ListingType } from '@/types'
 
@@ -69,10 +69,10 @@ async function PropertiesList({
     minBaths: searchParams.minBaths ? Number(searchParams.minBaths) : undefined,
   }
 
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
 
   const result = await getProperties(filters, page, ITEMS_PER_PAGE, user?.id)
   const hasActiveFilters = Object.values(filters).some(Boolean)

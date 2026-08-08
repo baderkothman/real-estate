@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import { logAudit } from '@/services/audit.service'
 import {
   banUser,
@@ -39,10 +39,10 @@ type AdminUserActionInput = {
 const VALID_PLANS: Plan[] = ['free', 'pro', 'agency']
 
 async function getAuthenticatedUserId() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
 
   return user?.id ?? null
 }

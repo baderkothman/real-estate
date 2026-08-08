@@ -10,7 +10,7 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useSupabase } from '@/components/providers/supabase-provider'
+import { useNeon } from '@/components/providers/neon-provider'
 import { cn } from '@/lib/utils'
 
 const baseItems = [
@@ -39,7 +39,7 @@ const rightItems = [
 
 export function MobileNav() {
   const pathname = usePathname()
-  const { user } = useSupabase()
+  const { user } = useNeon()
 
   const profileHref = user ? '/dashboard/profile' : '/auth/login'
   const createHref = user ? '/dashboard/properties/create' : '/auth/register'

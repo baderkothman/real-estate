@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { MessageComposer } from '@/components/messaging/message-composer'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import { cn, formatRelativeDate } from '@/lib/utils'
 import {
   getConversationById,
@@ -20,10 +20,10 @@ interface ConversationPageProps {
 export default async function ConversationPage({
   params,
 }: ConversationPageProps) {
-  const [{ id }, supabase] = await Promise.all([params, createClient()])
+  const [{ id }, dbClient] = await Promise.all([params, createClient()])
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   if (!user) redirect('/auth/login')
 
   // RLS scopes conversations to participants only — a non-participant (or a

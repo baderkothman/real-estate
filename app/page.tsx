@@ -17,6 +17,8 @@ import {
   getLatestProperties,
 } from '@/services/property.service'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   const [featured, latest] = await Promise.all([
     getFeaturedProperties(6),

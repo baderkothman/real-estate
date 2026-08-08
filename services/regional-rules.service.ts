@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 
 /**
  * Generic region_code/rule_key/rule_value config, seeded with Lebanon (LB)
- * defaults only (supabase/migrations/016_payments_ledger_commission.sql).
+ * defaults only (dbClient/migrations/016_payments_ledger_commission.sql).
  * Every seeded value is a conservative placeholder marked for legal review —
  * reading a rule here is not a compliance claim. No other region is
  * modeled; this app targets Lebanon only.
@@ -11,8 +11,8 @@ export async function getRegionalRule<T = unknown>(
   ruleKey: string,
   regionCode = 'LB'
 ): Promise<T | null> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('regional_rules')
     .select('rule_value')
     .eq('region_code', regionCode)

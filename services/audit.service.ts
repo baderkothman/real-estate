@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient } from '@/lib/neon/admin'
 
 export interface AuditLogInput {
   actorId: string | null
@@ -55,7 +55,7 @@ function dbRowToAuditLogEntry(
 /**
  * Records a high-impact domain change. Writes only via the service-role
  * client — `audit_log` has no INSERT policy for authenticated/anon roles
- * (see supabase/migrations/006_party_roles_audit_events.sql), so this is
+ * (see dbClient/migrations/006_party_roles_audit_events.sql), so this is
  * the only legitimate way to write an entry.
  *
  * Never throws: a failure to log must not block the primary action it's

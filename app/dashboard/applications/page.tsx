@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { ApplicationCard } from '@/components/applications/application-card'
 import { EmptyState } from '@/components/common/empty-state'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import {
   getApplicationsForOwner,
   getApplicationsSubmitted,
@@ -27,10 +27,10 @@ async function loadTransactions(applications: RentalApplication[]) {
 }
 
 export default async function DashboardApplicationsPage() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   if (!user) redirect('/auth/login')
 
   const [toReview, submitted] = await Promise.all([

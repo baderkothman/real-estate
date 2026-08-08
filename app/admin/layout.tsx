@@ -8,8 +8,12 @@ import {
 } from '@tabler/icons-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { hasNeonAuthEnv } from '@/lib/auth/server'
+import { hasNeonDataEnv } from '@/lib/neon/env'
+import { createClient } from '@/lib/neon/server'
 import { getUserById } from '@/services/user.service'
+
+export const dynamic = 'force-dynamic'
 
 const adminNavItems = [
   { href: '/admin', label: 'Dashboard', icon: IconLayoutDashboard },
@@ -24,10 +28,12 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
+  if (!hasNeonAuthEnv() || !hasNeonDataEnv()) redirect('/auth/login')
+
+  const dbClient = await createClient()
   const {
     data: { user: authUser },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
 
   if (!authUser) redirect('/auth/login')
 

@@ -9,33 +9,35 @@ npm run dev
 npm run build
 npm run start
 npm run lint
-npm run seed:users
+npm run typecheck
+npm run db:migrate
 ```
 
-No automated test suite is currently configured.
+Playwright accessibility tests are available but require a running local app
+with migrated Neon data.
 
 ## Project Reality (Important)
 
-- Auth is handled by Supabase Auth, not NextAuth.
-- Data is stored in Supabase (Postgres), not in-memory arrays.
+- Auth is handled by Neon Auth, not NextAuth.
+- Data is stored in Neon Postgres through the Neon Data API, not in-memory arrays.
 - Core domain tables are `profiles`, `properties`, and `saved_properties`.
 - Middleware and server routes enforce auth/role checks.
 
 ## Stack
 
-- Next.js 15 App Router
+- Next.js 16 App Router
 - React 19 + TypeScript
 - Tailwind CSS + shadcn/ui primitives
-- Supabase (`@supabase/ssr`, `@supabase/supabase-js`)
+- Neon Postgres, Neon Data API, and Neon Auth
 - Stripe subscriptions
 
 ## Architecture
 
-### Supabase Clients
+### Neon Clients
 
-- `lib/supabase/server.ts`: request-scoped server client (cookies-aware).
-- `lib/supabase/client.ts`: browser client for client components.
-- `lib/supabase/admin.ts`: service-role admin client for privileged operations.
+- `lib/auth/server.ts`: Neon Auth server singleton.
+- `lib/neon/server.ts`: request-scoped Data API client with Neon Auth token injection.
+- `lib/neon/admin.ts`: trusted server Data API client for privileged operations.
 
 Use server client for user-scoped actions and admin client only on trusted server paths.
 
@@ -51,7 +53,7 @@ When changing business rules, start in services first, then update route handler
 
 ### Auth and Authorization
 
-- Use `supabase.auth.getUser()` for server-side auth checks.
+- Use the server client auth facade for server-side auth checks.
 - `/dashboard/*` requires an authenticated user.
 - `/admin/*` requires authenticated user with `profiles.role = 'admin'`.
 - Role is read from `profiles` (database source of truth), not trusted from client state.
@@ -78,11 +80,7 @@ When changing business rules, start in services first, then update route handler
 
 ## Database and Migrations
 
-SQL migrations live in `supabase/migrations/`:
-
-1. `001_init.sql` creates schema, RLS policies, and analytics SQL functions.
-2. `002_security_hardening.sql` hardens signup defaults and profile update policy.
-3. `003_harden_function_search_path.sql` hardens SQL function execution context and grants.
+The Neon-ready schema migration lives in `neon/migrations/0001_initial_schema.sql`.
 
 Any schema or policy change should be implemented through a new migration.
 
@@ -108,9 +106,11 @@ Key expectations:
 
 Required for core app behavior:
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEON_AUTH_BASE_URL`
+- `NEON_AUTH_COOKIE_SECRET`
+- `NEON_DATA_API_URL`
+- `NEON_DATA_API_ADMIN_TOKEN`
+- `DATABASE_URL` for manual migrations
 
 Used for Stripe checkout:
 

@@ -4,7 +4,7 @@ import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
 import { MobileNav } from '@/components/layout/mobile-nav'
 import { CompareTray } from '@/components/property/compare-tray'
-import { SupabaseProvider } from '@/components/providers/supabase-provider'
+import { NeonProvider } from '@/components/providers/neon-provider'
 import { APP_DESCRIPTION, APP_NAME } from '@/lib/constants'
 
 export const metadata: Metadata = {
@@ -40,7 +40,7 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <SupabaseProvider>
+        <NeonProvider>
           <Header />
           {/* main gets bottom padding on mobile to clear the fixed nav */}
           <main id="main-content" className="flex-1 pb-[76px] md:pb-0">
@@ -52,7 +52,7 @@ export default function RootLayout({
           </div>
           <MobileNav />
           <CompareTray />
-        </SupabaseProvider>
+        </NeonProvider>
       </body>
     </html>
   )

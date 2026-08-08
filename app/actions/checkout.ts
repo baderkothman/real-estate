@@ -1,8 +1,8 @@
 'use server'
 
 import { headers } from 'next/headers'
+import { createClient } from '@/lib/neon/server'
 import { getPriceId } from '@/lib/stripe'
-import { createClient } from '@/lib/supabase/server'
 import { getUserById } from '@/services/user.service'
 
 type CheckoutInput = {
@@ -11,10 +11,10 @@ type CheckoutInput = {
 }
 
 export async function createCheckoutSessionAction(input: CheckoutInput) {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
 
   if (!user) return { error: 'Unauthorized' }
 

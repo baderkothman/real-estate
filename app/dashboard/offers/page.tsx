@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { EmptyState } from '@/components/common/empty-state'
 import { OfferCard } from '@/components/offers/offer-card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import {
   getOffersMade,
   getOffersReceived,
@@ -29,10 +29,10 @@ async function loadOfferDetails(offers: Offer[]) {
 }
 
 export default async function DashboardOffersPage() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   if (!user) redirect('/auth/login')
 
   const [made, received] = await Promise.all([

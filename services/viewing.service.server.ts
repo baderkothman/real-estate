@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import type { ListingType } from '@/types'
 
 // Server-only data access: callers authenticate before these RLS-protected writes.
@@ -102,9 +102,9 @@ export async function requestViewing(input: {
   requestedSlots: ViewingSlot[]
   locationNote?: string
 }): Promise<Viewing> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
-  const { data: row, error } = await supabase
+  const { data: row, error } = await dbClient
     .from('viewings')
     .insert({
       listing_id: input.listingId,
@@ -123,8 +123,8 @@ export async function requestViewing(input: {
 }
 
 async function getViewingRaw(id: string): Promise<ViewingRow | null> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('viewings')
     .select('host_id, requested_by')
     .eq('id', id)
@@ -144,8 +144,8 @@ export async function confirmViewing(
     throw new Error('Not authorized')
   }
 
-  const supabase = await createClient()
-  const { data: row, error } = await supabase
+  const dbClient = await createClient()
+  const { data: row, error } = await dbClient
     .from('viewings')
     .update({
       status: 'confirmed',
@@ -174,8 +174,8 @@ export async function cancelViewing(
     throw new Error('Not authorized')
   }
 
-  const supabase = await createClient()
-  const { data: row, error } = await supabase
+  const dbClient = await createClient()
+  const { data: row, error } = await dbClient
     .from('viewings')
     .update({ status: 'cancelled', cancellation_reason: reason ?? null })
     .eq('id', id)
@@ -196,8 +196,8 @@ export async function completeViewing(
     throw new Error('Not authorized')
   }
 
-  const supabase = await createClient()
-  const { data: row, error } = await supabase
+  const dbClient = await createClient()
+  const { data: row, error } = await dbClient
     .from('viewings')
     .update({ status: 'completed' })
     .eq('id', id)
@@ -218,8 +218,8 @@ export async function markViewingNoShow(
     throw new Error('Not authorized')
   }
 
-  const supabase = await createClient()
-  const { data: row, error } = await supabase
+  const dbClient = await createClient()
+  const { data: row, error } = await dbClient
     .from('viewings')
     .update({ status: 'no_show' })
     .eq('id', id)
@@ -243,8 +243,8 @@ export async function proposeReschedule(
     throw new Error('Not authorized')
   }
 
-  const supabase = await createClient()
-  const { data: row, error } = await supabase
+  const dbClient = await createClient()
+  const { data: row, error } = await dbClient
     .from('viewings')
     .update({
       status: 'requested',
@@ -264,8 +264,8 @@ export async function proposeReschedule(
 export async function getViewingsForRequester(
   userId: string
 ): Promise<Viewing[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('viewings')
     .select(VIEWING_SELECT)
     .eq('requested_by', userId)
@@ -276,8 +276,8 @@ export async function getViewingsForRequester(
 }
 
 export async function getViewingsForHost(userId: string): Promise<Viewing[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('viewings')
     .select(VIEWING_SELECT)
     .eq('host_id', userId)

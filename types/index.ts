@@ -19,7 +19,7 @@ export interface User {
 // ─── Property Types ─────────────────────────────────────────────────────────────
 //
 // `properties` (physical asset) and `listings` (market advertisement) are
-// separate tables in the database (see supabase/migrations/005_split_properties_listings.sql).
+// separate tables in the database (see dbClient/migrations/005_split_properties_listings.sql).
 // The `Property` type below is the historical, still-supported flattened
 // shape: it represents a *listing* joined with its underlying physical
 // property, and every existing consumer keeps working unchanged against it.
@@ -89,7 +89,7 @@ export interface PropertyFilters {
 // A profile's buyer/seller/landlord/tenant/agent role is scoped per-listing
 // (or, once transactions exist, per-transaction) rather than being a global
 // account attribute — one account can be a seller on one listing and a
-// buyer on another. See supabase/migrations/006_party_roles_audit_events.sql.
+// buyer on another. See dbClient/migrations/006_party_roles_audit_events.sql.
 
 export type PartyRoleType =
   | 'buyer'

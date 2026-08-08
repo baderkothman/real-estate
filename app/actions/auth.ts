@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 
 type Credentials = {
   email: string
@@ -8,8 +8,8 @@ type Credentials = {
 }
 
 export async function signInAction({ email, password }: Credentials) {
-  const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const dbClient = await createClient()
+  const { error } = await dbClient.auth.signInWithPassword({ email, password })
   return error ? { error: error.message } : { success: true }
 }
 
@@ -19,8 +19,8 @@ export async function signUpAction(
     phone: string
   }
 ) {
-  const supabase = await createClient()
-  const { data, error } = await supabase.auth.signUp({
+  const dbClient = await createClient()
+  const { data, error } = await dbClient.auth.signUp({
     email: input.email,
     password: input.password,
     options: {
@@ -33,32 +33,32 @@ export async function signUpAction(
 }
 
 export async function updatePasswordAction(password: string) {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   if (!user) return { error: 'Your password reset session has expired.' }
 
-  const { error } = await supabase.auth.updateUser({ password })
+  const { error } = await dbClient.auth.updateUser({ password })
   if (error) return { error: error.message }
 
-  await supabase.auth.signOut()
+  await dbClient.auth.signOut()
   return { success: true }
 }
 
 export async function changePasswordAction(password: string) {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
-  const { error } = await supabase.auth.updateUser({ password })
+  const { error } = await dbClient.auth.updateUser({ password })
   return error ? { error: error.message } : { success: true }
 }
 
 export async function signOutAction() {
-  const supabase = await createClient()
-  const { error } = await supabase.auth.signOut()
+  const dbClient = await createClient()
+  const { error } = await dbClient.auth.signOut()
   return error ? { error: error.message } : { success: true }
 }

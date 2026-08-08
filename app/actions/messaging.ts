@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import {
   closeInquiry,
   replyToInquiry,
@@ -12,10 +12,10 @@ import { createNotification } from '@/services/notification.service.server'
 import { getPropertyById } from '@/services/property.service'
 
 async function getAuthenticatedUserId() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   return user?.id ?? null
 }
 
@@ -69,8 +69,8 @@ export async function replyToInquiryAction(inquiryId: string, reply: string) {
   }
 
   try {
-    const supabase = await createClient()
-    const { data: inquiry } = await supabase
+    const dbClient = await createClient()
+    const { data: inquiry } = await dbClient
       .from('inquiries')
       .select('from_profile_id, listings(title)')
       .eq('id', inquiryId)
@@ -122,8 +122,8 @@ export async function sendMessageAction(conversationId: string, body: string) {
   try {
     await sendMessage(conversationId, userId, body.trim())
 
-    const supabase = await createClient()
-    const { data: otherParticipants } = await supabase
+    const dbClient = await createClient()
+    const { data: otherParticipants } = await dbClient
       .from('conversation_participants')
       .select('profile_id')
       .eq('conversation_id', conversationId)

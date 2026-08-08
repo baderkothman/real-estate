@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { EmptyState } from '@/components/common/empty-state'
 import { HiddenListingsList } from '@/components/property/hidden-listings-list'
 import { SavedSearchCard } from '@/components/property/saved-search-card'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import {
   getHiddenListings,
   getSavedSearches,
@@ -13,10 +13,10 @@ import {
 export const metadata: Metadata = { title: 'Saved Searches' }
 
 export default async function SavedSearchesPage() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   if (!user) redirect('/auth/login')
 
   const [searches, hiddenListings] = await Promise.all([

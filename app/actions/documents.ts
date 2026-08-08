@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import {
   createDocument,
   createDocumentDownloadUrl,
@@ -16,10 +16,10 @@ import {
 import { getTransactionById } from '@/services/transaction.service.server'
 
 async function getAuthenticatedUserId() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   return user?.id ?? null
 }
 
@@ -43,18 +43,7 @@ export async function getDocumentUploadUrlAction(
   const path = `${transactionId}/${crypto.randomUUID()}-${safeName}`
 
   try {
-    const upload = await createDocumentUploadUrl(path)
-    const publicKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    if (!publicKey) return { error: 'Storage is not configured' }
-
-    return {
-      ...upload,
-      headers: {
-        apikey: publicKey,
-        Authorization: `Bearer ${publicKey}`,
-        'x-upsert': 'false',
-      },
-    }
+    return await createDocumentUploadUrl(path)
   } catch (err) {
     console.error('Create upload URL error:', err)
     return { error: errorMessage(err, 'Failed to prepare upload') }

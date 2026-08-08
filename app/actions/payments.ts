@@ -1,17 +1,17 @@
 'use server'
 
+import { createClient } from '@/lib/neon/server'
 import { createDepositCheckoutSession } from '@/lib/payments/stripe-provider'
-import { createClient } from '@/lib/supabase/server'
 import { createPendingDepositIntent } from '@/services/payment.service'
 import { getRegionalRule } from '@/services/regional-rules.service'
 import { getTransactionById } from '@/services/transaction.service.server'
 import { getUserById } from '@/services/user.service'
 
 async function getAuthenticatedUserId() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   return user?.id ?? null
 }
 
@@ -35,8 +35,8 @@ export async function createDepositCheckoutSessionAction(
   if (!transaction) return { error: 'Transaction not found' }
 
   if (transaction.sourceType === 'offer') {
-    const supabase = await createClient()
-    const { data: offer } = await supabase
+    const dbClient = await createClient()
+    const { data: offer } = await dbClient
       .from('offers')
       .select('current_revision:offer_revisions!current_revision_id(price)')
       .eq('id', transaction.sourceId)

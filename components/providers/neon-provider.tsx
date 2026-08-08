@@ -23,17 +23,15 @@ export interface UserProfile {
   isBanned: boolean
 }
 
-interface SupabaseContextType {
+interface NeonContextType {
   user: UserProfile | null
   loading: boolean
   refreshUser: () => Promise<void>
 }
 
-const SupabaseContext = createContext<SupabaseContextType | undefined>(
-  undefined
-)
+const NeonContext = createContext<NeonContextType | undefined>(undefined)
 
-export function SupabaseProvider({ children }: { children: React.ReactNode }) {
+export function NeonProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -62,17 +60,13 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     [user, loading, fetchProfile]
   )
 
-  return (
-    <SupabaseContext.Provider value={value}>
-      {children}
-    </SupabaseContext.Provider>
-  )
+  return <NeonContext.Provider value={value}>{children}</NeonContext.Provider>
 }
 
-export function useSupabase() {
-  const context = useContext(SupabaseContext)
+export function useNeon() {
+  const context = useContext(NeonContext)
   if (!context) {
-    throw new Error('useSupabase must be used within SupabaseProvider')
+    throw new Error('useNeon must be used within NeonProvider')
   }
   return context
 }

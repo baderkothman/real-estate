@@ -1,7 +1,7 @@
 import 'server-only'
 
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/neon/admin'
+import { createClient } from '@/lib/neon/server'
 import type { PropertyFilters } from '@/types'
 
 // Server-only data access: callers authenticate before these RLS-protected writes.
@@ -37,8 +37,8 @@ export async function saveSearch(input: {
   name: string
   filters: PropertyFilters
 }): Promise<string> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('saved_searches')
     .insert({
       profile_id: input.profileId,
@@ -50,14 +50,14 @@ export async function saveSearch(input: {
 
   if (error || !data) throw new Error(error?.message ?? 'Failed to save search')
 
-  await supabase.from('search_alerts').insert({ saved_search_id: data.id })
+  await dbClient.from('search_alerts').insert({ saved_search_id: data.id })
 
   return data.id as string
 }
 
 export async function getSavedSearches(userId: string): Promise<SavedSearch[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('saved_searches')
     .select('*, search_alerts(is_active, frequency)')
     .eq('profile_id', userId)
@@ -78,8 +78,8 @@ export async function deleteSavedSearch(
   id: string,
   userId: string
 ): Promise<void> {
-  const supabase = await createClient()
-  await supabase
+  const dbClient = await createClient()
+  await dbClient
     .from('saved_searches')
     .delete()
     .eq('id', id)
@@ -90,8 +90,8 @@ export async function setSearchAlertActive(
   savedSearchId: string,
   isActive: boolean
 ): Promise<void> {
-  const supabase = await createClient()
-  await supabase
+  const dbClient = await createClient()
+  await dbClient
     .from('search_alerts')
     .update({ is_active: isActive })
     .eq('saved_search_id', savedSearchId)
@@ -166,8 +166,8 @@ export async function getNotesForListing(
   listingId: string,
   userId: string
 ): Promise<PropertyNote[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('property_notes')
     .select('*')
     .eq('listing_id', listingId)
@@ -189,8 +189,8 @@ export async function addPropertyNote(input: {
   listingId: string
   body: string
 }): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase.from('property_notes').insert({
+  const dbClient = await createClient()
+  const { error } = await dbClient.from('property_notes').insert({
     profile_id: input.profileId,
     listing_id: input.listingId,
     body: input.body,
@@ -202,8 +202,8 @@ export async function deletePropertyNote(
   id: string,
   userId: string
 ): Promise<void> {
-  const supabase = await createClient()
-  await supabase
+  const dbClient = await createClient()
+  await dbClient
     .from('property_notes')
     .delete()
     .eq('id', id)
@@ -221,8 +221,8 @@ export interface HiddenListing {
 export async function getHiddenListings(
   userId: string
 ): Promise<HiddenListing[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('hidden_listings')
     .select('listing_id, hidden_at, listings(title)')
     .eq('profile_id', userId)
@@ -246,8 +246,8 @@ export async function hideListing(
   listingId: string,
   userId: string
 ): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase
+  const dbClient = await createClient()
+  const { error } = await dbClient
     .from('hidden_listings')
     .insert({ profile_id: userId, listing_id: listingId })
   if (error) throw new Error(error.message)
@@ -257,8 +257,8 @@ export async function unhideListing(
   listingId: string,
   userId: string
 ): Promise<void> {
-  const supabase = await createClient()
-  await supabase
+  const dbClient = await createClient()
+  await dbClient
     .from('hidden_listings')
     .delete()
     .eq('profile_id', userId)

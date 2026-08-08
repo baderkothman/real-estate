@@ -1,13 +1,13 @@
 import 'server-only'
 
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/neon/admin'
+import { createClient } from '@/lib/neon/server'
 import type { ListingType, PartyRoleSummary, PartyRoleType } from '@/types'
 
 // Server-only data access: privileged writes stay behind trusted server callers.
 
 // `party_roles` has no INSERT/UPDATE/DELETE policy for authenticated/anon —
-// see supabase/migrations/006_party_roles_audit_events.sql — so every write
+// see dbClient/migrations/006_party_roles_audit_events.sql — so every write
 // here goes through the service-role admin client. Reads use the
 // request-scoped client so RLS naturally scopes a profile to their own
 // roles (or an admin to everyone's).
@@ -23,9 +23,9 @@ import type { ListingType, PartyRoleSummary, PartyRoleType } from '@/types'
 export async function getPartyRoleSummaryForProfile(
   profileId: string
 ): Promise<PartyRoleSummary[]> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
-  const { data, error } = await supabase
+  const { data, error } = await dbClient
     .from('party_roles')
     .select('role')
     .eq('profile_id', profileId)

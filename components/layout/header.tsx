@@ -15,7 +15,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { signOutAction } from '@/app/actions/auth'
 import { NotificationBell } from '@/components/layout/notification-bell'
-import { useSupabase } from '@/components/providers/supabase-provider'
+import { useNeon } from '@/components/providers/neon-provider'
 import { Button } from '@/components/ui/button'
 import { cn, getInitials } from '@/lib/utils'
 
@@ -28,7 +28,7 @@ const navLinks = [
 ]
 
 export function Header() {
-  const { user } = useSupabase()
+  const { user } = useNeon()
   const pathname = usePathname()
   const router = useRouter()
   const [profileOpen, setProfileOpen] = useState(false)

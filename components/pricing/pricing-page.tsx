@@ -9,7 +9,7 @@ import {
 import Link from 'next/link'
 import { useState } from 'react'
 import { createCheckoutSessionAction } from '@/app/actions/checkout'
-import { useSupabase } from '@/components/providers/supabase-provider'
+import { useNeon } from '@/components/providers/neon-provider'
 import { Button } from '@/components/ui/button'
 import { PLAN_FEATURES, PLAN_PRICES } from '@/lib/constants'
 import { cn } from '@/lib/utils'
@@ -39,7 +39,7 @@ const comparisonRows = [
 ]
 
 export function PricingPage() {
-  const { user } = useSupabase()
+  const { user } = useNeon()
   const [billing, setBilling] = useState<Billing>('month')
 
   const handleCheckout = async (plan: 'pro' | 'agency') => {

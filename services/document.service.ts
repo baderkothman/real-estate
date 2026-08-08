@@ -1,6 +1,5 @@
 import { getEsignProvider } from '@/lib/esign'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 
 export type EnvelopeStatus =
   | 'not_started'
@@ -91,8 +90,8 @@ function dbRowToDocument(row: DocumentRow): TransactionDocument {
 export async function getDocumentById(
   id: string
 ): Promise<TransactionDocument | null> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('documents')
     .select(DOCUMENT_SELECT)
     .eq('id', id)
@@ -105,8 +104,8 @@ export async function getDocumentById(
 export async function getDocumentsForTransaction(
   transactionId: string
 ): Promise<TransactionDocument[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('documents')
     .select(DOCUMENT_SELECT)
     .eq('transaction_id', transactionId)
@@ -123,8 +122,8 @@ export async function createDocument(input: {
   storagePath: string
   uploadedBy: string
 }): Promise<string> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('documents')
     .insert({
       transaction_id: input.transactionId,
@@ -145,12 +144,12 @@ export async function sendDocumentForSignature(
   documentId: string,
   documentTitle: string
 ): Promise<void> {
-  const [supabase, envelope] = await Promise.all([
+  const [dbClient, envelope] = await Promise.all([
     createClient(),
     getEsignProvider().createEnvelope({ documentTitle }),
   ])
 
-  const { error } = await supabase.rpc('send_document_for_signature', {
+  const { error } = await dbClient.rpc('send_document_for_signature', {
     p_document_id: documentId,
     p_envelope_id: envelope.envelopeId,
   })
@@ -158,49 +157,39 @@ export async function sendDocumentForSignature(
 }
 
 export async function signDocument(documentSignerId: string): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase.rpc('sign_document', {
+  const dbClient = await createClient()
+  const { error } = await dbClient.rpc('sign_document', {
     p_document_signer_id: documentSignerId,
   })
   if (error) throw new Error(error.message)
 }
 
 export async function declineDocument(documentSignerId: string): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase.rpc('decline_document', {
+  const dbClient = await createClient()
+  const { error } = await dbClient.rpc('decline_document', {
     p_document_signer_id: documentSignerId,
   })
   if (error) throw new Error(error.message)
 }
 
 export async function voidDocument(documentId: string): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase.rpc('void_document', {
+  const dbClient = await createClient()
+  const { error } = await dbClient.rpc('void_document', {
     p_document_id: documentId,
   })
   if (error) throw new Error(error.message)
 }
 
-// ─── Storage (private bucket, service-role-issued signed URLs only) ────────
+// ─── Storage ───────────────────────────────────────────────────────────────
 
 export async function createDocumentUploadUrl(
   path: string
 ): Promise<{ signedUrl: string; token: string; path: string }> {
-  const admin = createAdminClient()
-  const { data, error } = await admin.storage
-    .from('documents')
-    .createSignedUploadUrl(path)
-  if (error || !data)
-    throw new Error(error?.message ?? 'Failed to create upload URL')
-  return { signedUrl: data.signedUrl, token: data.token, path: data.path }
+  void path
+  throw new Error('Document storage provider is not configured')
 }
 
 export async function createDocumentDownloadUrl(path: string): Promise<string> {
-  const admin = createAdminClient()
-  const { data, error } = await admin.storage
-    .from('documents')
-    .createSignedUrl(path, 60 * 5) // 5 minutes
-  if (error || !data)
-    throw new Error(error?.message ?? 'Failed to create download URL')
-  return data.signedUrl
+  void path
+  throw new Error('Document storage provider is not configured')
 }

@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PARTY_ROLE_LABELS, PLAN_LIMITS } from '@/lib/constants'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import { cn, formatPrice, getInitials } from '@/lib/utils'
 import { getPartyRoleSummaryForProfile } from '@/services/party.service.server'
 import {
@@ -106,13 +106,10 @@ interface DashboardProfilePageProps {
 export default async function DashboardProfilePage({
   searchParams,
 }: DashboardProfilePageProps) {
-  const [{ tab }, supabase] = await Promise.all([
-    searchParams,
-    createClient(),
-  ])
+  const [{ tab }, dbClient] = await Promise.all([searchParams, createClient()])
   const {
     data: { user: authUser },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   if (!authUser) redirect('/auth/login')
 
   const user = await getUserById(authUser.id)

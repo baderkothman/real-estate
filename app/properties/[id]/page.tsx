@@ -24,7 +24,7 @@ import { PropertyGallery } from '@/components/property/property-gallery'
 import { PropertyNotes } from '@/components/property/property-notes'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import {
   cn,
   formatDate,
@@ -288,10 +288,10 @@ export async function generateMetadata({
 }
 
 export default async function PropertyPage({ params }: PropertyPageProps) {
-  const [{ id }, supabase] = await Promise.all([params, createClient()])
+  const [{ id }, dbClient] = await Promise.all([params, createClient()])
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
 
   const property = await getPropertyById(id, user?.id)
   if (!property) notFound()

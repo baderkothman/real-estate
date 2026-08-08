@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import { createNotification } from '@/services/notification.service.server'
 import { getPropertyById } from '@/services/property.service'
 import {
@@ -15,10 +15,10 @@ import {
 } from '@/services/viewing.service.server'
 
 async function getAuthenticatedUserId() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   return user?.id ?? null
 }
 

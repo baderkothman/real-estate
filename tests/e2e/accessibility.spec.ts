@@ -10,9 +10,8 @@ import { expect, test } from '@playwright/test'
  * order, computed contrast, dynamically-injected content, landmark
  * structure), which is why this needs a live browser pass.
  *
- * Requires: `npm run dev` running against a local Supabase instance with
- * demo users seeded (`npm run seed:users`) and at least one approved
- * listing seeded (see scratchpad seed-properties.sql from this session).
+ * Requires: `npm run dev` running against a local Neon database with demo
+ * users and at least one approved listing available.
  */
 
 const ADMIN_EMAIL = 'admin@othman.com'

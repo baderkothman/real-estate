@@ -1,8 +1,9 @@
 import 'server-only'
 
 import { ITEMS_PER_PAGE } from '@/lib/constants'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/neon/admin'
+import { hasNeonDataEnv } from '@/lib/neon/env'
+import { createClient } from '@/lib/neon/server'
 import { ensureOwnerPartyRole } from '@/services/party.service.server'
 import type {
   CreatePropertyInput,
@@ -19,7 +20,7 @@ import type {
 // ─── DB row types ──────────────────────────────────────────────────────────────
 //
 // `properties` (physical asset) and `listings` (market advertisement) are
-// separate tables — see supabase/migrations/005_split_properties_listings.sql.
+// separate tables — see dbClient/migrations/005_split_properties_listings.sql.
 // This service reads/writes both, joined, but returns the same `Property`
 // shape every existing consumer already expects (`id` = listing id).
 
@@ -113,9 +114,9 @@ export async function getProperties(
   pageSize = ITEMS_PER_PAGE,
   currentUserId?: string
 ): Promise<PaginatedResult<Property>> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
-  let query = supabase
+  let query = dbClient
     .from('listings')
     .select(LISTING_SELECT, { count: 'exact' })
     .order('created_at', { ascending: false })
@@ -157,7 +158,7 @@ export async function getProperties(
   // own search results — hiding never deletes anything, it only affects
   // what this one profile sees.
   if (currentUserId) {
-    const { data: hidden } = await supabase
+    const { data: hidden } = await dbClient
       .from('hidden_listings')
       .select('listing_id')
       .eq('profile_id', currentUserId)
@@ -176,7 +177,7 @@ export async function getProperties(
   // Build saved set for current user
   let savedSet = new Set<string>()
   if (currentUserId && rows && rows.length > 0) {
-    const { data: saved } = await supabase
+    const { data: saved } = await dbClient
       .from('saved_properties')
       .select('property_id')
       .eq('user_id', currentUserId)
@@ -206,9 +207,9 @@ export async function getPropertyById(
   id: string,
   currentUserId?: string
 ): Promise<Property | null> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
-  const { data: row, error } = await supabase
+  const { data: row, error } = await dbClient
     .from('listings')
     .select(LISTING_SELECT)
     .eq('id', id)
@@ -219,7 +220,7 @@ export async function getPropertyById(
 
   let savedByCurrentUser = false
   if (currentUserId) {
-    const { data: saved } = await supabase
+    const { data: saved } = await dbClient
       .from('saved_properties')
       .select('user_id')
       .eq('user_id', currentUserId)
@@ -235,9 +236,11 @@ export async function getPropertyById(
 }
 
 export async function getFeaturedProperties(limit = 6): Promise<Property[]> {
-  const supabase = await createClient()
+  if (!hasNeonDataEnv()) return []
 
-  const { data: rows, error } = await supabase
+  const dbClient = await createClient()
+
+  const { data: rows, error } = await dbClient
     .from('listings')
     .select(LISTING_SELECT)
     .eq('is_featured', true)
@@ -254,9 +257,11 @@ export async function getLatestProperties(
   limit = 8,
   excludeUserId?: string
 ): Promise<Property[]> {
-  const supabase = await createClient()
+  if (!hasNeonDataEnv()) return []
 
-  let query = supabase
+  const dbClient = await createClient()
+
+  let query = dbClient
     .from('listings')
     .select(LISTING_SELECT)
     .eq('moderation_status', 'approved')
@@ -276,9 +281,9 @@ export async function getLatestProperties(
 export async function createProperty(
   data: CreatePropertyInput
 ): Promise<Property> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
-  const { data: newListingId, error } = await supabase.rpc(
+  const { data: newListingId, error } = await dbClient.rpc(
     'create_property_listing',
     {
       p_owner_id: data.userId,
@@ -315,7 +320,7 @@ export async function updateProperty(
   id: string,
   data: Partial<Property>
 ): Promise<Property | null> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
   const listingUpdate: Record<string, unknown> = {}
   if (data.title !== undefined) listingUpdate.title = data.title
@@ -343,7 +348,7 @@ export async function updateProperty(
 
   let propertyId = data.propertyId
   if (Object.keys(propertyUpdate).length > 0 && !propertyId) {
-    const { data: listingRow } = await supabase
+    const { data: listingRow } = await dbClient
       .from('listings')
       .select('property_id')
       .eq('id', id)
@@ -352,7 +357,7 @@ export async function updateProperty(
   }
 
   if (Object.keys(listingUpdate).length > 0) {
-    const { error } = await supabase
+    const { error } = await dbClient
       .from('listings')
       .update(listingUpdate)
       .eq('id', id)
@@ -360,7 +365,7 @@ export async function updateProperty(
   }
 
   if (Object.keys(propertyUpdate).length > 0 && propertyId) {
-    const { error } = await supabase
+    const { error } = await dbClient
       .from('properties')
       .update(propertyUpdate)
       .eq('id', propertyId)
@@ -371,7 +376,7 @@ export async function updateProperty(
 }
 
 export async function deleteProperty(id: string): Promise<boolean> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
   // Single atomic DELETE ... RETURNING round trip instead of a
   // SELECT-then-DELETE pair: the two awaits looked independent to
@@ -383,7 +388,7 @@ export async function deleteProperty(id: string): Promise<boolean> {
   // cleanup below. Folding them into one `.delete().select()` call
   // removes the extra round trip entirely (strictly faster than either
   // sequential or parallel two-call versions) and removes the race.
-  const { data: listing, error } = await supabase
+  const { data: listing, error } = await dbClient
     .from('listings')
     .delete()
     .eq('id', id)
@@ -392,12 +397,12 @@ export async function deleteProperty(id: string): Promise<boolean> {
   if (error) return false
 
   if (listing?.property_id) {
-    const { count } = await supabase
+    const { count } = await dbClient
       .from('listings')
       .select('*', { count: 'exact', head: true })
       .eq('property_id', listing.property_id)
     if (!count) {
-      await supabase.from('properties').delete().eq('id', listing.property_id)
+      await dbClient.from('properties').delete().eq('id', listing.property_id)
     }
   }
 
@@ -408,9 +413,9 @@ export async function toggleSave(
   propertyId: string,
   userId: string
 ): Promise<{ saved: boolean }> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
-  const { data: existing } = await supabase
+  const { data: existing } = await dbClient
     .from('saved_properties')
     .select('user_id')
     .eq('user_id', userId)
@@ -418,7 +423,7 @@ export async function toggleSave(
     .maybeSingle()
 
   if (existing) {
-    await supabase
+    await dbClient
       .from('saved_properties')
       .delete()
       .eq('user_id', userId)
@@ -426,7 +431,7 @@ export async function toggleSave(
     return { saved: false }
   }
 
-  await supabase
+  await dbClient
     .from('saved_properties')
     .insert({ user_id: userId, property_id: propertyId })
   return { saved: true }
@@ -436,9 +441,9 @@ export async function toggleSold(
   propertyId: string,
   userId: string
 ): Promise<{ isSold: boolean }> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
-  const { data: row } = await supabase
+  const { data: row } = await dbClient
     .from('listings')
     .select('listed_by, lifecycle_status, listing_type')
     .eq('id', propertyId)
@@ -453,7 +458,7 @@ export async function toggleSold(
       ? 'leased'
       : 'sold'
 
-  await supabase
+  await dbClient
     .from('listings')
     .update({
       lifecycle_status: nextStatus,
@@ -468,9 +473,9 @@ export async function getUserProperties(
   userId: string,
   includeAll = false
 ): Promise<Property[]> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
-  let query = supabase
+  let query = dbClient
     .from('listings')
     .select(LISTING_SELECT)
     .eq('listed_by', userId)
@@ -486,9 +491,9 @@ export async function getUserProperties(
 }
 
 export async function getSavedProperties(userId: string): Promise<Property[]> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
-  const { data, error } = await supabase
+  const { data, error } = await dbClient
     .from('saved_properties')
     .select(`listings(${LISTING_SELECT})`)
     .eq('user_id', userId)
@@ -508,9 +513,9 @@ export async function getSimilarProperties(
   city: string,
   limit = 3
 ): Promise<Property[]> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
-  const { data: rows, error } = await supabase
+  const { data: rows, error } = await dbClient
     .from('listings')
     .select(LISTING_SELECT)
     .neq('id', propertyId)
@@ -536,11 +541,11 @@ export async function featureProperty(
   // the update. Callers (adminPropertyAction) already verify the caller is
   // an admin before reaching this function, and admin RLS/guard checks
   // allow the write through the caller's own session.
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const until = new Date()
   until.setDate(until.getDate() + days)
 
-  const { error } = await supabase
+  const { error } = await dbClient
     .from('listings')
     .update({
       is_featured: true,

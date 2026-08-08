@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { EmptyState } from '@/components/common/empty-state'
 import { InquiryReplyForm } from '@/components/messaging/inquiry-reply-form'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import { cn, formatRelativeDate } from '@/lib/utils'
 import {
   getConversationsForUser,
@@ -15,10 +15,10 @@ import {
 export const metadata: Metadata = { title: 'Messages' }
 
 export default async function DashboardMessagesPage() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   if (!user) redirect('/auth/login')
 
   const [receivedInquiries, sentInquiries, conversations] = await Promise.all([

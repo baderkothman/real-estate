@@ -7,8 +7,8 @@ import { getNewMatchingListings } from '@/services/listing.service.server'
 import { createNotification } from '@/services/notification.service.server'
 
 // Not wired into any scheduler by this change — deploying this requires
-// configuring a cron trigger (Vercel Cron, Supabase scheduled function, or
-// equivalent) to hit this route on the desired cadence, and setting
+// configuring a cron trigger (Vercel Cron or equivalent) to hit this route
+// on the desired cadence, and setting
 // CRON_SECRET so only that scheduler can invoke it. Dev-runnable manually:
 // `curl -X POST http://localhost:3000/api/cron/dispatch-search-alerts`
 // (with `Authorization: Bearer $CRON_SECRET` if that's set).

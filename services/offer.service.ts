@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 
 export type OfferStatus =
   | 'submitted'
@@ -110,8 +110,8 @@ function dbRowToOffer(row: OfferRow): Offer {
 }
 
 export async function getOfferById(id: string): Promise<Offer | null> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('offers')
     .select(OFFER_SELECT)
     .eq('id', id)
@@ -128,8 +128,8 @@ export async function submitOffer(input: {
   expiresAt?: string
   message?: string
 }): Promise<string> {
-  const supabase = await createClient()
-  const { data, error } = await supabase.rpc('submit_offer', {
+  const dbClient = await createClient()
+  const { data, error } = await dbClient.rpc('submit_offer', {
     p_listing_id: input.listingId,
     p_price: input.price,
     p_contingencies: input.contingencies ?? {},
@@ -150,8 +150,8 @@ export async function counterOffer(input: {
   expiresAt?: string
   message?: string
 }): Promise<string> {
-  const supabase = await createClient()
-  const { data, error } = await supabase.rpc('counter_offer', {
+  const dbClient = await createClient()
+  const { data, error } = await dbClient.rpc('counter_offer', {
     p_offer_id: input.offerId,
     p_price: input.price,
     p_contingencies: input.contingencies ?? {},
@@ -165,8 +165,8 @@ export async function counterOffer(input: {
 }
 
 export async function acceptOffer(offerId: string): Promise<string> {
-  const supabase = await createClient()
-  const { data, error } = await supabase.rpc('accept_offer', {
+  const dbClient = await createClient()
+  const { data, error } = await dbClient.rpc('accept_offer', {
     p_offer_id: offerId,
   })
   if (error || !data)
@@ -175,8 +175,8 @@ export async function acceptOffer(offerId: string): Promise<string> {
 }
 
 export async function rejectOffer(offerId: string): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase
+  const dbClient = await createClient()
+  const { error } = await dbClient
     .from('offers')
     .update({ status: 'rejected' })
     .eq('id', offerId)
@@ -184,8 +184,8 @@ export async function rejectOffer(offerId: string): Promise<void> {
 }
 
 export async function withdrawOffer(offerId: string): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase
+  const dbClient = await createClient()
+  const { error } = await dbClient
     .from('offers')
     .update({ status: 'withdrawn' })
     .eq('id', offerId)
@@ -195,8 +195,8 @@ export async function withdrawOffer(offerId: string): Promise<void> {
 export async function getRevisionsForOffer(
   offerId: string
 ): Promise<OfferRevision[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('offer_revisions')
     .select('*')
     .eq('offer_id', offerId)
@@ -218,8 +218,8 @@ export async function getRevisionsForOffer(
 
 /** Offers where the given profile holds the buyer party role — "Your Offers". */
 export async function getOffersMade(userId: string): Promise<Offer[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('offers')
     .select(
       `${OFFER_SELECT}, buyer:party_roles!buyer_party_id!inner(profile_id, profiles(name, profile_image))`
@@ -233,8 +233,8 @@ export async function getOffersMade(userId: string): Promise<Offer[]> {
 
 /** Offers where the given profile holds the seller party role — "Offers Received". */
 export async function getOffersReceived(userId: string): Promise<Offer[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('offers')
     .select(
       `${OFFER_SELECT}, seller:party_roles!seller_party_id!inner(profile_id, profiles(name, profile_image))`

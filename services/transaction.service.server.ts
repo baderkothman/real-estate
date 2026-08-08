@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 
 // Server-only data access: callers authenticate before these RLS-protected writes.
 
@@ -89,8 +89,8 @@ function dbRowToTransaction(row: TransactionRow): Transaction {
 export async function getTransactionById(
   id: string
 ): Promise<Transaction | null> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('transactions')
     .select(TRANSACTION_SELECT)
     .eq('id', id)
@@ -110,8 +110,8 @@ export async function getTransactionBySource(
   sourceType: 'offer' | 'rental_application',
   sourceId: string
 ): Promise<Transaction | null> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('transactions')
     .select(TRANSACTION_SELECT)
     .eq('source_type', sourceType)
@@ -134,8 +134,8 @@ export async function transitionTransactionStatus(
   id: string,
   status: TransactionStatus
 ): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase
+  const dbClient = await createClient()
+  const { error } = await dbClient
     .from('transactions')
     .update({ status })
     .eq('id', id)
@@ -162,10 +162,10 @@ interface PartyProfileJoin {
 export async function getTransactionParticipants(
   transaction: Transaction
 ): Promise<TransactionParticipant[]> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
   if (transaction.sourceType === 'offer') {
-    const { data } = await supabase
+    const { data } = await dbClient
       .from('offers')
       .select(
         'buyer:party_roles!buyer_party_id(profile_id, profiles(name, profile_image)), seller:party_roles!seller_party_id(profile_id, profiles(name, profile_image))'
@@ -198,7 +198,7 @@ export async function getTransactionParticipants(
     return participants
   }
 
-  const { data } = await supabase
+  const { data } = await dbClient
     .from('rental_applications')
     .select(
       'applicant:party_roles!applicant_party_id(profile_id, profiles(name, profile_image)), listings(listed_by, owner:profiles!listed_by(name, profile_image))'
@@ -276,8 +276,8 @@ function dbRowToTask(row: TaskRow): TransactionTask {
 export async function getTransactionTasks(
   transactionId: string
 ): Promise<TransactionTask[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('transaction_tasks')
     .select('*')
     .eq('transaction_id', transactionId)
@@ -292,13 +292,13 @@ export async function createTransactionTask(input: {
   title: string
   dueDate?: string
 }): Promise<void> {
-  const supabase = await createClient()
-  const { count } = await supabase
+  const dbClient = await createClient()
+  const { count } = await dbClient
     .from('transaction_tasks')
     .select('*', { count: 'exact', head: true })
     .eq('transaction_id', input.transactionId)
 
-  const { error } = await supabase.from('transaction_tasks').insert({
+  const { error } = await dbClient.from('transaction_tasks').insert({
     transaction_id: input.transactionId,
     title: input.title,
     due_date: input.dueDate ?? null,
@@ -311,8 +311,8 @@ export async function updateTaskStatus(
   taskId: string,
   status: TaskStatus
 ): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase
+  const dbClient = await createClient()
+  const { error } = await dbClient
     .from('transaction_tasks')
     .update({ status })
     .eq('id', taskId)

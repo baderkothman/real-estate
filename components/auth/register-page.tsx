@@ -14,7 +14,7 @@ import { signUpAction } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { getRegisterErrorMessage } from '@/lib/supabase/auth-errors'
+import { getRegisterErrorMessage } from '@/lib/auth/errors'
 
 const registerSchema = z
   .object({

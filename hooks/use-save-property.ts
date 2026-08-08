@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { toggleSavePropertyAction } from '@/app/actions/properties'
-import { useSupabase } from '@/components/providers/supabase-provider'
+import { useNeon } from '@/components/providers/neon-provider'
 
 interface UseSavePropertyReturn {
   isSaved: boolean
@@ -14,7 +14,7 @@ export function useSaveProperty(
   propertyId: string,
   initialSaved: boolean
 ): UseSavePropertyReturn {
-  const { user } = useSupabase()
+  const { user } = useNeon()
   const [isSaved, setIsSaved] = useState(initialSaved)
   const [isLoading, setIsLoading] = useState(false)
   const loginUrl = useMemo(() => {

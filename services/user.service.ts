@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient } from '@/lib/neon/admin'
 import type { CreateUserInput, PaginatedResult, Plan, User } from '@/types'
 
 // ─── DB row type ──────────────────────────────────────────────────────────────

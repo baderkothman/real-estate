@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { EmptyState } from '@/components/common/empty-state'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ViewingCard } from '@/components/viewings/viewing-card'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import {
   getViewingsForHost,
   getViewingsForRequester,
@@ -13,10 +13,10 @@ import {
 export const metadata: Metadata = { title: 'Viewings' }
 
 export default async function DashboardViewingsPage() {
-  const supabase = await createClient()
+  const dbClient = await createClient()
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   if (!user) redirect('/auth/login')
 
   const [asHost, asRequester] = await Promise.all([

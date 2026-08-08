@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 
 // Server-only data access: callers authenticate before these RLS-protected writes.
 
@@ -81,8 +81,8 @@ function dbRowToApplication(row: ApplicationRow): RentalApplication {
 export async function getApplicationById(
   id: string
 ): Promise<RentalApplication | null> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('rental_applications')
     .select(APPLICATION_SELECT)
     .eq('id', id)
@@ -101,8 +101,8 @@ export async function submitRentalApplication(input: {
   moveInDate?: string
   notes?: string
 }): Promise<string> {
-  const supabase = await createClient()
-  const { data, error } = await supabase.rpc('submit_rental_application', {
+  const dbClient = await createClient()
+  const { data, error } = await dbClient.rpc('submit_rental_application', {
     p_listing_id: input.listingId,
     p_monthly_income: input.monthlyIncome ?? null,
     p_employment_note: input.employmentNote ?? null,
@@ -117,8 +117,8 @@ export async function submitRentalApplication(input: {
 }
 
 export async function markApplicationUnderReview(id: string): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase
+  const dbClient = await createClient()
+  const { error } = await dbClient
     .from('rental_applications')
     .update({ status: 'under_review' })
     .eq('id', id)
@@ -126,8 +126,8 @@ export async function markApplicationUnderReview(id: string): Promise<void> {
 }
 
 export async function approveRentalApplication(id: string): Promise<string> {
-  const supabase = await createClient()
-  const { data, error } = await supabase.rpc('approve_rental_application', {
+  const dbClient = await createClient()
+  const { data, error } = await dbClient.rpc('approve_rental_application', {
     p_application_id: id,
   })
   if (error || !data)
@@ -138,8 +138,8 @@ export async function approveRentalApplication(id: string): Promise<string> {
 export async function conditionallyApproveApplication(
   id: string
 ): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase
+  const dbClient = await createClient()
+  const { error } = await dbClient
     .from('rental_applications')
     .update({ status: 'conditionally_approved' })
     .eq('id', id)
@@ -147,8 +147,8 @@ export async function conditionallyApproveApplication(
 }
 
 export async function rejectRentalApplication(id: string): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase
+  const dbClient = await createClient()
+  const { error } = await dbClient
     .from('rental_applications')
     .update({ status: 'rejected' })
     .eq('id', id)
@@ -156,8 +156,8 @@ export async function rejectRentalApplication(id: string): Promise<void> {
 }
 
 export async function withdrawRentalApplication(id: string): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase
+  const dbClient = await createClient()
+  const { error } = await dbClient
     .from('rental_applications')
     .update({ status: 'withdrawn' })
     .eq('id', id)
@@ -168,8 +168,8 @@ export async function withdrawRentalApplication(id: string): Promise<void> {
 export async function getApplicationsSubmitted(
   userId: string
 ): Promise<RentalApplication[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('rental_applications')
     .select(
       `${APPLICATION_SELECT.replace('applicant:party_roles!applicant_party_id', 'applicant:party_roles!applicant_party_id!inner')}`
@@ -185,8 +185,8 @@ export async function getApplicationsSubmitted(
 export async function getApplicationsForOwner(
   ownerId: string
 ): Promise<RentalApplication[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('rental_applications')
     .select(
       `${APPLICATION_SELECT}, listings!inner(title, listed_by, properties(city, cover_image))`

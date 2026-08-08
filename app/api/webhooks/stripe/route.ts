@@ -12,7 +12,7 @@ import {
 import type { Plan } from '@/types'
 
 // The one route handler this app genuinely needs: Stripe posts webhook
-// events directly, unauthenticated by any Supabase session, so this can't be
+// events directly, unauthenticated by any app session, so this can't be
 // a Server Action. This is what closes the previously-unclosed billing loop
 // — before this route existed, a successful checkout never updated
 // `profiles.plan`; only a manual admin override did.

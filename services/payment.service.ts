@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/neon/admin'
+import { createClient } from '@/lib/neon/server'
 import { applyCommissionToTransaction } from '@/services/commission.service'
 import { createNotification } from '@/services/notification.service.server'
 
@@ -71,8 +71,8 @@ function dbRowToPaymentIntent(row: PaymentIntentRow): PaymentIntentRecord {
 export async function getPaymentIntentsForTransaction(
   transactionId: string
 ): Promise<PaymentIntentRecord[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('payment_intents')
     .select('*, payments(id, amount, captured_at, held_by, released_at)')
     .eq('transaction_id', transactionId)

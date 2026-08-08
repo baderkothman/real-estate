@@ -27,8 +27,7 @@ export function NotificationBell() {
 
   useEffect(() => {
     load()
-    // Light polling rather than realtime — consistent with the rest of the
-    // app, which doesn't use Supabase Realtime anywhere.
+    // Light polling rather than realtime — consistent with the rest of the app.
     const interval = setInterval(load, 60_000)
     return () => clearInterval(interval)
   }, [load])

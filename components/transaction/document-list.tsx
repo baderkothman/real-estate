@@ -226,7 +226,6 @@ export function DocumentList({
       uploadBody.set('', file)
       const uploadResponse = await fetch(upload.signedUrl, {
         method: 'PUT',
-        headers: upload.headers,
         body: uploadBody,
       })
       if (!uploadResponse.ok) {

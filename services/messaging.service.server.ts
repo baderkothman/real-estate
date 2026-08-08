@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 
 // Server-only data access: callers authenticate before these RLS-protected writes.
 
@@ -82,8 +82,8 @@ export async function sendInquiry(input: {
   fromProfileId: string
   message: string
 }): Promise<Inquiry> {
-  const supabase = await createClient()
-  const { data: row, error } = await supabase
+  const dbClient = await createClient()
+  const { data: row, error } = await dbClient
     .from('inquiries')
     .insert({
       listing_id: input.listingId,
@@ -105,8 +105,8 @@ export async function sendInquiry(input: {
 export async function getInquiriesForOwner(
   ownerId: string
 ): Promise<Inquiry[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('inquiries')
     .select(`${INQUIRY_SELECT}, listings!inner(title, listed_by)`)
     .eq('listings.listed_by', ownerId)
@@ -119,8 +119,8 @@ export async function getInquiriesForOwner(
 export async function getInquiriesSentByUser(
   userId: string
 ): Promise<Inquiry[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('inquiries')
     .select(INQUIRY_SELECT)
     .eq('from_profile_id', userId)
@@ -135,15 +135,15 @@ export async function getInquiriesSentByUser(
  * adds both parties, carries the original question over as the thread's
  * first message, appends the reply as the second). See the
  * `reply_to_inquiry` SQL function in
- * supabase/migrations/012_conversations_messages_inquiries.sql for the
+ * dbClient/migrations/012_conversations_messages_inquiries.sql for the
  * authorization/atomicity details — this is a thin RPC wrapper.
  */
 export async function replyToInquiry(
   inquiryId: string,
   replyBody: string
 ): Promise<string> {
-  const supabase = await createClient()
-  const { data, error } = await supabase.rpc('reply_to_inquiry', {
+  const dbClient = await createClient()
+  const { data, error } = await dbClient.rpc('reply_to_inquiry', {
     p_inquiry_id: inquiryId,
     p_reply_body: replyBody,
   })
@@ -154,8 +154,8 @@ export async function replyToInquiry(
 }
 
 export async function closeInquiry(inquiryId: string): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase
+  const dbClient = await createClient()
+  const { error } = await dbClient
     .from('inquiries')
     .update({ status: 'closed' })
     .eq('id', inquiryId)
@@ -166,9 +166,9 @@ export async function closeInquiry(inquiryId: string): Promise<void> {
 export async function getConversationsForUser(
   userId: string
 ): Promise<ConversationSummary[]> {
-  const supabase = await createClient()
+  const dbClient = await createClient()
 
-  const { data: participantRows, error: participantError } = await supabase
+  const { data: participantRows, error: participantError } = await dbClient
     .from('conversation_participants')
     .select('conversation_id, last_read_at')
     .eq('profile_id', userId)
@@ -182,7 +182,7 @@ export async function getConversationsForUser(
     participantRows.map((r) => [r.conversation_id, r.last_read_at])
   )
 
-  const { data: conversations, error: conversationsError } = await supabase
+  const { data: conversations, error: conversationsError } = await dbClient
     .from('conversations')
     .select('id, listing_id, listings(title), created_at')
     .in('id', conversationIds)
@@ -190,11 +190,11 @@ export async function getConversationsForUser(
   if (conversationsError || !conversations) return []
 
   const [{ data: allParticipants }, { data: allMessages }] = await Promise.all([
-    supabase
+    dbClient
       .from('conversation_participants')
       .select('conversation_id, profile_id, profiles(name, profile_image)')
       .in('conversation_id', conversationIds),
-    supabase
+    dbClient
       .from('messages')
       .select('conversation_id, body, created_at')
       .in('conversation_id', conversationIds)
@@ -264,8 +264,8 @@ export async function getConversationsForUser(
 export async function getConversationById(
   id: string
 ): Promise<{ id: string; listingId: string; listingTitle?: string } | null> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('conversations')
     .select('id, listing_id, listings(title)')
     .eq('id', id)
@@ -287,8 +287,8 @@ export async function getConversationById(
 export async function getMessagesForConversation(
   conversationId: string
 ): Promise<ConversationMessage[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
+  const dbClient = await createClient()
+  const { data, error } = await dbClient
     .from('messages')
     .select('*, profiles!sender_id(name, profile_image)')
     .eq('conversation_id', conversationId)
@@ -323,8 +323,8 @@ export async function sendMessage(
   senderId: string,
   body: string
 ): Promise<void> {
-  const supabase = await createClient()
-  const { error } = await supabase.from('messages').insert({
+  const dbClient = await createClient()
+  const { error } = await dbClient.from('messages').insert({
     conversation_id: conversationId,
     sender_id: senderId,
     body,
@@ -336,8 +336,8 @@ export async function markConversationRead(
   conversationId: string,
   userId: string
 ): Promise<void> {
-  const supabase = await createClient()
-  await supabase
+  const dbClient = await createClient()
+  await dbClient
     .from('conversation_participants')
     .update({ last_read_at: new Date().toISOString() })
     .eq('conversation_id', conversationId)

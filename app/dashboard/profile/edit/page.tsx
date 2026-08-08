@@ -12,11 +12,11 @@ import { useEffect, useState } from 'react'
 import { changePasswordAction } from '@/app/actions/auth'
 import { updateUserProfileAction } from '@/app/actions/users'
 import { PlanBadge } from '@/components/common/plan-badge'
-import { useSupabase } from '@/components/providers/supabase-provider'
+import { useNeon } from '@/components/providers/neon-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { getPasswordPolicyErrorMessage } from '@/lib/supabase/auth-errors'
+import { getPasswordPolicyErrorMessage } from '@/lib/auth/errors'
 import { getInitials } from '@/lib/utils'
 
 interface ProfileData {
@@ -28,7 +28,7 @@ interface ProfileData {
 }
 
 export default function EditProfilePage() {
-  const { user, refreshUser } = useSupabase()
+  const { user, refreshUser } = useNeon()
 
   const [profile, setProfile] = useState<ProfileData>({
     name: '',

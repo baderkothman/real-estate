@@ -8,7 +8,7 @@ import { PaymentList } from '@/components/transaction/payment-list'
 import { TaskList } from '@/components/transaction/task-list'
 import { TransactionStatusActions } from '@/components/transaction/transaction-status-actions'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import { cn, formatDate, getInitials } from '@/lib/utils'
 import { getDocumentsForTransaction } from '@/services/document.service'
 import { getPaymentIntentsForTransaction } from '@/services/payment.service'
@@ -56,10 +56,10 @@ function nextActionFor(status: string, openTaskTitle?: string) {
 export default async function TransactionPage({
   params,
 }: TransactionPageProps) {
-  const [{ id }, supabase] = await Promise.all([params, createClient()])
+  const [{ id }, dbClient] = await Promise.all([params, createClient()])
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await dbClient.auth.getUser()
   if (!user) redirect('/auth/login')
 
   // RLS (is_transaction_party) scopes this to the listing owner and the

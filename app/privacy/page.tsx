@@ -26,8 +26,8 @@ export default function PrivacyPage() {
             </p>
             <p>
               We do not sell your personal data. We may share data with service
-              providers such as Supabase for authentication and Stripe for
-              payments when required to run the service.
+              providers such as Neon for authentication and Stripe for payments
+              when required to run the service.
             </p>
             <p>
               If you need your account data updated or removed, contact
